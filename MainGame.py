@@ -7,19 +7,29 @@ import random
 # pygame setup
 pygame.init()
 
+# debug option
+textDebug = True
+# when on, shows text on screen, and can type to write stuff
 
+# configure screen
 scale = 5
 pixels = (60, 70)
+# startup screen manager
 sm = ScreenManager(scale, pixels)
 
+# game loop
 running = True
 
-
+# sprite random movement
 imgVel = (0, 0)
 imgPos = (30, 30)
 hiddenPos = (30, 30)
 
+if (textDebug):
+    textDebugString = ""
+    shiftHeld = False
 
+# configure button actions
 sm.images["test"].setClick (print, "AA")
 
 while running:
@@ -28,19 +38,34 @@ while running:
         pos = pygame.mouse.get_pos()
         if (pos):
             pos = (int(pos[0]/scale), int(pos[1]/scale))
-        #print (pos)
         if event.type == pygame.QUIT:
             running = False
-        #elif event.type == pygame.MOUSEBUTTONDOWN:
-        #    if abs(pos[0] - imgPos[0]) < 5 and abs(pos[1] - imgPos[1]) < 5:
-        #        dragged = True
-        #elif event.type == pygame.MOUSEMOTION:
-        #    if dragged:
-        #        imgPos = (pos[0], pos[1])
         elif event.type == pygame.MOUSEBUTTONUP:
             sm.handleMouse(pos)
-            #if dragged:
-            #    dragged = False
+        elif event.type == pygame.KEYDOWN:
+            if textDebug:
+                asText = pygame.key.name(event.key)
+                print (asText)
+                if (asText.isalpha() and len(asText) == 1):
+                    if (shiftHeld):
+                        textDebugString += asText.capitalize()
+                    else:
+                        textDebugString += asText
+                elif shiftHeld and asText in ['/']:
+                    if asText == '/':
+                        textDebugString += '?'
+                elif asText in ['.']:
+                    textDebugString += asText
+                elif asText == 'space':
+                    textDebugString += ' '
+                elif asText == 'left shift' or asText == 'right shift':
+                    shiftHeld = True
+                elif asText == 'backspace':
+                    textDebugString = textDebugString[:-1] # https://stackoverflow.com/questions/15478127/remove-final-character-from-string
+        elif event.type == pygame.KEYUP:
+            if textDebug:
+                if (event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT):
+                    shiftHeld = False
 
     # keys = pygame.key.get_pressed()
     # if keys[pygame.K_w]:
@@ -63,9 +88,20 @@ while running:
 
     sm.images["bgwhite"].drawImage ()
     sm.images["room2"].drawImage ((30, 30))
-    sm.images["bgblack"].drawImage ()
+    sm.drawImage ("bgblack")
     #sm.images["test"].drawImage ((30, 30))
     sm.images["test"].drawImage (imgPos)
+
+
+    if (textDebug):
+        sm.drawImage ("bgwhite")
+        sm.drawText ("ABCDEFGHIJKL", (1, 10), "black", False)
+        sm.drawText ("MNOPQRSTUVW", (1, 20), "black", False)
+        sm.drawText ("XYZabcdefghi", (1, 30), "black", False)
+        sm.drawText ("jklmnopqrstu", (1, 40), "black", False)
+        sm.drawText ("vwxyz?. a a.a", (1, 50), "black", False)
+        sm.drawText (textDebugString, (1, 69), "red", False)
+
     
     #sm.drawImage ("room", (30, 30))
     #sm.drawImage ("kitchen", (30, 30))

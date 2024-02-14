@@ -1,10 +1,14 @@
 import pygame
 from os import listdir
 
-debug = True
+# debug option
+debug = False
+
+# select from choice of filter (1-3)
 filterSelection = 2
 
 
+# frame rate stuff
 clock = pygame.time.Clock()
 dt = 0
 
@@ -40,7 +44,10 @@ class ScreenManager:
         def __init__ (self, name, surface):
             self.name = name
             self.images = {}
-            self.origin = [0.5, 0.5] # default middle middle
+            if ("font" in name):
+                self.origin = [0, 1] # bottom left for text
+            else:
+                self.origin = [0.5, 0.5] # default middle middle
             self.framesEachImage = 30 # lower for faster, higher for slower - default 30 frames per image
             self.currentFrame = 0
             self.wasUsedThisFrame = False
@@ -79,6 +86,58 @@ class ScreenManager:
             right = self.pos[0] + (1 - self.origin[0]) * self[frame].get_width()
             bottom = self.pos[1] + (1 - self.origin[1]) * self[frame].get_height()
             return (pos[0] > left and pos[0] < right and pos[1] > top and pos[1] < bottom)
+
+
+    def drawImage (self, name, pos=(0, 0)):
+        self.images[name].drawImage (pos)
+
+    def getLengthOfText (self, string):
+        startX = -1 # account for space at the end of the text
+        for char in string:
+            if (char >= 'a' and char <= 'z'):
+                img = self.images ["font" + char + "2"]
+            elif (char >= 'A' and char <= 'Z'):
+                img = self.images["font" + char]
+            elif (char == "."):
+                img = self.images["fontdot"]
+            elif (char == "?"):
+                img = self.images["fontquestion"]
+            elif (("font" + char) in self.images):
+                img = self.images["font" + char]
+            else:
+                print ("Cannot find character: ", char)
+            startX += img[0].get_width() + 1 # 1 space in-between characters
+        return startX
+    
+    def drawText (self, string, pos, color=(0, 0, 0, 255), centered = True): # if not centered, then left-aligned
+        # calculate length
+        if (centered):
+            startX = -int(self.getLengthOfText(string) / 2) # round up or down? does it matter?
+        else:
+            startX = 0
+        for char in string:
+            if (char >= 'a' and char <= 'z'):
+                img = self.images ["font" + char + "2"]
+            elif (char >= 'A' and char <= 'Z'):
+                img = self.images["font" + char]
+            elif (char == "."):
+                img = self.images["fontdot"]
+            elif (char == "?"):
+                img = self.images["fontquestion"]
+            elif (("font" + char) in self.images):
+                img = self.images["font" + char]
+
+            if (color is not (0, 0, 0, 255)):
+                copy = img[0].copy() # required for custom colors....? would it be just faster to do <...>.. yeah, but eh
+                copy.fill(color, special_flags=pygame.BLEND_MAX)
+            
+            #img.drawImage ((pos[0] + startX, pos[1]))
+            self.drawingSurface.blit (copy, #blargh
+                                    (pos[0] + startX - img.origin[0] * img[0].get_width(), 
+                                    pos[1] - img.origin[1] * img[0].get_height())
+                                    )
+            
+            startX += img[0].get_width() + 1 # uh huh
 
 
     def __loadImages__(self):
@@ -165,21 +224,3 @@ class ScreenManager:
         # dt is delta time in seconds since last frame, used for framerate-
         # independent physics.
         dt = clock.tick(60) / 1000
-
-        
-        #for event in pygame.event.get():
-        #     pos = pygame.mouse.get_pos()
-        #     if (pos):
-        #         pos = (int(pos[0]/scale), int(pos[1]/scale))
-        #     #print (pos)
-            #if event.type == pygame.QUIT:
-             #   running = False
-        #     elif event.type == pygame.MOUSEBUTTONDOWN:
-        #         if abs(pos[0] - imgPos[0]) < 5 and abs(pos[1] - imgPos[1]) < 5:
-        #             dragged = True
-        #     elif event.type == pygame.MOUSEMOTION:
-        #         if dragged:
-        #             imgPos = (pos[0], pos[1])
-        #     elif event.type == pygame.MOUSEBUTTONUP:
-        #         if dragged:
-        #             dragged = False
