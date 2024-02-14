@@ -1,8 +1,12 @@
 import pygame
 from os import listdir
 
-debug = False
+debug = True
 filterSelection = 2
+
+
+clock = pygame.time.Clock()
+dt = 0
 
 class ScreenManager:
 
@@ -30,19 +34,52 @@ class ScreenManager:
                 for y in range(int(scale/2), screenPixels[1], scale):
                     pygame.draw.circle(self.gridfilter, (0, 0, 0, 0), (x, y), scale/2)
 
-        self.allImages = self.__loadImages__()
+        self.images = self.__loadImages__()
 
     class ImageSet:
-        def __init__ (self):
+        def __init__ (self, name, surface):
+            self.name = name
             self.images = {}
             self.origin = [0.5, 0.5] # default middle middle
             self.framesEachImage = 30 # lower for faster, higher for slower - default 30 frames per image
             self.currentFrame = 0
             self.wasUsedThisFrame = False
+            self.clickable = False # to prevent clicks not going through (user can only click on one object)
+            self.func = 0
+            self.args = 0
+            self.wargs = 0
+            self.surface = surface
+            self.pos = (0, 0)
         def __getitem__ (self, pos):
             return self.images[pos]
+        def drawImage (self, pos=(0, 0)):
+            self.pos = pos
+            self.currentFrame += 1
+            frame = int (self.currentFrame / self.framesEachImage) % len(self.images)
+            self.surface.blit (self[frame], 
+                                    (pos[0] - self.origin[0] * self[frame].get_width(), 
+                                    pos[1] - self.origin[1] * self[frame].get_height())
+                                    )
+            self.wasUsedThisFrame = True
+
         def willChangeFrame (self):
             return self.currentFrame % self.framesEachImage == self.framesEachImage - 1
+        def setClick (self, function, *args, **wargs):
+            self.clickable = True
+            self.func = function
+            self.args = args
+            self.wargs = wargs
+        def onClick (self):
+            self.func(*self.args, **self.wargs)
+        def contains (self, pos):
+            # calculate bounding box
+            frame = int (self.currentFrame / self.framesEachImage) % len(self.images)
+            left = self.pos[0] - self.origin[0] * self[frame].get_width() - 1 # hueh?
+            top = self.pos[1] - self.origin[1] * self[frame].get_height() - 1 
+            right = self.pos[0] + (1 - self.origin[0]) * self[frame].get_width()
+            bottom = self.pos[1] + (1 - self.origin[1]) * self[frame].get_height()
+            return (pos[0] > left and pos[0] < right and pos[1] > top and pos[1] < bottom)
+
 
     def __loadImages__(self):
         images = {}
@@ -63,7 +100,7 @@ class ScreenManager:
             if type == "png" or type == "jpg":
                 #print (name)
                 if name not in images:
-                    images[name] = self.ImageSet()
+                    images[name] = self.ImageSet(name, self.drawingSurface)
                 images[name].images [num] = pygame.image.load("images/" + filename).convert_alpha()
             elif type == "txt":
                 #image data
@@ -98,20 +135,20 @@ class ScreenManager:
             # ignore if not in images list
         return images
 
-    def drawImage (self, imageName, pos=(0, 0)): # frames? auto-detect duration on screen / number of draw calls?
+    #def drawImage (self, imageName, pos=(0, 0)): # frames? auto-detect duration on screen / number of draw calls?
         #drawSurface.blit (allImages[imageName][frame], pos)
-        imgSet = self.allImages[imageName]
-        imgSet.currentFrame += 1
-        frame = int (imgSet.currentFrame / imgSet.framesEachImage) % len(imgSet.images)
-        self.drawingSurface.blit (imgSet[frame], 
-                                  (pos[0] - imgSet.origin[0] * imgSet[frame].get_width(), 
-                                   pos[1] - imgSet.origin[1] * imgSet[frame].get_height())
-                                  )
-        imgSet.wasUsedThisFrame = True
+    #    self.allImages[imageName].drawImage (self.drawingSurface, pos)
         #drawingSurface.blit (img, (imgPos[0] - 15, imgPos[1] - 15))
 
+    def handleMouse (self, pos):
+        for imageSet in self.images.values():
+            if (imageSet.clickable and imageSet.contains (pos)):
+                if debug:
+                    print ("Clicked on ", imageSet.name)
+                imageSet.onClick()
+
     def endFrame(self):
-        for imgSet in self.allImages.values():
+        for imgSet in self.images.values():
             if not imgSet.wasUsedThisFrame: # reset animation if it wasn't on the screen last frame
                 imgSet.currentFrame = 0
             else:
@@ -122,3 +159,27 @@ class ScreenManager:
         self.screen.blit(self.gridfilter, (0, 0))
         # flip() the display to put your work on screen
         pygame.display.flip()
+
+        
+        # limits FPS to 60
+        # dt is delta time in seconds since last frame, used for framerate-
+        # independent physics.
+        dt = clock.tick(60) / 1000
+
+        
+        #for event in pygame.event.get():
+        #     pos = pygame.mouse.get_pos()
+        #     if (pos):
+        #         pos = (int(pos[0]/scale), int(pos[1]/scale))
+        #     #print (pos)
+            #if event.type == pygame.QUIT:
+             #   running = False
+        #     elif event.type == pygame.MOUSEBUTTONDOWN:
+        #         if abs(pos[0] - imgPos[0]) < 5 and abs(pos[1] - imgPos[1]) < 5:
+        #             dragged = True
+        #     elif event.type == pygame.MOUSEMOTION:
+        #         if dragged:
+        #             imgPos = (pos[0], pos[1])
+        #     elif event.type == pygame.MOUSEBUTTONUP:
+        #         if dragged:
+        #             dragged = False
