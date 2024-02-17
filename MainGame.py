@@ -1,36 +1,76 @@
-# Example file showing a circle moving on screen
+# do game object things instead?
+# - meshes (animated / center point, etc)
+# - audio sounds
+# - on click events, etc
+# and initialize the game things before the loop starts
+# that is, load images by name (manually) instead of automatically and having a horrible jumble in the loop
+
+# rigidbodies?
+# - collision events
+
+
 import pygame
 from os import listdir
-from screenmanager import ScreenManager
+from gamemanager import GameManager
+from gameobject import GameObject
 import random
+import imageset
 
 # pygame setup
 pygame.init()
 
 # debug option
-textDebug = True
+#textDebug = False
 # when on, shows text on screen, and can type to write stuff
 
 # configure screen
-scale = 5
+scale = 3
 pixels = (60, 70)
 # startup screen manager
-sm = ScreenManager(scale, pixels)
+gm = GameManager(scale, pixels)
+imageset.setSurface(gm.drawingSurface)
+imageset.loadImage("test", [0.5, 0.5], 45, 10)
+imageset.loadImage("bgwhite", [0, 0], 1, 0)
+imageset.loadImage("room2", [0, 0], 45, 1)
+imageset.loadImage("bgblack", [0, 0], 45, 2)
+
+def mainPetOnInit(self):
+    self.imgVel = (0, 0)
+    self.imgPos = (30, 30)
+    self.hiddenPos = (30, 30)
+
+    #self.pos = (30, 30)
+    print ("aaa")
+    return True
+def mainPetOnTick(self, prevPos):
+    self.accel = ((random.random() - 0.5)*(0.5 - abs(self.hiddenPos[0]/60 - 0.5)) - ((self.hiddenPos[0]/60 - 0.5)**3)*random.random() ,
+             (random.random() - 0.5)*(0.5 - abs(self.hiddenPos[1]/60 - 0.5)) - ((self.hiddenPos[1]/60 - 0.5)**3)*random.random() )
+    self.imgVel = (self.imgVel[0]*0.9 + self.accel[0], self.imgVel[1]*0.9 + self.accel[1])
+    self.hiddenPos = (self.hiddenPos[0] + self.imgVel[0], self.hiddenPos[1] + self.imgVel[1])
+    #uhhh
+    if (self.willChangeFrame()):
+        return self.hiddenPos
+    return prevPos
+
+    
+
+gm.addGameObject(GameObject(imageset.imageSets["test"], onInit = mainPetOnInit, onTick = mainPetOnTick, onReleased = lambda pos: print("AA")))
+gm.addGameObject(GameObject(imageset.imageSets["bgwhite"], onInit = lambda self:True, onTick=lambda self, pos:(0, 0)))
+gm.addGameObject(GameObject(imageset.imageSets["room2"], onInit = lambda self:True, onTick=lambda self, pos:(0, 0)))
+gm.addGameObject(GameObject(imageset.imageSets["bgblack"], onInit = lambda self:True, onTick=lambda self, pos:(0, 0)))
 
 # game loop
 running = True
 
 # sprite random movement
-imgVel = (0, 0)
-imgPos = (30, 30)
-hiddenPos = (30, 30)
 
-if (textDebug):
-    textDebugString = ""
-    shiftHeld = False
+
+# if (textDebug):
+#     textDebugString = ""
+#     shiftHeld = False
 
 # configure button actions
-sm.images["test"].setClick (print, "AA")
+#gm.images["test"].setClick (print, "AA")
 
 while running:
     # poll for events
@@ -41,7 +81,10 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.MOUSEBUTTONUP:
-            sm.handleMouse(pos)
+            #gm.handleMouse(pos)
+            for go in gm.gameObjects:
+                if (go.isActive() and go.imageset.contains(go.getCurrentFrame(), pos)):
+                    go.released (pos)
         elif event.type == pygame.KEYDOWN:
             if textDebug:
                 asText = pygame.key.name(event.key)
@@ -67,40 +110,31 @@ while running:
                 if (event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT):
                     shiftHeld = False
 
-    # keys = pygame.key.get_pressed()
-    # if keys[pygame.K_w]:
-    #     player_pos.y -= 300 * dt
-    # if keys[pygame.K_s]:
-    #     player_pos.y += 300 * dt
-    # if keys[pygame.K_a]:
-    #     player_pos.x -= 300 * dt
-    # if keys[pygame.K_d]:
-    #     player_pos.x += 300 * dt
+    for go in gm.gameObjects:
+        if (go.isActive()):
+            go.tick()
 
-    accel = ((random.random() - 0.5)*(0.5 - abs(hiddenPos[0]/60 - 0.5)) - ((hiddenPos[0]/60 - 0.5)**3)*random.random() ,
-             (random.random() - 0.5)*(0.5 - abs(hiddenPos[1]/60 - 0.5)) - ((hiddenPos[1]/60 - 0.5)**3)*random.random() )
-    imgVel = (imgVel[0]*0.9 + accel[0], imgVel[1]*0.9 + accel[1])
-    hiddenPos = (hiddenPos[0] + imgVel[0], hiddenPos[1] + imgVel[1])
-    #uhhh
-    if (sm.images["test"].willChangeFrame()):
-        imgPos = hiddenPos
+    gm.gameObjects.sort(key=lambda ele:ele.imageset.layer) # so it sorts everything every iteration? maybe. 
+    for go in gm.gameObjects:
+        if (go.isActive()):
+            go.draw()
 
 
-    sm.images["bgwhite"].drawImage ()
-    sm.images["room2"].drawImage ((30, 30))
-    sm.drawImage ("bgblack")
-    #sm.images["test"].drawImage ((30, 30))
-    sm.images["test"].drawImage (imgPos)
+    #gm.images["bgwhite"].drawImage ()
+    #gm.images["room2"].drawImage ((30, 30))
+    #gm.drawImage ("bgblack")
+    ##sm.images["test"].drawImage ((30, 30))
+    #gm.images["test"].drawImage (imgPos)
 
 
-    if (textDebug):
-        sm.drawImage ("bgwhite")
-        sm.drawText ("ABCDEFGHIJKL", (1, 10), "black", False)
-        sm.drawText ("MNOPQRSTUVW", (1, 20), "black", False)
-        sm.drawText ("XYZabcdefghi", (1, 30), "black", False)
-        sm.drawText ("jklmnopqrstu", (1, 40), "black", False)
-        sm.drawText ("vwxyz?. a a.a", (1, 50), "black", False)
-        sm.drawText (textDebugString, (1, 69), "red", False)
+    # if (textDebug):
+    #     gm.drawImage ("bgwhite")
+    #     gm.drawText ("ABCDEFGHIJKL", (1, 10), "black", False)
+    #     gm.drawText ("MNOPQRSTUVW", (1, 20), "black", False)
+    #     gm.drawText ("XYZabcdefghi", (1, 30), "black", False)
+    #     gm.drawText ("jklmnopqrstu", (1, 40), "black", False)
+    #     gm.drawText ("vwxyz?. a a.a", (1, 50), "black", False)
+    #     gm.drawText (textDebugString, (1, 69), "red", False)
 
     
     #sm.drawImage ("room", (30, 30))
@@ -113,5 +147,5 @@ while running:
 
 
 
-    sm.endFrame()
+    gm.endFrame()
 pygame.quit()
