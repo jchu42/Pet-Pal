@@ -14,7 +14,13 @@ dt = 0
 class GameManager:
 
     def __init__(self, scale, pixels):
-        gridColor = (50, 50, 50, 100)
+        # scale color   alpha
+        # 1     255     0
+        # 6     50     122
+        # 8    0       255
+        color = max(255 - (scale - 1) * 50, 0)
+        alpha = min((scale - 1) * 20, 255)
+        gridColor = (color, color, color, alpha)
 
         self.scale = scale
         self.pixels = pixels
@@ -54,7 +60,7 @@ class GameManager:
         def __init__(self, iObjsSorted):
             self.iObjsSorted = iObjsSorted
         def __iter__(self):
-            self.x = 0
+            self.x = -1 # -1, so that first iteration returns 0
             self.y = 0
             return self
         def __next__(self):

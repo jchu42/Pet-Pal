@@ -5,7 +5,7 @@ class GameObject:
                  onInit = lambda:False,
                  onActivate = lambda *args, **kwargs:None,
                  onDeactivate = lambda *args, **kwargs:None,
-                 onTick = lambda prevPos:prevPos,
+                 onTick = lambda prevPos:None,
                  onHover = lambda pos:None,
                  onPressed = lambda pos:None,
                  onHeld = lambda pos:None,
@@ -46,10 +46,12 @@ class GameObject:
         right = self.pos[0] + (1 - self.imageset.origin[0]) * self.imageset[frame].get_width()
         bottom = self.pos[1] + (1 - self.imageset.origin[1]) * self.imageset[frame].get_height()
         return (pos[0] > left and pos[0] < right and pos[1] > top and pos[1] < bottom)
+    def setPos (self, pos):
+        self.nextPos = pos
     
     def tick(self):
         #self.nextPos = self.tickFunction(self.pos)
-        self.nextPos = self.tickFunction(self, self.pos)
+        self.tickFunction(self, self.pos)
     def draw(self):
         self.pos = self.nextPos
         self.imageset.drawImage (self.pos, self.getCurrentFrame())
