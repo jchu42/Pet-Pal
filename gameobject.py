@@ -37,6 +37,15 @@ class GameObject:
         return int (self.currentFrame / self.imageset.framesEachImage) % len(self.imageset.images)
     def isActive(self):
         return self.active
+    def contains (self, pos):
+        frame = self.getCurrentFrame()
+        # calculate bounding box
+        #frame = int (self.currentFrame / self.framesEachImage) % len(self.images)
+        left = self.pos[0] - self.imageset.origin[0] * self.imageset[frame].get_width() - 1 # hueh?
+        top = self.pos[1] - self.imageset.origin[1] * self.imageset[frame].get_height() - 1 
+        right = self.pos[0] + (1 - self.imageset.origin[0]) * self.imageset[frame].get_width()
+        bottom = self.pos[1] + (1 - self.imageset.origin[1]) * self.imageset[frame].get_height()
+        return (pos[0] > left and pos[0] < right and pos[1] > top and pos[1] < bottom)
     
     def tick(self):
         #self.nextPos = self.tickFunction(self.pos)

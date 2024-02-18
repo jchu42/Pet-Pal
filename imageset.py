@@ -13,7 +13,7 @@ class ImageSet:
         else:
             self.origin = [0.5, 0.5] # default middle middle
         self.framesEachImage = 30 # lower for faster, higher for slower - default 30 frames per image
-        self.layer = 5
+        #self.layer = 5
         # self.currentFrame = 0
         # self.wasUsedThisFrame = False
         #self.clickable = False # to prevent clicks not going through (user can only click on one object)
@@ -32,6 +32,24 @@ class ImageSet:
                                 )
         self.wasUsedThisFrame = True
 
+    def setImageVariables (self, origin=[0,0], framesEachImage=30):
+        if ("middle" in origin):
+            o = [0.5,0.5]
+        else:
+            o = [-1, -1]
+        if ("left" in origin):
+            o = [0, o[1]]
+        elif ("right" in origin):
+            o = [1, o[1]]
+        if ("top" in origin):
+            o = [o[0], 0]
+        elif ("bottom" in origin):
+            o = [o[0], 1]
+        if (o == [-1, -1]):
+            self.origin = origin # uwu
+        else:
+            self.origin = o
+        self.framesEachImage = framesEachImage
     #def willChangeFrame (self):
     #    return self.currentFrame % self.framesEachImage == self.framesEachImage - 1
         
@@ -42,19 +60,9 @@ class ImageSet:
     #    self.wargs = wargs
     #def onClick (self):
     #    self.func(*self.args, **self.wargs)
-    def contains (self, frame, pos):
-        # calculate bounding box
-        #frame = int (self.currentFrame / self.framesEachImage) % len(self.images)
-        left = self.pos[0] - self.origin[0] * self[frame].get_width() - 1 # hueh?
-        top = self.pos[1] - self.origin[1] * self[frame].get_height() - 1 
-        right = self.pos[0] + (1 - self.origin[0]) * self[frame].get_width()
-        bottom = self.pos[1] + (1 - self.origin[1]) * self[frame].get_height()
-        return (pos[0] > left and pos[0] < right and pos[1] > top and pos[1] < bottom)
-
-
 
 imageSets = {}
-def setSurface(surface): # a lie
+def load(surface):
     files = listdir("images/") # assuming all are files
     #imageDataFile = ""
     for filename in files:
@@ -74,26 +82,5 @@ def setSurface(surface): # a lie
             if name not in imageSets:
                 imageSets[name] = ImageSet(name, surface)
             imageSets[name].images [num] = pygame.image.load("images/" + filename).convert_alpha()
-
-
-def loadImage (imageset, origin=[0,0], framesEachImage=30, layer=5):
-    imageset = imageSets[imageset] # if is string rather than object (which is likely)
-    if ("middle" in origin):
-        o = [0.5,0.5]
-    else:
-        o = [-1, -1]
-    if ("left" in origin):
-        o = [0, o[1]]
-    elif ("right" in origin):
-        o = [1, o[1]]
-    if ("top" in origin):
-        o = [o[0], 0]
-    elif ("bottom" in origin):
-        o = [o[0], 1]
-    if (o == [-1, -1]):
-        imageset.origin = origin # uwu
-    else:
-        imageset.origin = o
-    imageset.framesEachImage = framesEachImage
-    imageset.layer = layer
+            
 

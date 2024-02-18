@@ -1,4 +1,6 @@
 import pygame
+import imageset
+from gameobject import GameObject
 #from imageset import loadImages
 
 # select from choice of filter (1-3)
@@ -36,11 +38,47 @@ class GameManager:
                     pygame.draw.circle(self.gridfilter, (0, 0, 0, 0), (x, y), scale/2)
 
         #self.images = loadImages()
-        self.gameObjects = []
+        #self.gameObjects = []
+        imageset.load(self.drawingSurface)
+        self.iObjsDict = {}
+        self.iObjsSorted = []
+        self.gameObjects = GameManager.GameObjsIterator(self.iObjsSorted)
 
-    def addGameObject (self, gameObject):
-        #gameObject.active = gameObject.init()
-        self.gameObjects.append(gameObject)
+    class ImageObjects:
+        def __init__(self, imageset):
+            self.imageset = imageset
+            self.gameObjects = []
+        def addGameObject (self, obj):
+            self.gameObjects.append(obj)
+    class GameObjsIterator:
+        def __init__(self, iObjsSorted):
+            self.iObjsSorted = iObjsSorted
+        def __iter__(self):
+            self.x = 0
+            self.y = 0
+            return self
+        def __next__(self):
+            if (len(self.iObjsSorted) == 0):
+                raise StopIteration
+            self.x += 1
+            if (self.x >= len(self.iObjsSorted[self.y].gameObjects)):
+                self.x = 0
+                self.y += 1
+                if (self.y >= len(self.iObjsSorted)):
+                    raise StopIteration
+            return self.iObjsSorted[self.y].gameObjects[self.x]
+
+    def addImage (self, name, origin=[0,0], framesEachImage=30):
+        imageset.imageSets[name].setImageVariables (origin, framesEachImage)
+        iObj = GameManager.ImageObjects(imageset.imageSets[name])
+
+        self.iObjsSorted.append(iObj)
+        self.iObjsDict[name] = iObj
+        
+        
+    def addGameObject (self, name, *args, **kwargs):
+        go = GameObject(self.iObjsDict[name].imageset, *args, **kwargs)
+        self.iObjsDict[name].gameObjects.append(go)
 
 
     #def drawImage (self, name, pos=(0, 0)):

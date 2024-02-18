@@ -12,9 +12,7 @@
 import pygame
 from os import listdir
 from gamemanager import GameManager
-from gameobject import GameObject
 import random
-import imageset
 
 # pygame setup
 pygame.init()
@@ -28,11 +26,10 @@ scale = 3
 pixels = (60, 70)
 # startup screen manager
 gm = GameManager(scale, pixels)
-imageset.setSurface(gm.drawingSurface)
-imageset.loadImage("test", [0.5, 0.5], 45, 10)
-imageset.loadImage("bgwhite", [0, 0], 1, 0)
-imageset.loadImage("room2", [0, 0], 45, 1)
-imageset.loadImage("bgblack", [0, 0], 45, 2)
+gm.addImage("bgwhite", [0, 0], 1) # order matters - later images are drawn on top
+gm.addImage("room2", [0, 0], 45)
+gm.addImage("bgblack", [0, 0], 45)
+gm.addImage("test", [0.5, 0.5], 45)
 
 def mainPetOnInit(self):
     self.imgVel = (0, 0)
@@ -53,11 +50,10 @@ def mainPetOnTick(self, prevPos):
     return prevPos
 
     
-
-gm.addGameObject(GameObject(imageset.imageSets["test"], onInit = mainPetOnInit, onTick = mainPetOnTick, onReleased = lambda pos: print("AA")))
-gm.addGameObject(GameObject(imageset.imageSets["bgwhite"], onInit = lambda self:True, onTick=lambda self, pos:(0, 0)))
-gm.addGameObject(GameObject(imageset.imageSets["room2"], onInit = lambda self:True, onTick=lambda self, pos:(0, 0)))
-gm.addGameObject(GameObject(imageset.imageSets["bgblack"], onInit = lambda self:True, onTick=lambda self, pos:(0, 0)))
+gm.addGameObject("bgwhite", onInit = lambda self:True, onTick=lambda self, pos:(0, 0))
+gm.addGameObject("room2", onInit = lambda self:True, onTick=lambda self, pos:(0, 0))
+gm.addGameObject("bgblack", onInit = lambda self:True, onTick=lambda self, pos:(0, 0))
+gm.addGameObject("test", onInit = mainPetOnInit, onTick = mainPetOnTick, onReleased = lambda pos: print("AA"))
 
 # game loop
 running = True
@@ -83,7 +79,7 @@ while running:
         elif event.type == pygame.MOUSEBUTTONUP:
             #gm.handleMouse(pos)
             for go in gm.gameObjects:
-                if (go.isActive() and go.imageset.contains(go.getCurrentFrame(), pos)):
+                if (go.isActive() and go.contains(pos)):
                     go.released (pos)
         elif event.type == pygame.KEYDOWN:
             if textDebug:
@@ -110,13 +106,15 @@ while running:
                 if (event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT):
                     shiftHeld = False
 
+
     for go in gm.gameObjects:
         if (go.isActive()):
             go.tick()
 
-    gm.gameObjects.sort(key=lambda ele:ele.imageset.layer) # so it sorts everything every iteration? maybe. 
+    #gm.gameObjects.sort(key=lambda ele:ele.imageset.layer) # so it sorts everything every iteration? maybe. 
     for go in gm.gameObjects:
         if (go.isActive()):
+            #print (go.imageset.name)
             go.draw()
 
 
