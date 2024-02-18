@@ -1,3 +1,0 @@
-test middle middle 45
-bgblack top left 1
-bgwhite top left 1
