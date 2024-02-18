@@ -77,6 +77,10 @@ def handleStateChange (self, state, *args, **kwargs): # arbitrary argument input
         gm.assignMouseUp(textTest, lambda a, pos: self.setState(1))
     if (state == 1):
         mainUI ("kitchen")
+        textTest = GameObject ()
+        gm.assignText (textTest, "go back", (255, 0, 0, 255), True)
+        gm.assignInit (textTest, lambda self: self.setPos((30, 70)))
+        gm.assignMouseUp(textTest, lambda a, pos: self.setState(0))
 
 gm.onStateChange = handleStateChange
 
