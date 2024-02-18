@@ -33,11 +33,20 @@ pixels = (60, 70)
 gm = GameManager(scale, pixels)
 gm.createMesh("bgwhite", [0, 0], 1) # order matters - later images are drawn on top
 gm.createMesh("room2", [0, 0], 1)
+gm.createMesh("kitchen", [0, 0], 1)
 gm.createMesh("bgblack", [0, 0], 1)
 gm.createMesh("test", [0.5, 0.5], 45)
 
 
-def handleStateChange (state, *args, **kwargs): # arbitrary argument input for game state customization
+def mainUI(room):
+    bgwhite = GameObject()
+    gm.assignMesh(bgwhite, "bgwhite")
+    room2 = GameObject()
+    gm.assignMesh(room2, room)
+    bgblack = GameObject()
+    gm.assignMesh(bgblack, "bgblack")
+
+def handleStateChange (self, state, *args, **kwargs): # arbitrary argument input for game state customization
     if (state == 0):
         # define game object behaviors
         def mainPetOnInit(self):
@@ -60,19 +69,15 @@ def handleStateChange (state, *args, **kwargs): # arbitrary argument input for g
         gm.assignTick(mainPet, mainPetOnTick)
         gm.assignMouseUp(mainPet, mainPetOnClick)
 
-        def mainUI():
-            bgwhite = GameObject()
-            gm.assignMesh(bgwhite, "bgwhite")
-            room2 = GameObject()
-            gm.assignMesh(room2, "room2")
-            bgblack = GameObject()
-            gm.assignMesh(bgblack, "bgblack")
-        mainUI()
-        # define game objects
-        #gm.addGameObject("bgwhite", onInit = lambda self:True, onTick=lambda self, pos:(0, 0))
-        #gm.addGameObject("room2", onInit = lambda self:True, onTick=lambda self, pos:(0, 0))
-        #gm.addGameObject("bgblack", onInit = lambda self:True, onTick=lambda self, pos:(0, 0))
-        #gm.addGameObject("test", onInit = mainPetOnInit, onTick = mainPetOnTick, onReleased = lambda pos: print("AA"))
+        mainUI("room2")
+        
+        textTest = GameObject ()
+        gm.assignText (textTest, "agfdgdfsfds", (255, 0, 0, 255), True)
+        gm.assignInit (textTest, lambda self: self.setPos((30, 70)))
+        gm.assignMouseUp(textTest, lambda a, pos: self.setState(1))
+    if (state == 1):
+        mainUI ("kitchen")
+
 gm.onStateChange = handleStateChange
 
 # game loop
@@ -84,14 +89,15 @@ while running:
         pos = pygame.mouse.get_pos()
         if (pos):
             pos = (int(pos[0]/scale), int(pos[1]/scale))
+            gm.handleMouseHover(pos)
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.MOUSEBUTTONUP:
-            #gm.handleMouse(pos)
-            #for go in gm.gameObjects:
-            #    if (go.isActive() and go.contains(pos)):
-            #        go.released (pos)
             gm.handleMouseUp(pos)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            gm.handleMouseDown(pos)
+        elif event.type == pygame.MOUSEMOTION:
+            gm.handleMouseHover(pos)
         elif event.type == pygame.KEYDOWN:
             if textDebug:
                 asText = pygame.key.name(event.key)

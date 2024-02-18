@@ -49,6 +49,7 @@ class GameManager:
         imageset.load(self.drawingSurface)
 
 
+        self.newState = 0
         self.onStateChange = None # define in MainGame
         self.state = 0
         self.stateChanged = True
@@ -57,7 +58,7 @@ class GameManager:
         self.goMeshesDict = {}
         self.goMeshes = []
         self.goTick = []
-        self.goHover = [] # separate array for each object allows us to have a tonne of objects with less overhead?
+        self.goMouseHover = [] # separate array for each object allows us to have a tonne of objects with less overhead?
         self.goMouseDown = []
         self.goMouseDrag = []
         self.goMouseUp = []
@@ -73,7 +74,7 @@ class GameManager:
         for gomesh in self.goMeshes:
             gomesh.gameObjects = []
         self.goTick = []
-        self.goHover = []
+        self.goMouseHover = []
         self.goMouseDown = []
         self.goMouseDrag = []
         self.goMouseUp = []
@@ -85,6 +86,8 @@ class GameManager:
         def addGameObject (self, obj):
             self.gameObjects.append(obj)
     def assignMesh (self, go, name):
+        if (name not in self.goMeshesDict):
+            print ("Image", name, "not found. Did you forget to createMesh (" + name + ") it?")
         self.goMeshesDict[name].gameObjects.append(go)
         go.name = name
         go.framesEachImage = self.goMeshesDict[name].imageset.framesEachImage
@@ -98,8 +101,7 @@ class GameManager:
                     go.currentFrame += 1
 
     def assignInit (self, go, function):
-        go.active = function(go) # lmao
-
+        function(go) # lmao
 
     def assignTick (self, go, function):
         self.goTick.append  ((go, function))
@@ -108,11 +110,11 @@ class GameManager:
             if (go.active):
                 function(go, go.pos)
 
-    def assignHover (self, go, function):
-        self.goHover.append((go, function))
-    def handleHover (self, pos):
+    def assignMouseHover (self, go, function):
+        self.goMouseHover.append((go, function))
+    def handleMouseHover (self, pos):
         # object must have a mesh
-        for go, function in self.goHover:
+        for go, function in self.goMouseHover:
             if (go.active and go.name in self.goMeshesDict):
                 # use mesh's dimensions to detect if it's inside
                 if (self.goMeshesDict[go.name].imageset.contains (go.getCurrentFrame(), (pos[0] - go.pos[0], pos[1] - go.pos[1]))):
@@ -148,93 +150,74 @@ class GameManager:
                 if (self.goMeshesDict[go.name].imageset.contains (go.getCurrentFrame(), (pos[0] - go.pos[0], pos[1] - go.pos[1]))):
                     function(go, pos)
 
-        
-        
-    #def addGameObject (self, name, *args, **kwargs):
-    #    go = GameObject(self.iObjsDict[name].imageset, *args, **kwargs)
-    #    self.iObjsDict[name].gameObjects.append(go)
-
-
-    #def drawImage (self, name, pos=(0, 0)):
-    #    self.images[name].drawImage (pos)
-
-    def getLengthOfText (self, string):
+    def __getLengthOfText (self, string):
         startX = -1 # account for space at the end of the text
         for char in string:
             if (char >= 'a' and char <= 'z'):
-                img = self.images ["font" + char + "2"]
+                img = imageset.imageSets["font" + char + "2"]
             elif (char >= 'A' and char <= 'Z'):
-                img = self.images["font" + char]
+                img = imageset.imageSets["font" + char]
             elif (char == "."):
-                img = self.images["fontdot"]
+                img = imageset.imageSets["fontdot"]
             elif (char == "?"):
-                img = self.images["fontquestion"]
-            elif (("font" + char) in self.images):
-                img = self.images["font" + char]
+                img = imageset.imageSets["fontquestion"]
+            elif (("font" + char) in imageset.imageSets):
+                img = imageset.imageSets["font" + char]
             else:
                 print ("Cannot find character: ", char)
             startX += img[0].get_width() + 1 # 1 space in-between characters
         return startX
     
-    def drawText (self, string, pos, color=(0, 0, 0, 255), centered = True): # if not centered, then left-aligned
-        # calculate length
-        if (centered):
-            startX = -int(self.getLengthOfText(string) / 2) # round up or down? does it matter?
-        else:
-            startX = 0
-        for char in string:
-            if (char >= 'a' and char <= 'z'):
-                img = self.images ["font" + char + "2"]
-            elif (char >= 'A' and char <= 'Z'):
-                img = self.images["font" + char]
-            elif (char == "."):
-                img = self.images["fontdot"]
-            elif (char == "?"):
-                img = self.images["fontquestion"]
-            elif (("font" + char) in self.images):
-                img = self.images["font" + char]
-
-            if (color is not (0, 0, 0, 255)):
-                copy = img[0].copy() # required for custom colors....? would it be just faster to do <...>.. yeah, but eh
-                copy.fill(color, special_flags=pygame.BLEND_MAX)
+    def assignText (self, go, string, color=(0, 0, 0, 255), centered = True): # if not centered, then left-aligned
+        name = "TEXT" + ' '.join(map(str, color)) + string + str(centered) # save all copies of colors of strings of text
+        if (name) not in imageset.imageSets:
+            textSurface = pygame.Surface((self.__getLengthOfText (string), 8), pygame.SRCALPHA) # how tall is the text anyway?
             
-            #img.drawImage ((pos[0] + startX, pos[1]))
-            self.drawingSurface.blit (copy, #blargh
-                                    (pos[0] + startX - img.origin[0] * img[0].get_width(), 
-                                    pos[1] - img.origin[1] * img[0].get_height())
-                                    )
+            startX = 0 # round up or down? does it matter?
+
+            for char in string:
+                if (char >= 'a' and char <= 'z'):
+                    img = imageset.imageSets ["font" + char + "2"]
+                elif (char >= 'A' and char <= 'Z'):
+                    img = imageset.imageSets["font" + char]
+                elif (char == "."):
+                    img = imageset.imageSets["fontdot"]
+                elif (char == "?"):
+                    img = imageset.imageSets["fontquestion"]
+                elif (("font" + char) in imageset.imageSets):
+                    img = imageset.imageSets["font" + char]
+                else:
+                    print ("char", char, "not found")
+
+                if (color is not (0, 0, 0, 255)):
+                    copy = img[0].copy() # required for custom colors....? would it be just faster to do <...>.. yeah, but eh
+                    copy.fill(color, special_flags=pygame.BLEND_MAX)
+                else:
+                    copy = img[0]
+
+                textSurface.blit (copy, (startX - img.origin[0] * img[0].get_width(), 0))
+
+                startX += img[0].get_width() + 1 # uh huh
             
-            startX += img[0].get_width() + 1 # uh huh
+            imageset.imageSets [name] = imageset.ImageSet(name, self.drawingSurface)
+            imageset.imageSets [name].images[0] = textSurface
+            if (centered):
+                self.createMesh (name, origin=[0.5,1], framesEachImage = 1)
+            else:
+                self.createMesh (name, origin=[0,1], framesEachImage = 1)
 
-
-
-    #def drawImage (self, imageName, pos=(0, 0)): # frames? auto-detect duration on screen / number of draw calls?
-        #drawSurface.blit (allImages[imageName][frame], pos)
-    #    self.allImages[imageName].drawImage (self.drawingSurface, pos)
-        #drawingSurface.blit (img, (imgPos[0] - 15, imgPos[1] - 15))
-
-    #def handleMouse (self, pos):
-    #    for imageSet in self.images.values():
-    #        if (imageSet.clickable and imageSet.contains (pos)):
-    #            if debug:
-    #                print ("Clicked on ", imageSet.name)
-    #            imageSet.onClick()
+            print ("bleh")
+        self.assignMesh (go, name)
 
 
     def setState (self, newState, *args, **kwargs):
-        self.state = newState
+        self.newState = newState
         self.stateChanged = True
         self.args = args
         self.kwargs = kwargs
 
     def endFrame(self):
-        # for imgSet in self.images.values():
-        #     if not imgSet.wasUsedThisFrame: # reset animation if it wasn't on the screen last frame
-        #         imgSet.currentFrame = 0
-        #     else:
-        #         imgSet.wasUsedThisFrame = False # reset frame tracker
-        # draw drawingSurface (small pixel screen) onto main screen after multiplying its scale
-        self.screen.blit (pygame.transform.scale_by(self.drawingSurface, self.scale), (0, 0)) #
+        self.screen.blit (pygame.transform.scale_by(self.drawingSurface, self.scale), (0, 0)) # draw scaled drawing surface to screen buffer
         #filter
         self.screen.blit(self.gridfilter, (0, 0))
         # flip() the display to put your work on screen
@@ -248,7 +231,8 @@ class GameManager:
         clock.tick(60) / 1000
 
         if (self.stateChanged):
+            self.state = self.newState
             self.stateChanged = False
             # reset manager
             self.resetHandlers()
-            self.onStateChange(self.state, self.args, self.kwargs)
+            self.onStateChange(self, self.state, self.args, self.kwargs)
