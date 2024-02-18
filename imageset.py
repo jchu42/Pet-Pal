@@ -25,7 +25,7 @@ class ImageSet:
     def __getitem__ (self, pos):
         return self.images[pos]
     def drawImage (self, pos=(0, 0), frame=0):
-        self.pos = pos
+        #self.pos = pos
         self.surface.blit (self[frame], 
                                 (pos[0] - self.origin[0] * self[frame].get_width(), 
                                 pos[1] - self.origin[1] * self[frame].get_height())
@@ -50,6 +50,15 @@ class ImageSet:
         else:
             self.origin = o
         self.framesEachImage = framesEachImage
+
+    def contains (self, frame, pos):
+        # calculate bounding box
+        #frame = int (self.currentFrame / self.framesEachImage) % len(self.images)
+        left = - self.origin[0] * self[frame].get_width() - 1 # hueh?
+        top = - self.origin[1] * self[frame].get_height() - 1 
+        right = (1 - self.origin[0]) * self[frame].get_width()
+        bottom = (1 - self.origin[1]) * self[frame].get_height()
+        return (pos[0] > left and pos[0] < right and pos[1] > top and pos[1] < bottom)
     #def willChangeFrame (self):
     #    return self.currentFrame % self.framesEachImage == self.framesEachImage - 1
         

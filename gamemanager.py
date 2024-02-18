@@ -6,6 +6,7 @@ from gameobject import GameObject
 # select from choice of filter (1-3)
 filterSelection = 2
 
+#gameobjects only exist in component handlers
 
 # frame rate stuff
 clock = pygame.time.Clock()
@@ -46,45 +47,112 @@ class GameManager:
         #self.images = loadImages()
         #self.gameObjects = []
         imageset.load(self.drawingSurface)
-        self.iObjsDict = {}
-        self.iObjsSorted = []
-        self.gameObjects = GameManager.GameObjsIterator(self.iObjsSorted)
 
-    class ImageObjects:
+
+        self.onStateChange = None # define in MainGame
+        self.state = 0
+        self.stateChanged = True
+        self.args = ()
+        self.kwargs = ()
+        self.goMeshesDict = {}
+        self.goMeshes = []
+        self.goTick = []
+        self.goHover = [] # separate array for each object allows us to have a tonne of objects with less overhead?
+        self.goMouseDown = []
+        self.goMouseDrag = []
+        self.goMouseUp = []
+    
+    
+    def createMesh (self, name, origin=[0,0], framesEachImage=30):
+        imageset.imageSets[name].setImageVariables (origin, framesEachImage)
+        iObj = GameManager.Mesh(imageset.imageSets[name])
+        self.goMeshes.append(iObj)
+        self.goMeshesDict[name] = iObj
+
+    def resetHandlers (self):
+        for gomesh in self.goMeshes:
+            gomesh.gameObjects = []
+        self.goTick = []
+        self.goHover = []
+        self.goMouseDown = []
+        self.goMouseDrag = []
+        self.goMouseUp = []
+
+    class Mesh:
         def __init__(self, imageset):
             self.imageset = imageset
             self.gameObjects = []
         def addGameObject (self, obj):
             self.gameObjects.append(obj)
-    class GameObjsIterator:
-        def __init__(self, iObjsSorted):
-            self.iObjsSorted = iObjsSorted
-        def __iter__(self):
-            self.x = -1 # -1, so that first iteration returns 0
-            self.y = 0
-            return self
-        def __next__(self):
-            if (len(self.iObjsSorted) == 0):
-                raise StopIteration
-            self.x += 1
-            if (self.x >= len(self.iObjsSorted[self.y].gameObjects)):
-                self.x = 0
-                self.y += 1
-                if (self.y >= len(self.iObjsSorted)):
-                    raise StopIteration
-            return self.iObjsSorted[self.y].gameObjects[self.x]
+    def assignMesh (self, go, name):
+        self.goMeshesDict[name].gameObjects.append(go)
+        go.name = name
+        go.framesEachImage = self.goMeshesDict[name].imageset.framesEachImage
+        go.images = self.goMeshesDict[name].imageset.images
+    def handleMeshes(self):
+        for gomesh in self.goMeshes:
+            for go in gomesh.gameObjects:
+                if (go.active):
+                    go.pos = go.nextPos
+                    gomesh.imageset.drawImage(go.pos, go.getCurrentFrame())
+                    go.currentFrame += 1
 
-    def addImage (self, name, origin=[0,0], framesEachImage=30):
-        imageset.imageSets[name].setImageVariables (origin, framesEachImage)
-        iObj = GameManager.ImageObjects(imageset.imageSets[name])
+    def assignInit (self, go, function):
+        go.active = function(go) # lmao
 
-        self.iObjsSorted.append(iObj)
-        self.iObjsDict[name] = iObj
+
+    def assignTick (self, go, function):
+        self.goTick.append  ((go, function))
+    def handleTick (self):
+        for go, function in self.goTick:
+            if (go.active):
+                function(go, go.pos)
+
+    def assignHover (self, go, function):
+        self.goHover.append((go, function))
+    def handleHover (self, pos):
+        # object must have a mesh
+        for go, function in self.goHover:
+            if (go.active and go.name in self.goMeshesDict):
+                # use mesh's dimensions to detect if it's inside
+                if (self.goMeshesDict[go.name].imageset.contains (go.getCurrentFrame(), (pos[0] - go.pos[0], pos[1] - go.pos[1]))):
+                    function(go, pos)
+
+    def assignMouseDown (self, go, function):
+        self.goMouseDown.append((go, function))
+    def handleMouseDown (self, pos):
+        # object must have a mesh
+        for go, function in self.goMouseDown:
+            if (go.active and go.name in self.goMeshesDict):
+                # use mesh's dimensions to detect if it's inside
+                if (self.goMeshesDict[go.name].imageset.contains (go.getCurrentFrame(), (pos[0] - go.pos[0], pos[1] - go.pos[1]))):
+                    function(go, pos)
+
+    def assignMouseDrag (self, go, function):
+        self.goMouseDrag.append((go, function))
+    def handleMouseDrag (self, pos):
+        # object must have a mesh
+        for go, function in self.goMouseDrag:
+            if (go.active and go.name in self.goMeshesDict):
+                # use mesh's dimensions to detect if it's inside
+                if (self.goMeshesDict[go.name].imageset.contains (go.getCurrentFrame(), (pos[0] - go.pos[0], pos[1] - go.pos[1]))):
+                    function(go, pos)
+
+    def assignMouseUp (self, go, function):
+        self.goMouseUp.append((go, function))
+    def handleMouseUp (self, pos):
+        # object must have a mesh
+        for go, function in self.goMouseUp:
+            if (go.active and go.name in self.goMeshesDict):
+                # use mesh's dimensions to detect if it's inside
+                if (self.goMeshesDict[go.name].imageset.contains (go.getCurrentFrame(), (pos[0] - go.pos[0], pos[1] - go.pos[1]))):
+                    function(go, pos)
+
         
         
-    def addGameObject (self, name, *args, **kwargs):
-        go = GameObject(self.iObjsDict[name].imageset, *args, **kwargs)
-        self.iObjsDict[name].gameObjects.append(go)
+    #def addGameObject (self, name, *args, **kwargs):
+    #    go = GameObject(self.iObjsDict[name].imageset, *args, **kwargs)
+    #    self.iObjsDict[name].gameObjects.append(go)
 
 
     #def drawImage (self, name, pos=(0, 0)):
@@ -152,6 +220,13 @@ class GameManager:
     #                print ("Clicked on ", imageSet.name)
     #            imageSet.onClick()
 
+
+    def setState (self, newState, *args, **kwargs):
+        self.state = newState
+        self.stateChanged = True
+        self.args = args
+        self.kwargs = kwargs
+
     def endFrame(self):
         # for imgSet in self.images.values():
         #     if not imgSet.wasUsedThisFrame: # reset animation if it wasn't on the screen last frame
@@ -169,4 +244,11 @@ class GameManager:
         # limits FPS to 60
         # dt is delta time in seconds since last frame, used for framerate-
         # independent physics.
-        dt = clock.tick(60) / 1000
+        #dt = clock.tick(60) / 1000
+        clock.tick(60) / 1000
+
+        if (self.stateChanged):
+            self.stateChanged = False
+            # reset manager
+            self.resetHandlers()
+            self.onStateChange(self.state, self.args, self.kwargs)
