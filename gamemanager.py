@@ -10,7 +10,7 @@ filterSelection = 2
 #gameobjects only exist in component handlers
 
 # frame rate stuff
-fps = 5
+fps = 4
 clock = pygame.time.Clock()
 dt = 0
 
@@ -33,7 +33,7 @@ class GameManager:
         self.newState = 0
         #self.onStateChange = None # define in MainGame
         self.states = {}
-        self.state = 0
+        self.currentState = ""
         self.stateChanged = True
         self.gos = []
         self.goMouseHover = [] # separate array for each object allows us to have a tonne of objects with less overhead?
@@ -91,6 +91,8 @@ class GameManager:
         return go
 
     def handleTick(self)->None:
+        if (self.currentState != ''):
+            self.states[self.currentState].stateTick()
         for go in self.gos:
             go.tick()
     
@@ -201,9 +203,9 @@ class GameManager:
         clock.tick(fps) / 1000
 
         if (self.stateChanged):
-            self.state = self.newState
+            self.currentState = self.newState
             self.stateChanged = False
             # reset manager
             self.resetHandlers()
             #self.onStateChange(self, self.state, self.args, self.kwargs)
-            self.states[self.state].loadState()
+            self.states[self.currentState].loadState()

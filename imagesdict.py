@@ -16,9 +16,8 @@ class ImagesDict:
     def __getitem__(name:str):
         return ImagesDict.images[name]
     @staticmethod
-    def drawImage (imagename:str, pos=(0, 0), origin=(0.5,0.5), frame:int=0):
+    def drawImage (imagename:str, pos=(0, 0), origin=(0.5,0.5), frame:int=0, mirrored=False):
         #print ("1", imagename, frame,  len(ImagesDict.images[imagename]))
-        frame = frame % len(ImagesDict.images[imagename]) # automatically loop frames
         #print ("2", frame)
         if (imagename in ImagesDict.images):
             if ("middle" in origin):
@@ -35,9 +34,13 @@ class ImagesDict:
                 origin2 = [origin2[0], 1]
             if (origin2 != [-1,-1]):
                 origin = origin2
-            ImagesDict.surface.blit (ImagesDict.images[imagename][frame], 
-                                    (pos[0] - origin[0] * ImagesDict.images[imagename][frame].get_width(), 
-                                    pos[1] - origin[1] * ImagesDict.images[imagename][frame].get_height())
+            frame = frame % len(ImagesDict.images[imagename]) # automatically loop frames
+            img = ImagesDict.images[imagename][frame]
+            if (mirrored):
+                img = pygame.transform.flip(img, True, False)
+            ImagesDict.surface.blit (img, 
+                                    (pos[0] - origin[0] * img.get_width(), 
+                                    pos[1] - origin[1] * img.get_height())
                                     )
         else:
             print ("Erorr: imagename: [" + imagename + "." + frame + "] not found!")

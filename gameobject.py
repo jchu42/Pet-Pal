@@ -14,14 +14,19 @@ class GameObject:
         self.__nextPos = (0, 0)
         self.__imageName = ""
         self.__frame = 0
+        self.__mirrored = False
 
     def tick(self)->None:
         pass
 
+    def mirror(self)->Self:
+        self.__mirrored = True
+        return self
     def draw(self)->None:
         self.__pos = self.__nextPos
-        ImagesDict.drawImage(self.__imageName, self.__pos, self.__origin, self.__frame)
+        ImagesDict.drawImage(self.__imageName, self.__pos, self.__origin, self.__frame, self.__mirrored)
         self.__frame += 1
+        self.__mirrored = False
     def setOrigin (self, origin:tuple[int, int])->Self:
         self.__origin = origin
         return self

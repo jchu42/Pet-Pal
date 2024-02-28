@@ -8,6 +8,9 @@ class GameState:
         pass
     def loadState(self, *args, **wargs)->None:
         pass
+    def stateTick(self)->None:
+        pass
+
     def setState (self, newState:str, *args, **wargs)->None:
         self.gm.setState(newState, *args, **wargs)
 

@@ -11,4 +11,4 @@ class Room2(GameState):
         # self.gm.assignText (textTest, "go back", (255, 0, 0, 255), True)
         #self.gm.assignInit (textTest, lambda self: self.setPos((30, 70)))
         #self.gm.assignMouseUp(textTest, lambda a, pos: self.setState(0))
-        self.gm.assignMouseUp(textTest, lambda a, pos: self.setState("room"))
+        self.gm.assignMouseUp(textTest, lambda go, pos: self.setState("room"))

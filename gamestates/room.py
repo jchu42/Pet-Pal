@@ -33,11 +33,11 @@ class Room(GameState):
         # self.gm.assignDelete(mainPet, lambda self:print("*dies*"))
 
         self.mainUI("room2")
-        
+
         mainPet = MainPet (self.gm)
         
         textTest = GameObject (self.gm).setPos((30, 70)).setImageText("fdsfa", (255, 0, 0, 255), True)
         #self.gm.assignText (textTest, "agfdgdfsfds", (255, 0, 0, 255), True)
         # self.gm.assignInit (textTest, lambda self: self.setPos((30, 70)))
-        self.gm.assignMouseUp(textTest, lambda a, pos: self.setState("room2"))
+        self.gm.assignMouseUp(textTest, lambda go, pos: self.setState("room2"))
 
