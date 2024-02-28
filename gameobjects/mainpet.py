@@ -1,4 +1,5 @@
 from gameobject import GameObject
+from gameobjects.status import Status
 import random
 import gamemanager
 
@@ -12,7 +13,16 @@ class MainPet(GameObject):
         gm.assignMouseDown(self, lambda go, pos:print("AA"))
         self.setImageName("pandaidle")
 
+        self.__happy = 59
+        self.happy = 5
+
+        Status(gm, self)
+
     def tick(self)->None:
+        self.__happy -= 1
+        if (self.__happy < 0):
+            self.__happy = 59
+        self.happy = int(self.__happy / 10)
         self.accel = ((random.random() - 0.5)*(0.5 - abs(self.hiddenPos[0]/60 - 0.5)) - ((self.hiddenPos[0]/60 - 0.5)**3)*random.random() ,
                 (random.random() - 0.5)*(0.5 - abs(self.hiddenPos[1]/60 - 0.5)) - ((self.hiddenPos[1]/60 - 0.5)**3)*random.random() )
         self.imgVel = (self.imgVel[0]*0.9 + self.accel[0], self.imgVel[1]*0.9 + self.accel[1])
