@@ -8,7 +8,7 @@ import gamestate
 # select from choice of filter (1-3)
 filterSelection = 2
 
-#gameobjects only exist in component handlers
+textDebug = True
 
 # frame rate stuff
 fps = 5
@@ -43,6 +43,7 @@ class GameManager:
         self.goMouseUp = []
         self.onDelete = []
         self.onKeyPress = []
+        self.onButton = []
 
     def addState (self, state: gamestate)->Self:
         self.states[state.getName()] = state
@@ -89,6 +90,7 @@ class GameManager:
         self.goMouseDrag = []
         self.goMouseUp = []
         self.onKeyPress = []
+        self.onButton = []
 
     def addGameObject (self, go:GameObject)->GameObject:
         self.gos.append(go)
@@ -130,7 +132,7 @@ class GameManager:
         # object must have a mesh
         for go, function in self.goMouseHover:
             if (go.contains ((pos[0] - go.getPos()[0], pos[1] - go.getPos()[1]))):
-                function(pos)
+                function()
 
     def assignMouseDown (self, go:GameObject, function) -> GameObject:
         self.goMouseDown.append((go, function))
@@ -139,7 +141,7 @@ class GameManager:
         # object must have a mesh
         for go, function in self.goMouseDown:
             if (go.contains ((pos[0] - go.getPos()[0], pos[1] - go.getPos()[1]))):
-                function(pos)
+                function()
 
     def assignMouseDrag (self, go:GameObject, function) -> GameObject:
         self.goMouseDrag.append((go, function))
@@ -148,7 +150,7 @@ class GameManager:
         # object must have a mesh
         for go, function in self.goMouseDrag:
             if (go.contains ((pos[0] - go.getPos()[0], pos[1] - go.getPos()[1]))):
-                function(pos)
+                function()
 
     def assignMouseUp (self, go:GameObject, function) -> GameObject:
         self.goMouseUp.append((go, function))
@@ -157,18 +159,27 @@ class GameManager:
         # object must have a mesh
         for go, function in self.goMouseUp:
             if (go.contains ((pos[0] - go.getPos()[0], pos[1] - go.getPos()[1]))):
-                function(pos)
+                function()
 
     def assignDelete (self, go:GameObject, function) -> GameObject:
         self.onDelete.append((go, function))
         return go
 
-    def assignKeyPress (self, go:GameObject, function)->GameObject:
-        self.onKeyPress.append((go, function))
-        return go
+    def assignKeyPress (self, function)->None:
+        self.onKeyPress.append(function)
+    def assignButton(self, buttonname, function)->None:
+        self.onButton.append((buttonname, function))
     def handleKeyPress(self, str)->None:
-        for go, function in self.onKeyPress:
+        for function in self.onKeyPress:
+            if (textDebug):
+                print (str)
             function(str)
+        for buttonname, function in self.onButton:
+            if (str == buttonname):
+                if (textDebug):
+                    print (str)
+                function()
+    
 
     def setState (self, newState:str, *args, **kwargs)->None:
         self.newState = newState

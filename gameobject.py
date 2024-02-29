@@ -44,7 +44,7 @@ class GameObject:
             self.__frame = 0 # reset animation state on name change
         return self
 
-    def getCharImg (self, char:str)-> pygame.Surface:
+    def __getCharImg (self, char:str)-> pygame.Surface:
         if (char >= 'A' and char <= 'Z'):
             char = char.lower()
         if (char >= 'a' and char <= 'z'):
@@ -81,7 +81,7 @@ class GameObject:
             #if (char >= 'a' and char <= 'z'):
             #    img = ImagesDict.images["font" + char + "2"]
             #elif (char >= 'A' and char <= 'Z'):
-            img = self.getCharImg(char)
+            img = self.__getCharImg(char)
             startX += img[0].get_width() + 1 # 1 space in-between characters
         return startX
     
@@ -96,7 +96,7 @@ class GameObject:
             startX = 0 # round up or down? does it matter?
 
             for char in string:
-                img = self.getCharImg (char)
+                img = self.__getCharImg (char)
 
                 if (color != (0, 0, 0, 255)):
                     copy = img[0].copy() # required for custom colors....? would it be just faster to do <...>.. yeah, but eh
@@ -128,13 +128,22 @@ class GameObject:
     
     def assignMouseHover (self, function)->Self:
         self.gm.assignMouseHover(self, function)
+        return self
     def assignMouseDown (self, function)->Self:
         self.gm.assignMouseDown(self, function)
+        return self
     def assignMouseDrag (self, function)->Self:
         self.gm.assignMouseDrag(self, function)
+        return self
     def assignMouseUp (self, function)->Self:
         self.gm.assignMouseUp(self, function)
+        return self
     def assignDelete (self, function)->Self:
         self.gm.assignDelete(self, function)
+        return self
     def assignKeyPress (self, function)->Self:
-        self.gm.assignKeyPress(self, function)
+        self.gm.assignKeyPress(function)
+        return self
+    def assignButton (self, buttonname:str, function)->Self:
+        self.gm.assignButton(buttonname, function)
+        return self

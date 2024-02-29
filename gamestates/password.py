@@ -16,11 +16,13 @@ class Password(GameState):
         StrInput (self.gm).setPos ((3, 34)).setColor((0, 255, 255, 0)).setCensored(True)
 
         nextButton = GameObject (self.gm).setImageText("Next", (255, 0, 0, 255), True).setPos((30, 69))
-        nextButton.assignMouseUp(lambda pos: self.setState("room"))
-        nextButton.assignKeyPress(self.nextButtonAction)
+        nextButton.assignMouseUp(lambda: self.setState("roomselector"))
+        # nextButton.assignKeyPress(self.nextButtonAction)
+        nextButton.assignButton("return", lambda:self.setState("roomselector")) # or just room
+
         #GameObject (self.gm).setImageText("go back", (255, 0, 0, 255), True).setPos((30, 69)).assignMouseUp(lambda go, pos: self.setState("room"))
         
-    def nextButtonAction (self, key:str)->None:
-        print (key)
-        if (key == "return"): # enter button pressed
-            self.setState("room")
+    # def nextButtonAction (self, key:str)->None:
+    #     print (key)
+    #     if (key == "return"): # enter button pressed
+    #         self.setState("room")

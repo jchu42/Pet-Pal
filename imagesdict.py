@@ -45,7 +45,10 @@ class ImagesDict:
                                     pos[1] - origin[1] * img.get_height())
                                     )
         else:
-            print ("Erorr: imagename: [" + imagename + "." + str(frame) + "] not found!")
+            try:
+                print ("Erorr: imagename: [" + imagename + "." + str(frame) + "] not found!")
+            except:
+                print (imagename, frame)
 
     # def contains (self, frame, pos):
     #     left = - self.origin[0] * self[frame].get_width() - 1

@@ -21,6 +21,7 @@ from gamestates.room import Room
 from gamestates.texttest import TextTest
 from gamestates.username import Username
 from gamestates.password import Password
+from gamestates.roomselector import RoomSelector
 
 # pygame setup
 pygame.init()
@@ -38,6 +39,7 @@ ImagesDict(gm.drawingSurface) # static function call
 gm.addState(Username(gm))
 gm.addState(TextTest(gm))
 gm.addState(Password(gm))
+gm.addState(RoomSelector(gm))
 gm.addState(Room(gm))
 
 #gm.setState ("texttest")

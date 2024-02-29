@@ -3,8 +3,6 @@ import random
 import gamemanager
 from typing import Self
 
-textDebug = False
-
 class StrInput(GameObject):
     def __init__(self, gm:gamemanager)->None:
         GameObject.__init__(self, gm)
@@ -31,7 +29,7 @@ class StrInput(GameObject):
             self.setImageText(self.text, self.color, False)
 
     def getText (self)->str:
-         return self.text
+        return self.text
     def handleKeyPress (self, key:str):
         if (key.isalnum() and len(key) == 1):
             self.text += key
@@ -48,6 +46,3 @@ class StrInput(GameObject):
         elif key == 'backspace':
             self.text = self.text[:-1]
         # ignore other key presses
-
-        if (textDebug):
-            print (key, self.text)

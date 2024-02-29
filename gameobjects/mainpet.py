@@ -13,7 +13,7 @@ class MainPet(GameObject):
 
         GameObject.__init__(self, gm, [0.5, 1])
 
-        gm.assignMouseDown(self, lambda go, pos:print("AA"))
+        gm.assignMouseDown(self, lambda:print("AA"))
         self.petType = petType
         self.setImageName(self.petType + "idle")
 

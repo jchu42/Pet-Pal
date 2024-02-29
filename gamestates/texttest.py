@@ -17,4 +17,4 @@ class TextTest(GameState):
         GameObject (self.gm).setImageText("zxcv b n m", (255, 0, 255, 255), True).setPos((30, 42))
         StrInput (self.gm).setPos ((1, 48)).setColor((0, 255, 255, 0))
 
-        GameObject (self.gm).setImageText("go back", (255, 0, 0, 255), True).setPos((30, 69)).assignMouseUp(lambda pos: self.setState("room"))
+        GameObject (self.gm).setImageText("go back", (255, 0, 0, 255), True).setPos((30, 69)).assignMouseUp(lambda: self.setState("room"))
