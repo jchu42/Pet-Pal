@@ -46,7 +46,6 @@ class GameObject:
 
     def getCharImg (self, char:str)-> pygame.Surface:
         if (char >= 'A' and char <= 'Z'):
-            print ("pls have as all lowercase: ", str)
             char = char.lower()
         if (char >= 'a' and char <= 'z'):
             img = ImagesDict.images["font" + char]
@@ -54,14 +53,27 @@ class GameObject:
             img = ImagesDict.images["fontdot"]
         elif (char == "?"):
             img = ImagesDict.images["fontquestion"]
+        elif (char == '/'):
+            img = ImagesDict.images["fontslash"]
         elif (char == '\\'):
             img = ImagesDict.images["fontbackslash"]
         elif (char == ':'):
             img = ImagesDict.images["fontcolon"]
+        elif (char == '*'):
+            img = ImagesDict.images["fontstar"]
+        elif (char == '"'):
+            img = ImagesDict.images["fontdoublequote"]
+        elif (char == '|'):
+            img = ImagesDict.images["fontpipe"]
+        elif (char == '<'):
+            img = ImagesDict.images["fontlessthan"]
+        elif (char == '>'):
+            img = ImagesDict.images["fontmorethan"]
         elif (("font" + char) in ImagesDict.images): # a
             img = ImagesDict.images["font" + char]
         else:
             print ("Cannot find character: ", char)
+            img = ImagesDict.images["fontunknown"]
         return img
     def __getLengthOfText (self, string:str) -> int:
         startX = -1 # account for space at the end of the text
@@ -73,13 +85,13 @@ class GameObject:
             startX += img[0].get_width() + 1 # 1 space in-between characters
         return startX
     
-    def setImageText(self, string:str, color=(0, 0, 0, 255), centered = True)->Self:
+    def setImageText(self, string:str, color:tuple[int, int, int, int]=(0, 0, 0, 255), centered:bool = True)->Self:
         if (string == ""):
             self.setImageName("") # empty
-            return
+            return self
         name = "TEXT" + ' '.join(map(str, color)) + string + str(centered) # save all copies of colors of strings of text
         if (name) not in ImagesDict.images:
-            textSurface = pygame.Surface((self.__getLengthOfText (string), 8), pygame.SRCALPHA) # how tall is the text anyway?
+            textSurface = pygame.Surface((self.__getLengthOfText (string), 5), pygame.SRCALPHA) # how tall is the text anyway?
             
             startX = 0 # round up or down? does it matter?
 

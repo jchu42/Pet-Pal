@@ -1,22 +1,22 @@
 from os import listdir
-from typing import List
+#from typing import List
 import pygame
 
 # debug option
 debug = False
 
 class ImagesDict:
-    images:dict[List:[pygame.Surface]] = {} # static variable
-    surface:pygame.surface = None
+    images:dict[list:[pygame.Surface]] = {} # static variable
+    surface:pygame.Surface = None
     @staticmethod
     def __init__ (surface:pygame.Surface)->None:
         ImagesDict.surface = surface
         ImagesDict.loadResources(surface)
     @staticmethod
-    def __getitem__(name:str):
+    def __getitem__(name:str)->list[pygame.Surface]:
         return ImagesDict.images[name]
     @staticmethod
-    def drawImage (imagename:str, pos=(0, 0), origin=(0.5,0.5), frame:int=0, mirrored=False):
+    def drawImage (imagename:str, pos=(0, 0), origin=(0.5,0.5), frame:int=0, mirrored=False)->None:
         if (imagename == ""):
             return
         #print ("1", imagename, frame,  len(ImagesDict.images[imagename]))
@@ -77,4 +77,3 @@ class ImagesDict:
                     ImagesDict.images[name] = {}
                 ImagesDict.images[name] [num] = pygame.image.load("images/" + filename).convert_alpha()
             
-

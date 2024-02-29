@@ -1,5 +1,6 @@
 import pygame
 from imagesdict import ImagesDict
+from typing import Self
 import gameobject as GameObject
 import gamestate
 #from imageset import loadImages
@@ -20,10 +21,10 @@ class GameManager:
 
         self.scale = scale
         self.pixels = pixels
-        screenPixels = (pixels[0]*scale, pixels[1]*scale)
-        self.screen = pygame.display.set_mode(screenPixels)
+        self.screenPixels = (pixels[0]*scale, pixels[1]*scale)
+        self.screen = pygame.display.set_mode(self.screenPixels)
         self.drawingSurface = pygame.Surface (pixels) # surface to draw on with lower resolution than main screen. scaled when drawn onto main screen.
-        self.gridfilter = self.__generateGridSurface(scale, screenPixels)
+        self.gridfilter = self.__generateGridSurface(scale, self.screenPixels)
 
         #self.images = loadImages()
         #self.gameObjects = []
@@ -43,8 +44,9 @@ class GameManager:
         self.onDelete = []
         self.onKeyPress = []
 
-    def addState (self, state: gamestate):
+    def addState (self, state: gamestate)->Self:
         self.states[state.getName()] = state
+        return self
 
     def __generateGridSurface(self, scale:int, screenPixels: tuple[int, int])->pygame.Surface:
         color = max(255 - (scale - 1) * 50, 0)
@@ -74,8 +76,8 @@ class GameManager:
     #     self.goMeshesDict[name] = iObj
 
     def resetHandlers (self)->None:
-        for go, function in self.onDelete:
-            function(go)
+        for function in self.onDelete:
+            function()
         self.onDelete = []
         # for gomesh in self.goMeshes:
         #     gomesh.gameObjects = []
@@ -121,14 +123,14 @@ class GameManager:
         for go in self.gos:
             go.draw()
 
-    def assignMouseHover (self, go:GameObject, function)->GameObject:
+    def assignMouseHover (self, go, function)->GameObject:
         self.goMouseHover.append((go, function))
         return go
     def handleMouseHover (self, pos):
         # object must have a mesh
         for go, function in self.goMouseHover:
             if (go.contains ((pos[0] - go.getPos()[0], pos[1] - go.getPos()[1]))):
-                function(go, pos)
+                function(pos)
 
     def assignMouseDown (self, go:GameObject, function) -> GameObject:
         self.goMouseDown.append((go, function))
@@ -137,7 +139,7 @@ class GameManager:
         # object must have a mesh
         for go, function in self.goMouseDown:
             if (go.contains ((pos[0] - go.getPos()[0], pos[1] - go.getPos()[1]))):
-                function(go, pos)
+                function(pos)
 
     def assignMouseDrag (self, go:GameObject, function) -> GameObject:
         self.goMouseDrag.append((go, function))
@@ -146,7 +148,7 @@ class GameManager:
         # object must have a mesh
         for go, function in self.goMouseDrag:
             if (go.contains ((pos[0] - go.getPos()[0], pos[1] - go.getPos()[1]))):
-                function(go, pos)
+                function(pos)
 
     def assignMouseUp (self, go:GameObject, function) -> GameObject:
         self.goMouseUp.append((go, function))
@@ -155,7 +157,7 @@ class GameManager:
         # object must have a mesh
         for go, function in self.goMouseUp:
             if (go.contains ((pos[0] - go.getPos()[0], pos[1] - go.getPos()[1]))):
-                function(go, pos)
+                function(pos)
 
     def assignDelete (self, go:GameObject, function) -> GameObject:
         self.onDelete.append((go, function))
@@ -166,7 +168,7 @@ class GameManager:
         return go
     def handleKeyPress(self, str)->None:
         for go, function in self.onKeyPress:
-            function(go, str)
+            function(str)
 
     def setState (self, newState:str, *args, **kwargs)->None:
         self.newState = newState
@@ -185,7 +187,7 @@ class GameManager:
         # dt is delta time in seconds since last frame, used for framerate-
         # independent physics.
         #dt = clock.tick(60) / 1000
-        clock.tick(fps) / 1000
+        clock.tick(fps)
 
         if (self.stateChanged):
             self.currentState = self.newState
@@ -193,4 +195,4 @@ class GameManager:
             # reset manager
             self.resetHandlers()
             #self.onStateChange(self, self.state, self.args, self.kwargs)
-            self.states[self.currentState].loadState()
+            self.states[self.currentState].loadState(*self.args, **self.kwargs)
