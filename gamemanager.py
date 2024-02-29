@@ -10,7 +10,7 @@ filterSelection = 2
 #gameobjects only exist in component handlers
 
 # frame rate stuff
-fps = 4
+fps = 5
 clock = pygame.time.Clock()
 dt = 0
 
@@ -41,6 +41,7 @@ class GameManager:
         self.goMouseDrag = []
         self.goMouseUp = []
         self.onDelete = []
+        self.onKeyPress = []
 
     def addState (self, state: gamestate):
         self.states[state.getName()] = state
@@ -85,10 +86,30 @@ class GameManager:
         self.goMouseDown = []
         self.goMouseDrag = []
         self.goMouseUp = []
+        self.onKeyPress = []
 
     def addGameObject (self, go:GameObject)->GameObject:
         self.gos.append(go)
         return go
+    def removeGameObject(self, go:GameObject)->GameObject:
+        if go in self.gos:
+            self.gos.remove(go)
+        for tup in self.goMouseHover:
+            if (tup[0] == go):
+                self.goMouseHover.remove(tup)
+        for tup in self.goMouseDown:
+            if (tup[0] == go):
+                self.goMouseDown.remove(tup)
+        for tup  in self.goMouseDrag:
+            if (tup[0] == go):
+                self.goMouseDrag.remove(tup)
+        for tup in self.goMouseUp:
+            if (tup[0] == go):
+                self.goMouseUp.remove(tup)
+        for tup in self.onDelete:
+            if (tup[0] == go):
+                tup[1](tup[0]) # AHAHAAHA
+                self.onDelete.remove(tup)
 
     def handleTick(self)->None:
         if (self.currentState != ''):
@@ -140,47 +161,12 @@ class GameManager:
         self.onDelete.append((go, function))
         return go
 
-    
-    # def assignText (self, go, string, color=(0, 0, 0, 255), centered = True): # if not centered, then left-aligned
-    #     name = "TEXT" + ' '.join(map(str, color)) + string + str(centered) # save all copies of colors of strings of text
-    #     if (name) not in imagesdict.imageSets:
-    #         textSurface = pygame.Surface((self.__getLengthOfText (string), 8), pygame.SRCALPHA) # how tall is the text anyway?
-            
-    #         startX = 0 # round up or down? does it matter?
-
-    #         for char in string:
-    #             if (char >= 'a' and char <= 'z'):
-    #                 img = imagesdict.imageSets ["font" + char + "2"]
-    #             elif (char >= 'A' and char <= 'Z'):
-    #                 img = imagesdict.imageSets["font" + char]
-    #             elif (char == "."):
-    #                 img = imagesdict.imageSets["fontdot"]
-    #             elif (char == "?"):
-    #                 img = imagesdict.imageSets["fontquestion"]
-    #             elif (("font" + char) in imagesdict.imageSets):
-    #                 img = imagesdict.imageSets["font" + char]
-    #             else:
-    #                 print ("char", char, "not found")
-
-    #             if (color is not (0, 0, 0, 255)):
-    #                 copy = img[0].copy() # required for custom colors....? would it be just faster to do <...>.. yeah, but eh
-    #                 copy.fill(color, special_flags=pygame.BLEND_MAX)
-    #             else:
-    #                 copy = img[0]
-
-    #             textSurface.blit (copy, (startX - img.origin[0] * img[0].get_width(), 0))
-
-    #             startX += img[0].get_width() + 1 # uh huh
-            
-    #         imagesdict.imageSets [name] = imagesdict.ImageSet(name, self.drawingSurface)
-    #         imagesdict.imageSets [name].images[0] = textSurface
-    #         if (centered):
-    #             self.createMesh (name, origin=[0.5,1], framesEachImage = 1)
-    #         else:
-    #             self.createMesh (name, origin=[0,1], framesEachImage = 1)
-    #     #self.assignMesh (go, name)
-    #     go.setImageName(name)
-
+    def assignKeyPress (self, go:GameObject, function)->GameObject:
+        self.onKeyPress.append((go, function))
+        return go
+    def handleKeyPress(self, str)->None:
+        for go, function in self.onKeyPress:
+            function(go, str)
 
     def setState (self, newState:str, *args, **kwargs)->None:
         self.newState = newState
@@ -189,13 +175,12 @@ class GameManager:
         self.kwargs = kwargs
 
     def endFrame(self)->None:
-        self.screen.blit (pygame.transform.scale_by(self.drawingSurface, self.scale), (0, 0)) # draw scaled drawing surface to screen buffer
-        #filter
+        # draw scaled drawing surface to screen buffer
+        self.screen.blit (pygame.transform.scale_by(self.drawingSurface, self.scale), (0, 0)) 
+        # draw filter
         self.screen.blit(self.gridfilter, (0, 0))
         # flip() the display to put your work on screen
         pygame.display.flip()
-
-        
         
         # dt is delta time in seconds since last frame, used for framerate-
         # independent physics.

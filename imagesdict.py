@@ -17,6 +17,8 @@ class ImagesDict:
         return ImagesDict.images[name]
     @staticmethod
     def drawImage (imagename:str, pos=(0, 0), origin=(0.5,0.5), frame:int=0, mirrored=False):
+        if (imagename == ""):
+            return
         #print ("1", imagename, frame,  len(ImagesDict.images[imagename]))
         #print ("2", frame)
         if (imagename in ImagesDict.images):
@@ -43,7 +45,7 @@ class ImagesDict:
                                     pos[1] - origin[1] * img.get_height())
                                     )
         else:
-            print ("Erorr: imagename: [" + imagename + "." + frame + "] not found!")
+            print ("Erorr: imagename: [" + imagename + "." + str(frame) + "] not found!")
 
     # def contains (self, frame, pos):
     #     left = - self.origin[0] * self[frame].get_width() - 1
