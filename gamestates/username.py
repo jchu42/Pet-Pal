@@ -9,8 +9,8 @@ class Username(GameState):
     def loadState(self, *args, **wargs)->None:
         self.bgColor ((0, 0, 0, 255))
 
-        GameObject (self.gm).setImageText("Enter Username", (255, 0, 0, 255), centered=False).setPos((1, 10))
-        self.username = StrInput (self.gm).setPos ((3, 16)).setColor((0, 255, 255, 0))
+        GameObject (self.gm).setImageText("Enter Username", (255, 0, 0, 255), centered=False).setPos((2, 10))
+        self.username = StrInput (self.gm).setPos ((4, 16)).setColor((0, 255, 255, 0))
 
         nextButton = GameObject (self.gm).setImageText("Next", (255, 0, 0, 255), True).setPos((30, 69))
         nextButton.assignMouseUp(lambda: self.setState("password", username=self.username.getText()))

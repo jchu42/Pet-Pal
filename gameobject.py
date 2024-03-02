@@ -8,40 +8,40 @@ class GameObject:
         self.gm = gm
         gm.addGameObject(self) # fuggit we ball
 
-        self.__origin = origin
+        self._origin = origin
 
-        self.__pos = None
-        self.__nextPos = (0, 0)
-        self.__imageName = ""
-        self.__frame = 0
-        self.__mirrored = False
+        self._pos = None
+        self._nextPos = (0, 0)
+        self._imageName = ""
+        self._frame = 0
+        self._mirrored = False
 
     def tick(self)->None:
         pass
 
     def mirror(self)->Self:
-        self.__mirrored = True
+        self._mirrored = True
         return self
     def draw(self)->None:
-        self.__pos = self.__nextPos
-        ImagesDict.drawImage(self.__imageName, self.__pos, self.__origin, self.__frame, self.__mirrored)
-        self.__frame += 1
-        self.__mirrored = False
+        self._pos = self._nextPos
+        ImagesDict.drawImage(self._imageName, self._pos, self._origin, self._frame, self._mirrored)
+        self._frame += 1
+        self._mirrored = False
     def setOrigin (self, origin:tuple[int, int])->Self:
-        self.__origin = origin
+        self._origin = origin
         return self
     def getPos(self)->tuple[int, int]:
-        if (self.__pos == None): # if hasn't been initialized yet
-            self.__pos = self.__nextPos
-        return self.__pos
+        if (self._pos == None): # if hasn't been initialized yet
+            self._pos = self._nextPos
+        return self._pos
     def setPos(self, pos:tuple[int, int])->Self:
-        self.__nextPos = pos
+        self._nextPos = pos
         return self
     
     def setImageName(self, name:str)->Self:
-        if (name != self.__imageName):
-            self.__imageName = name
-            self.__frame = 0 # reset animation state on name change
+        if (name != self._imageName):
+            self._imageName = name
+            self._frame = 0 # reset animation state on name change
         return self
 
     def __getCharImg (self, char:str)-> pygame.Surface:
@@ -112,18 +112,18 @@ class GameObject:
             ImagesDict.images [name] = {} 
             ImagesDict.images [name][0] = textSurface
         if (centered):
-            self.__origin = [0.5, 1]
+            self._origin = [0.5, 1]
         else:
-            self.__origin = [0, 1]
+            self._origin = [0, 1]
         self.setImageName(name)
         return self
     
     def contains (self, pos:tuple[int, int])->bool:
-        frame = self.__frame % len(ImagesDict.images[self.__imageName])
-        left = - self.__origin[0] * ImagesDict.images[self.__imageName][frame].get_width() - 1
-        top = - self.__origin[1] * ImagesDict.images[self.__imageName][frame].get_height()  - 1 
-        right = (1 - self.__origin[0]) * ImagesDict.images[self.__imageName][frame].get_width() 
-        bottom = (1 - self.__origin[1]) * ImagesDict.images[self.__imageName][frame].get_height() 
+        frame = self._frame % len(ImagesDict.images[self._imageName])
+        left = - self._origin[0] * ImagesDict.images[self._imageName][frame].get_width() - 1
+        top = - self._origin[1] * ImagesDict.images[self._imageName][frame].get_height()  - 1 
+        right = (1 - self._origin[0]) * ImagesDict.images[self._imageName][frame].get_width() 
+        bottom = (1 - self._origin[1]) * ImagesDict.images[self._imageName][frame].get_height() 
         return (pos[0] > left and pos[0] < right and pos[1] > top and pos[1] < bottom)
     
     def assignMouseHover (self, function)->Self:

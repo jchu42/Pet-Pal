@@ -21,7 +21,7 @@ class ImagesDict:
             return
         #print ("1", imagename, frame,  len(ImagesDict.images[imagename]))
         #print ("2", frame)
-        if (imagename in ImagesDict.images):
+        if (imagename in ImagesDict.images and imagename != ''):
             if ("middle" in origin):
                 origin2 = [0.5,0.5]
             else:

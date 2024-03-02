@@ -22,6 +22,7 @@ from gamestates.texttest import TextTest
 from gamestates.username import Username
 from gamestates.password import Password
 from gamestates.roomselector import RoomSelector
+from gamestates.petselector import PetSelector
 
 # pygame setup
 pygame.init()
@@ -40,6 +41,7 @@ gm.addState(Username(gm))
 gm.addState(TextTest(gm))
 gm.addState(Password(gm))
 gm.addState(RoomSelector(gm))
+gm.addState(PetSelector(gm))
 gm.addState(Room(gm))
 
 #gm.setState ("texttest")

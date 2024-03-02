@@ -33,7 +33,7 @@ class Selector(GameObject):
 
         self.lessthan = GameObject(gm).setImageName(lessthanname).setPos((10, 30))
         self.lessthan.assignMouseUp(self.decrement).assignButton("left", self.decrement)
-        self.morethan = GameObject(gm).setImageName(morethanname).setPos((50, 30)).assignMouseUp(self.increment)
+        self.morethan = GameObject(gm).setImageName(morethanname).setPos((50, 30))
         self.morethan.assignMouseUp(self.increment).assignButton("right", self.increment)
     def setLessThanPos (self, pos:tuple[int, int])->Self:
         self.lessthan.setPos (pos)

@@ -8,7 +8,7 @@ import gamestate
 # select from choice of filter (1-3)
 filterSelection = 2
 
-textDebug = True
+textDebug = False
 
 # frame rate stuff
 fps = 5
@@ -172,12 +172,12 @@ class GameManager:
     def handleKeyPress(self, str)->None:
         for function in self.onKeyPress:
             if (textDebug):
-                print (str)
+                print ("handlekeypress:", str)
             function(str)
         for buttonname, function in self.onButton:
             if (str == buttonname):
                 if (textDebug):
-                    print (str)
+                    print ("handleButton:", str)
                 function()
     
 
