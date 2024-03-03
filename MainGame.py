@@ -18,8 +18,8 @@ from gamestates.petselector import PetSelector
 # pygame setup
 pygame.init()
 pygame.midi.init()
-audio = pygame.mixer.Sound("audiotest2.mp3")
-audio.set_volume(0.2)
+# audio = pygame.mixer.Sound("audiotest2.mp3")
+# audio.set_volume(0.2)
 #audio.play()
 
 
