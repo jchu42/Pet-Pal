@@ -4,6 +4,7 @@
 # - collision events?
 
 import pygame
+import pygame.midi
 from gamemanager import GameManager
 from gameobject import GameObject
 from imagesdict import ImagesDict
@@ -16,6 +17,11 @@ from gamestates.petselector import PetSelector
 
 # pygame setup
 pygame.init()
+pygame.midi.init()
+audio = pygame.mixer.Sound("audiotest2.mp3")
+audio.set_volume(0.2)
+#audio.play()
+
 
 # configure screen
 scale = 4

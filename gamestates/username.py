@@ -14,10 +14,8 @@ class Username(GameState):
 
         nextButton = GameObject (self.gm).setImageText("Next", (255, 0, 0, 255), True).setPos((30, 69))
         nextButton.assignMouseUp(lambda: self.setState("password", username=self.username.getText()))
-        #nextButton.assignKeyPress(self.nextButtonAction)
         nextButton.assignButton("return", lambda:self.setState("password", username=self.username.getText()))
-        #GameObject (self.gm).setImageText("go back", (255, 0, 0, 255), True).setPos((30, 69)).assignMouseUp(lambda go, pos: self.setState("room"))
 
-    # def nextButtonAction (self, key:str):
-    #     if (key == "return"): # enter button pressed
-    #         self.setState("password", username=self.username.getText())
+    def changeToPassword (self)->None:
+        # todo - combine username and password states; add a back button to go from password back to username
+        pass

@@ -26,6 +26,8 @@ class GameManager:
         self.drawingSurface = pygame.Surface (pixels) # surface to draw on with lower resolution than main screen. scaled when drawn onto main screen.
         self.gridfilter = self.__generateGridSurface(scale, self.screenPixels)
 
+        self.midiout = pygame.midi.Output(pygame.midi.get_default_output_id())
+
         #self.images = loadImages()
         #self.gameObjects = []
         ImagesDict.loadResources(self.drawingSurface)
@@ -36,7 +38,7 @@ class GameManager:
         self.states = {}
         self.currentState = ""
         self.stateChanged = True
-        
+
         self.gos = []
 
         self.goMouseHover = [] # separate array for each object allows us to have a tonne of objects with less overhead?
@@ -161,13 +163,9 @@ class GameManager:
                 function()
     
     def resetHandlers (self)->None:
-        for function in self.onDelete:
-            function()
+        for go, function in self.onDelete:
+            function(go)
         self.onDelete = []
-        # for gomesh in self.goMeshes:
-        #     gomesh.gameObjects = []
-        # self.goMeshes = []
-        # self.goTick = []
         self.gos = []
         self.goMouseHover = []
         self.goMouseDown = []

@@ -45,10 +45,12 @@ class Selector(GameObject):
         return self.options[self.selection]
 
     def increment(self)->None:
+        self.playSound(2000, 1)
         self.selection += 1
         if (self.selection >= len(self.options)):
             self.selection = 0
     def decrement(self)->None:
+        self.playSound(1000, 1)
         self.selection -= 1
         if (self.selection < 0):
             self.selection = len(self.options) - 1

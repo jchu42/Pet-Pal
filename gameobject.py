@@ -43,6 +43,14 @@ class GameObject:
         self._nextPos = pos
         return self
     
+    def playSound (self, frequency:int, instrument:int=1, volume:int=63):
+        #def unplaySound (self):
+        #    self.gm.midiout.note_off(pygame.midi.frequency_to_midi(frequency), velocity=volume)
+        #unplaySound(self) # in case of same sound played twice
+        self.gm.midiout.set_instrument(instrument)
+        self.gm.midiout.note_on(pygame.midi.frequency_to_midi(frequency), velocity=volume) # does it cause a memory leak? we may never know
+        #self.assignDelete(unplaySound)
+
     def setImageName(self, name:str)->Self:
         if (name != self._imageName):
             self._imageName = name
