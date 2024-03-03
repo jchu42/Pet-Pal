@@ -1,7 +1,9 @@
+import time
 import gamemanager 
 from imagesdict import ImagesDict
 from typing import Self
 import pygame
+import threading
 
 class GameObject:
     def __init__(self, gm:gamemanager, origin:tuple[int, int]=(0.5, 0.5))->None:
@@ -16,10 +18,17 @@ class GameObject:
         self._framesPerFrame = 1
         self._frame = 0
         self._mirrored = False
+        self.lastPlayed = (0, 0)
+        self.assignDelete(self.__deleteSound)
+
+    def __deleteSound(self, go)->None:
+        self.gm.midiout.note_off(*self.lastPlayed)
 
     def setFramesPerFrame (self, frames:int)->Self:
         self._framesPerFrame = 1.0/frames
         return self
+    def getFrame (self)->int:
+        return int(self._frame)
 
     def tick(self)->None:
         pass
@@ -29,7 +38,7 @@ class GameObject:
         return self
     def draw(self)->None:
         self._pos = self._nextPos
-        ImagesDict.drawImage(self._imageName, self._pos, self._origin, int(self._frame), self._mirrored)
+        ImagesDict.drawImage(self._imageName, self._pos, self._origin, self.getFrame(), self._mirrored)
         self._frame += self._framesPerFrame
         self._mirrored = False
     def setOrigin (self, origin:tuple[int, int])->Self:
@@ -43,13 +52,12 @@ class GameObject:
         self._nextPos = pos
         return self
     
-    def playSound (self, frequency:int, instrument:int=1, volume:int=63):
-        #def unplaySound (self):
-        #    self.gm.midiout.note_off(pygame.midi.frequency_to_midi(frequency), velocity=volume)
-        #unplaySound(self) # in case of same sound played twice
+    def playSound (self, frequency:int, instrument:int=1, volume:int=63):#, duration:int=2):
+        self.gm.midiout.note_off(*self.lastPlayed) 
         self.gm.midiout.set_instrument(instrument)
-        self.gm.midiout.note_on(pygame.midi.frequency_to_midi(frequency), velocity=volume) # does it cause a memory leak? we may never know
-        #self.assignDelete(unplaySound)
+        self.lastPlayed = (pygame.midi.frequency_to_midi(frequency), volume)
+        self.gm.midiout.note_on(*self.lastPlayed) 
+
 
     def setImageName(self, name:str)->Self:
         if (name != self._imageName):
@@ -58,9 +66,9 @@ class GameObject:
         return self
 
     def __getCharImg (self, char:str)-> pygame.Surface:
-        if (char >= 'A' and char <= 'Z'):
-            char = char.lower()
         if (char >= 'a' and char <= 'z'):
+            char = char.upper()
+        if (char >= 'A' and char <= 'Z'):
             img = ImagesDict.images["font" + char]
         elif (char == "."):
             img = ImagesDict.images["fontdot"]
@@ -133,7 +141,9 @@ class GameObject:
         return self
     
     def contains (self, pos:tuple[int, int])->bool:
-        frame = self._frame % len(ImagesDict.images[self._imageName])
+        if (self._imageName not in ImagesDict.images):
+            return False
+        frame = self.getFrame() % len(ImagesDict.images[self._imageName])
         left = - self._origin[0] * ImagesDict.images[self._imageName][frame].get_width() - 1
         top = - self._origin[1] * ImagesDict.images[self._imageName][frame].get_height()  - 1 
         right = (1 - self._origin[0]) * ImagesDict.images[self._imageName][frame].get_width() 

@@ -15,7 +15,7 @@ class MainPet(GameObject):
 
         GameObject.__init__(self, gm, [0.5, 1])
 
-        gm.assignMouseDown(self, lambda:print("AA"))
+        #gm.assignMouseDown(self, lambda:print("AA"))
         self.petType = petType
         self.setImageName(self.petType + "idle")
 
@@ -49,7 +49,13 @@ class MainPet(GameObject):
         self.__happy -= 1 # change happiness and stuff when doing server things and turning it real-time
         if (self.__happy < 0):
             self.__happy = 59
-            self.poops.append (GameObject(self.gm).setImageName("poop").setPos((int(random.random()*40 + 10), int(random.random()*40+10))).setFramesPerFrame(3))
+
+            poop = GameObject(self.gm)
+            poop.setImageName("poop")
+            poop.setPos((int(random.random()*40 + 10), int(random.random()*40+10)))
+            poop.setFramesPerFrame(3)
+            poop.assignMouseUp(poop.deleteSelf)
+            self.poops.append (poop)
             if (len(self.poops) > 3):
                 self.poops[0].deleteSelf()
                 self.poops.remove(self.poops[0])

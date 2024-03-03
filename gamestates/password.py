@@ -17,12 +17,4 @@ class Password(GameState):
 
         nextButton = GameObject (self.gm).setImageText("Next", (255, 0, 0, 255), True).setPos((30, 69))
         nextButton.assignMouseUp(lambda: self.setState("petselector"))
-        # nextButton.assignKeyPress(self.nextButtonAction)
         nextButton.assignButton("return", lambda:self.setState("petselector")) # or just room
-
-        #GameObject (self.gm).setImageText("go back", (255, 0, 0, 255), True).setPos((30, 69)).assignMouseUp(lambda go, pos: self.setState("room"))
-        
-    # def nextButtonAction (self, key:str)->None:
-    #     print (key)
-    #     if (key == "return"): # enter button pressed
-    #         self.setState("room")

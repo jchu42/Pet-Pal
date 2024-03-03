@@ -1,5 +1,13 @@
 
-# - audio
+# TODO:
+# - database (store username/password, statuses, last time)
+# - eating
+# - cleaning up poop animation
+# - hunger/health levels; display status
+# - combine username and password states; add a back button to go from password back to username
+
+# cool instruments:
+# 10, 32/34, 38, 46, 55, 81, 96, 120
 
 # - collision events?
 
@@ -14,6 +22,8 @@ from gamestates.username import Username
 from gamestates.password import Password
 from gamestates.roomselector import RoomSelector
 from gamestates.petselector import PetSelector
+from gamestates.audiotest import AudioTest
+from gamestates.mainmenu import MainMenu
 
 # pygame setup
 pygame.init()
@@ -35,8 +45,10 @@ gm.addState(Password(gm))
 gm.addState(RoomSelector(gm))
 gm.addState(PetSelector(gm))
 gm.addState(Room(gm))
+gm.addState(AudioTest(gm))
+gm.addState(MainMenu(gm))
 
-gm.setState("username") # login screen
+gm.setState("mainmenu") # login screen
 
 # game loop
 running = True

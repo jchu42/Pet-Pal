@@ -11,7 +11,7 @@ class RoomSelector(GameState):
         self.bgColor ((0, 0, 0, 255))
 
         selector = Selector(self.gm, ["room", "room2", "kitchen"], color=(255, 255, 255, 255))
-        selector.setLessThanPos((5, 65)).setMoreThanPos((55, 65))
+        selector.setLessThanPos((5, 69)).setMoreThanPos((55, 69))
 
         nextButton = GameObject (self.gm).setImageText("Next", (255, 0, 0, 255), True).setPos((30, 69))
         nextButton.assignMouseUp(lambda: self.setState("room", roomname=selector.getOption(), petname=petname))
