@@ -101,6 +101,12 @@ class GameManager:
             if (tup[0] == go):
                 tup[1](tup[0]) # AHAHAAHA
                 self.onDelete.remove(tup)
+        for tup in self.onKeyPress:
+            if (tup[0] == go):
+                self.onKeyPress.remove(tup)
+        for tup in self.onButton:
+            if (tup[0] == go):
+                self.onButton.remove(tup)
 
     def handleTick(self)->None:
         if (self.currentState != ''):
@@ -147,16 +153,16 @@ class GameManager:
         self.onDelete.append((go, function))
         return go
 
-    def assignKeyPress (self, function)->None:
-        self.onKeyPress.append(function)
-    def assignButton(self, buttonname, function)->None:
-        self.onButton.append((buttonname, function))
+    def assignKeyPress (self, go:GameObject, function)->None:
+        self.onKeyPress.append((go, function))
+    def assignButton(self, go:GameObject, buttonname, function)->None:
+        self.onButton.append((go, buttonname, function))
     def handleKeyPress(self, str)->None:
-        for function in self.onKeyPress:
+        for go, function in self.onKeyPress:
             if (textDebug):
                 print ("handlekeypress:", str)
             function(str)
-        for buttonname, function in self.onButton:
+        for go, buttonname, function in self.onButton:
             if (str == buttonname):
                 if (textDebug):
                     print ("handleButton:", str)

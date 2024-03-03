@@ -18,8 +18,7 @@ from gameobject import GameObject
 from imagesdict import ImagesDict
 from gamestates.room import Room
 from gamestates.texttest import TextTest
-from gamestates.username import Username
-from gamestates.password import Password
+from gamestates.login import Login
 from gamestates.roomselector import RoomSelector
 from gamestates.petselector import PetSelector
 from gamestates.audiotest import AudioTest
@@ -39,9 +38,8 @@ pixels = (60, 70)
 # startup screen manager
 gm = GameManager(scale, pixels)
 ImagesDict(gm.drawingSurface) # static function call
-gm.addState(Username(gm))
+gm.addState(Login(gm))
 gm.addState(TextTest(gm))
-gm.addState(Password(gm))
 gm.addState(RoomSelector(gm))
 gm.addState(PetSelector(gm))
 gm.addState(Room(gm))

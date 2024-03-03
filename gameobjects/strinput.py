@@ -1,3 +1,4 @@
+import math
 from gameobject import GameObject
 import random
 import gamemanager
@@ -10,6 +11,7 @@ class StrInput(GameObject):
         self.text = ""
         self.color = (0, 0, 0, 255)
         self.censored = False
+        self.mul = math.pow(2, 1.0/12)
     def setCensored (self, censored:bool)->Self:
         self.censored = censored
         return self
@@ -31,6 +33,7 @@ class StrInput(GameObject):
     def getText (self)->str:
         return self.text
     def handleKeyPress (self, key:str):
+        keySound = 0
         if (key.isalnum() and len(key) == 1):
             self.text += key
         elif key == '/': # convert to 'shift' variants automatically
@@ -43,6 +46,17 @@ class StrInput(GameObject):
             self.text += key
         elif key == 'space':
             self.text += ' '
+            keySound = 40
         elif key == 'backspace':
             self.text = self.text[:-1]
-        # ignore other key presses
+            keySound = 41
+        else:
+            keySound = -1
+        if (keySound == 0):
+            if (key.isalpha()):
+                keySound = ord(key) - 32
+            else:
+                keySound = ord(key)
+        if keySound != -1:
+            keySound -= 38
+            self.playSound(25*math.pow(self.mul, keySound), 46)

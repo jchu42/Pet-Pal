@@ -9,15 +9,15 @@ class MainMenu(GameState):
     def loadState(self, *args, **wargs)->None:
         self.bgColor ((0, 0, 0, 255))
         
-        loginButton = GameObject (self.gm).setImageText("Login", (255, 0, 0, 255), True).setPos((30, 12))
-        loginButton.assignMouseUp(lambda: self.setState("username"))
-        loginButton.assignButton("return", lambda:self.setState("username"))
+        loginButton = GameObject (self.gm).setImageText("Login", (255, 0, 0, 255), True).setPos((30, 20))
+        loginButton.assignMouseUp(lambda: self.setState("login"))
+        loginButton.assignButton("return", lambda:self.setState("login"))
 
-        texttestButton = GameObject (self.gm).setImageText("Text Test", (255, 0, 0, 255), True).setPos((30, 24))
+        texttestButton = GameObject (self.gm).setImageText("Text Test", (255, 0, 0, 255), True).setPos((30, 35))
         texttestButton.assignMouseUp(lambda: self.setState("texttest"))
         texttestButton.assignButton("return", lambda:self.setState("texttest"))
 
-        audiotestButton = GameObject (self.gm).setImageText("Audio Test", (255, 0, 0, 255), True).setPos((30, 36))
+        audiotestButton = GameObject (self.gm).setImageText("Audio Test", (255, 0, 0, 255), True).setPos((30, 50))
         audiotestButton.assignMouseUp(lambda: self.setState("audiotest"))
         audiotestButton.assignButton("return", lambda:self.setState("audiotest"))
 

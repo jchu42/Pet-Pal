@@ -12,6 +12,7 @@ class GameObject:
 
         self._origin = origin
 
+        self._muted = False
         self._pos = None
         self._nextPos = (0, 0)
         self._imageName = ""
@@ -20,6 +21,10 @@ class GameObject:
         self._mirrored = False
         self.lastPlayed = (0, 0)
         self.assignDelete(self.__deleteSound)
+
+    def setMuted (self, muted:bool)->Self:
+        self._muted = muted
+        return self
 
     def __deleteSound(self, go)->None:
         self.gm.midiout.note_off(*self.lastPlayed)
@@ -53,10 +58,11 @@ class GameObject:
         return self
     
     def playSound (self, frequency:int, instrument:int=1, volume:int=63):#, duration:int=2):
-        self.gm.midiout.note_off(*self.lastPlayed) 
-        self.gm.midiout.set_instrument(instrument)
-        self.lastPlayed = (pygame.midi.frequency_to_midi(frequency), volume)
-        self.gm.midiout.note_on(*self.lastPlayed) 
+        if not self._muted:
+            self.gm.midiout.note_off(*self.lastPlayed) 
+            self.gm.midiout.set_instrument(instrument)
+            self.lastPlayed = (pygame.midi.frequency_to_midi(frequency), volume)
+            self.gm.midiout.note_on(*self.lastPlayed) 
 
 
     def setImageName(self, name:str)->Self:
@@ -166,10 +172,10 @@ class GameObject:
         self.gm.assignDelete(self, function)
         return self
     def assignKeyPress (self, function)->Self:
-        self.gm.assignKeyPress(function)
+        self.gm.assignKeyPress(self, function)
         return self
     def assignButton (self, buttonname:str, function)->Self:
-        self.gm.assignButton(buttonname, function)
+        self.gm.assignButton(self, buttonname, function)
         return self
 
     def deleteSelf (self) -> Self:
