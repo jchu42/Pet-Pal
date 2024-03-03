@@ -29,6 +29,8 @@ class MainPet(GameObject):
         self.actionValue = 0
         self.changeAction = True
 
+        self.poops:list[GameObject] = []
+
     def setImageName(self, name:str|list[str])->Self:
         if (type(name) == str):
             if (not self.petType in name):
@@ -44,9 +46,13 @@ class MainPet(GameObject):
         return self
     
     def tick(self)->None:
-        self.__happy -= 1
+        self.__happy -= 1 # change happiness and stuff when doing server things and turning it real-time
         if (self.__happy < 0):
             self.__happy = 59
+            self.poops.append (GameObject(self.gm).setImageName("poop").setPos((int(random.random()*40 + 10), int(random.random()*40+10))).setFramesPerFrame(3))
+            if (len(self.poops) > 3):
+                self.poops[0].deleteSelf()
+                self.poops.remove(self.poops[0])
         self.happy = int(self.__happy / 10)
 
         # idle, idle2, idle3...

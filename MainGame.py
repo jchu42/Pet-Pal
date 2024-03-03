@@ -1,17 +1,7 @@
-# do game object things instead?
-# - meshes (animated / center point, etc)
-# - audio sounds
-# - on click events, etc
-# and initialize the game things before the loop starts
-# that is, load images by name (manually) instead of automatically and having a horrible jumble in the loop
 
-# rigidbodies?
-# - collision events
+# - audio
 
-
-
-
-# include scenes? - automatically remove all active objects, and add in new objects, with parameters?
+# - collision events?
 
 import pygame
 from gamemanager import GameManager
@@ -27,10 +17,6 @@ from gamestates.petselector import PetSelector
 # pygame setup
 pygame.init()
 
-# debug option
-#textDebug = False
-# when on, shows text on screen, and can type to write stuff
-
 # configure screen
 scale = 4
 pixels = (60, 70)
@@ -44,8 +30,7 @@ gm.addState(RoomSelector(gm))
 gm.addState(PetSelector(gm))
 gm.addState(Room(gm))
 
-#gm.setState ("texttest")
-gm.setState("username") 
+gm.setState("username") # login screen
 
 # game loop
 running = True

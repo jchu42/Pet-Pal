@@ -36,7 +36,9 @@ class GameManager:
         self.states = {}
         self.currentState = ""
         self.stateChanged = True
+        
         self.gos = []
+
         self.goMouseHover = [] # separate array for each object allows us to have a tonne of objects with less overhead?
         self.goMouseDown = []
         self.goMouseDrag = []
@@ -44,10 +46,6 @@ class GameManager:
         self.onDelete = []
         self.onKeyPress = []
         self.onButton = []
-
-    def addState (self, state: gamestate)->Self:
-        self.states[state.getName()] = state
-        return self
 
     def __generateGridSurface(self, scale:int, screenPixels: tuple[int, int])->pygame.Surface:
         color = max(255 - (scale - 1) * 50, 0)
@@ -70,27 +68,14 @@ class GameManager:
                     pygame.draw.circle(gridfilter, (0, 0, 0, 0), (x, y), scale/2)
         return gridfilter
     
-    # def createMesh (self, name, origin=[0,0], framesEachImage=30):
-    #     imageset.imageSets[name].setImageVariables (origin, framesEachImage)
-    #     iObj = GameManager.Mesh(imageset.imageSets[name])
-    #     self.goMeshes.append(iObj)
-    #     self.goMeshesDict[name] = iObj
-
-    def resetHandlers (self)->None:
-        for function in self.onDelete:
-            function()
-        self.onDelete = []
-        # for gomesh in self.goMeshes:
-        #     gomesh.gameObjects = []
-        # self.goMeshes = []
-        # self.goTick = []
-        self.gos = []
-        self.goMouseHover = []
-        self.goMouseDown = []
-        self.goMouseDrag = []
-        self.goMouseUp = []
-        self.onKeyPress = []
-        self.onButton = []
+    def addState (self, state: gamestate)->Self:
+        self.states[state.getName()] = state
+        return self
+    def setState (self, newState:str, *args, **kwargs)->None:
+        self.newState = newState
+        self.stateChanged = True
+        self.args = args
+        self.kwargs = kwargs
 
     def addGameObject (self, go:GameObject)->GameObject:
         self.gos.append(go)
@@ -120,7 +105,6 @@ class GameManager:
             self.states[self.currentState].stateTick()
         for go in self.gos:
             go.tick()
-    
     def handleMeshes(self)->None:
         for go in self.gos:
             go.draw()
@@ -129,7 +113,6 @@ class GameManager:
         self.goMouseHover.append((go, function))
         return go
     def handleMouseHover (self, pos):
-        # object must have a mesh
         for go, function in self.goMouseHover:
             if (go.contains ((pos[0] - go.getPos()[0], pos[1] - go.getPos()[1]))):
                 function()
@@ -138,7 +121,6 @@ class GameManager:
         self.goMouseDown.append((go, function))
         return go
     def handleMouseDown (self, pos):
-        # object must have a mesh
         for go, function in self.goMouseDown:
             if (go.contains ((pos[0] - go.getPos()[0], pos[1] - go.getPos()[1]))):
                 function()
@@ -147,7 +129,6 @@ class GameManager:
         self.goMouseDrag.append((go, function))
         return go
     def handleMouseDrag (self, pos):
-        # object must have a mesh
         for go, function in self.goMouseDrag:
             if (go.contains ((pos[0] - go.getPos()[0], pos[1] - go.getPos()[1]))):
                 function()
@@ -156,7 +137,6 @@ class GameManager:
         self.goMouseUp.append((go, function))
         return go
     def handleMouseUp (self, pos):
-        # object must have a mesh
         for go, function in self.goMouseUp:
             if (go.contains ((pos[0] - go.getPos()[0], pos[1] - go.getPos()[1]))):
                 function()
@@ -180,12 +160,21 @@ class GameManager:
                     print ("handleButton:", str)
                 function()
     
-
-    def setState (self, newState:str, *args, **kwargs)->None:
-        self.newState = newState
-        self.stateChanged = True
-        self.args = args
-        self.kwargs = kwargs
+    def resetHandlers (self)->None:
+        for function in self.onDelete:
+            function()
+        self.onDelete = []
+        # for gomesh in self.goMeshes:
+        #     gomesh.gameObjects = []
+        # self.goMeshes = []
+        # self.goTick = []
+        self.gos = []
+        self.goMouseHover = []
+        self.goMouseDown = []
+        self.goMouseDrag = []
+        self.goMouseUp = []
+        self.onKeyPress = []
+        self.onButton = []
 
     def endFrame(self)->None:
         # draw scaled drawing surface to screen buffer

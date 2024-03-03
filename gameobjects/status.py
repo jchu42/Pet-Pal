@@ -10,4 +10,4 @@ class Status(GameObject):
         self.setOrigin ((0.5, 1))
     def tick(self)->None:
         self.setImageName("happy" + str(self.mp.happy))
-        self.setPos((self.mp.getPos()[0], self.mp.getPos()[1] - 15)) # some number
+        self.setPos((self.mp.getPos()[0], self.mp.getPos()[1] - 15))

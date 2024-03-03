@@ -12,4 +12,5 @@ class Room(GameState):
 
         mainPet = MainPet (self.gm, petname).setPos((30, 30))
         
-        textTest = GameObject (self.gm).setPos((30, 69)).setImageText("frefGvVB", (255, 0, 0, 255), True).assignMouseUp(lambda: self.setState("texttest"))
+        textTest = GameObject (self.gm).setPos((30, 69)).setImageText("frefGvVB", (255, 0, 0, 255), True)
+        textTest.assignMouseUp(lambda: self.setState("texttest"))

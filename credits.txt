@@ -2,3 +2,4 @@ room.jpg    https://openverse.org/image/26ec49b0-b14c-43ce-a576-2eabcdc25895?q=r
 kitchen.jpg https://openverse.org/image/aa5e1438-076b-48d5-8585-f40845376704?q=kitchen
 room2.jpg   https://openverse.org/image/1bdd859b-81a3-4b4d-baa8-efd817ae86f4?q=room
 panda       https://www.patreon.com/posts/red-panda-98152976
+cat         https://www.patreon.com/posts/cat-sprites-40356299

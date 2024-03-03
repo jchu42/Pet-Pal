@@ -6,15 +6,20 @@ import pygame
 class GameObject:
     def __init__(self, gm:gamemanager, origin:tuple[int, int]=(0.5, 0.5))->None:
         self.gm = gm
-        gm.addGameObject(self) # fuggit we ball
+        gm.addGameObject(self)
 
         self._origin = origin
 
         self._pos = None
         self._nextPos = (0, 0)
         self._imageName = ""
+        self._framesPerFrame = 1
         self._frame = 0
         self._mirrored = False
+
+    def setFramesPerFrame (self, frames:int)->Self:
+        self._framesPerFrame = 1.0/frames
+        return self
 
     def tick(self)->None:
         pass
@@ -24,8 +29,8 @@ class GameObject:
         return self
     def draw(self)->None:
         self._pos = self._nextPos
-        ImagesDict.drawImage(self._imageName, self._pos, self._origin, self._frame, self._mirrored)
-        self._frame += 1
+        ImagesDict.drawImage(self._imageName, self._pos, self._origin, int(self._frame), self._mirrored)
+        self._frame += self._framesPerFrame
         self._mirrored = False
     def setOrigin (self, origin:tuple[int, int])->Self:
         self._origin = origin
@@ -86,28 +91,29 @@ class GameObject:
         return startX
     
     def setImageText(self, string:str, color:tuple[int, int, int, int]=(0, 0, 0, 255), centered:bool = True)->Self:
+        """
+        """
         if (string == ""):
             self.setImageName("") # empty
             return self
-        name = "TEXT" + ' '.join(map(str, color)) + string + str(centered) # save all copies of colors of strings of text
+        name = "TEXT" + ' '.join(map(str, color)) + string # save all copies of colors of strings of text
         if (name) not in ImagesDict.images:
-            textSurface = pygame.Surface((self.__getLengthOfText (string), 5), pygame.SRCALPHA) # how tall is the text anyway?
+            textSurface = pygame.Surface((self.__getLengthOfText (string), 5), pygame.SRCALPHA)
             
-            startX = 0 # round up or down? does it matter?
+            startX = 0
 
             for char in string:
                 img = self.__getCharImg (char)
 
                 if (color != (0, 0, 0, 255)):
-                    copy = img[0].copy() # required for custom colors....? would it be just faster to do <...>.. yeah, but eh
+                    copy = img[0].copy() 
                     copy.fill(color, special_flags=pygame.BLEND_MAX)
                 else:
                     copy = img[0]
 
-                #textSurface.blit (copy, (startX - self.__origin[0] * img[0].get_width(), 0))
                 textSurface.blit (copy, (startX, 0))
 
-                startX += img[0].get_width() + 1 # uh huh
+                startX += img[0].get_width() + 1
             
             ImagesDict.images [name] = {} 
             ImagesDict.images [name][0] = textSurface
@@ -146,4 +152,8 @@ class GameObject:
         return self
     def assignButton (self, buttonname:str, function)->Self:
         self.gm.assignButton(buttonname, function)
+        return self
+
+    def deleteSelf (self) -> Self:
+        self.gm.removeGameObject(self)
         return self

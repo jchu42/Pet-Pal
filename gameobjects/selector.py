@@ -23,7 +23,7 @@ class Selector(GameObject):
             ImagesDict.images [lessthanname] = {} 
             ImagesDict.images [lessthanname][0] = lessthan
         morethanname = "fontmorethan" + ' '.join(map(str, color)) 
-        if ("fontmorethan" + ' '.join(map(str, color)) not in ImagesDict.images):
+        if (morethanname not in ImagesDict.images):
             morethan = ImagesDict.images["fontmorethan"][0].copy()
             morethan.fill(color, special_flags=pygame.BLEND_MAX)
             ImagesDict.images [morethanname] = {} 
