@@ -1,38 +1,56 @@
+from typing import Callable, Self
 import time
-import gamemanager 
+import gamemanager
 from imagesdict import ImagesDict
-from typing import Self
 import pygame
-import threading
 
 class GameObject:
-    def __init__(self, gm:gamemanager, origin:tuple[int, int]=(0.5, 0.5))->None:
-        self.gm = gm
-        gm.addGameObject(self)
 
+    midi_out: pygame.midi.Output = None
+
+    def __init__(self, origin:tuple[int, int]=(0.5, 0.5))->None:
+        # self.gm = gm
+        # gm.add_game_object(self)
         self._origin = origin
 
         self._muted = False
         self._pos = None
-        self._nextPos = (0, 0)
-        self._imageName = ""
-        self._framesPerFrame = 1
+        self._next_pos = (0, 0)
+        self._image_name = ""
+        self._frames_per_frame = 1
         self._frame = 0
         self._mirrored = False
-        self.lastPlayed = (0, 0)
-        self.assignDelete(self.__deleteSound)
+        self.last_played = (0, 0)
 
-    def setMuted (self, muted:bool)->Self:
+        self.queued_child_game_objects:list[GameObject] = []
+
+        self.on_mouse_hover:list[Callable[[],None]] = []
+        self.on_mouse_down:list[Callable[[],None]] = []
+        self.on_mouse_drag:list[Callable[[],None]] = []
+        self.on_mouse_up:list[Callable[[],None]] = []
+        self.on_key_press:list[Callable[[str],None]] = []
+        self.on_button:list[Callable[[],None]] = []
+        self.on_delete:list[Callable[[],None]] = []
+
+        self.on_delete.append(self.__delete_sound)
+        self.deleted = False
+
+    def add_child_object(self, go:Self)->Self:
+        """This function queues the game objects to be added to the game manager's list of objects"""
+        self.queued_child_game_objects.append(go)
+        return go
+
+    def set_muted (self, muted:bool)->Self:
         self._muted = muted
         return self
 
-    def __deleteSound(self, go)->None:
-        self.gm.midiout.note_off(*self.lastPlayed)
+    def __delete_sound(self)->None:
+        self.midi_out.note_off(*self.last_played)
 
-    def setFramesPerFrame (self, frames:int)->Self:
-        self._framesPerFrame = 1.0/frames
+    def set_frames_per_frame (self, frames:int)->Self:
+        self._frames_per_frame = 1.0/frames
         return self
-    def getFrame (self)->int:
+    def get_frame (self)->int:
         return int(self._frame)
 
     def tick(self)->None:
@@ -42,36 +60,36 @@ class GameObject:
         self._mirrored = True
         return self
     def draw(self)->None:
-        self._pos = self._nextPos
-        ImagesDict.drawImage(self._imageName, self._pos, self._origin, self.getFrame(), self._mirrored)
-        self._frame += self._framesPerFrame
+        self._pos = self._next_pos
+        ImagesDict.draw_image(self._image_name, self._pos, self._origin, self.get_frame(), self._mirrored)
+        self._frame += self._frames_per_frame
         self._mirrored = False
-    def setOrigin (self, origin:tuple[int, int])->Self:
+    def set_origin (self, origin:tuple[int, int])->Self:
         self._origin = origin
         return self
-    def getPos(self)->tuple[int, int]:
+    def get_pos(self)->tuple[int, int]:
         if (self._pos == None): # if hasn't been initialized yet
-            self._pos = self._nextPos
+            self._pos = self._next_pos
         return self._pos
-    def setPos(self, pos:tuple[int, int])->Self:
-        self._nextPos = pos
+    def set_pos(self, pos:tuple[int, int])->Self:
+        self._next_pos = pos
         return self
     
-    def playSound (self, frequency:int, instrument:int=1, volume:int=63):#, duration:int=2):
+    def play_sound (self, frequency:int, instrument:int=1, volume:int=100):#, duration:int=2):
         if not self._muted:
-            self.gm.midiout.note_off(*self.lastPlayed) 
-            self.gm.midiout.set_instrument(instrument)
-            self.lastPlayed = (pygame.midi.frequency_to_midi(frequency), volume)
-            self.gm.midiout.note_on(*self.lastPlayed) 
+            self.midi_out.note_off(*self.last_played) 
+            self.midi_out.set_instrument(instrument)
+            self.last_played = (pygame.midi.frequency_to_midi(frequency), volume)
+            self.midi_out.note_on(*self.last_played) 
 
 
-    def setImageName(self, name:str)->Self:
-        if (name != self._imageName):
-            self._imageName = name
+    def set_image_name(self, name:str)->Self:
+        if (name != self._image_name):
+            self._image_name = name
             self._frame = 0 # reset animation state on name change
         return self
 
-    def __getCharImg (self, char:str)-> pygame.Surface:
+    def __get_char_img (self, char:str)-> pygame.Surface:
         if (char >= 'a' and char <= 'z'):
             char = char.upper()
         if (char >= 'A' and char <= 'Z'):
@@ -108,24 +126,24 @@ class GameObject:
             #if (char >= 'a' and char <= 'z'):
             #    img = ImagesDict.images["font" + char + "2"]
             #elif (char >= 'A' and char <= 'Z'):
-            img = self.__getCharImg(char)
+            img = self.__get_char_img(char)
             startX += img[0].get_width() + 1 # 1 space in-between characters
         return startX
     
-    def setImageText(self, string:str, color:tuple[int, int, int, int]=(0, 0, 0, 255), centered:bool = True)->Self:
+    def set_image_text(self, string:str, color:tuple[int, int, int, int]=(0, 0, 0, 255), centered:bool = True)->Self:
         """
         """
         if (string == ""):
-            self.setImageName("") # empty
+            self.set_image_name("") # empty
             return self
         name = "TEXT" + ' '.join(map(str, color)) + string # save all copies of colors of strings of text
         if (name) not in ImagesDict.images:
-            textSurface = pygame.Surface((self.__getLengthOfText (string), 5), pygame.SRCALPHA)
+            text_surface = pygame.Surface((self.__getLengthOfText (string), 5), pygame.SRCALPHA)
             
-            startX = 0
+            start_x = 0
 
             for char in string:
-                img = self.__getCharImg (char)
+                img = self.__get_char_img (char)
 
                 if (color != (0, 0, 0, 255)):
                     copy = img[0].copy() 
@@ -133,51 +151,51 @@ class GameObject:
                 else:
                     copy = img[0]
 
-                textSurface.blit (copy, (startX, 0))
+                text_surface.blit (copy, (start_x, 0))
 
-                startX += img[0].get_width() + 1
+                start_x += img[0].get_width() + 1
             
             ImagesDict.images [name] = {} 
-            ImagesDict.images [name][0] = textSurface
+            ImagesDict.images [name][0] = text_surface
         if (centered):
             self._origin = [0.5, 1]
         else:
             self._origin = [0, 1]
-        self.setImageName(name)
+        self.set_image_name(name)
         return self
     
     def contains (self, pos:tuple[int, int])->bool:
-        if (self._imageName not in ImagesDict.images):
+        if (self._image_name not in ImagesDict.images):
             return False
-        frame = self.getFrame() % len(ImagesDict.images[self._imageName])
-        left = - self._origin[0] * ImagesDict.images[self._imageName][frame].get_width() - 1
-        top = - self._origin[1] * ImagesDict.images[self._imageName][frame].get_height()  - 1 
-        right = (1 - self._origin[0]) * ImagesDict.images[self._imageName][frame].get_width() 
-        bottom = (1 - self._origin[1]) * ImagesDict.images[self._imageName][frame].get_height() 
+        frame = self.get_frame() % len(ImagesDict.images[self._image_name])
+        left = - self._origin[0] * ImagesDict.images[self._image_name][frame].get_width() - 1
+        top = - self._origin[1] * ImagesDict.images[self._image_name][frame].get_height()  - 1 
+        right = (1 - self._origin[0]) * ImagesDict.images[self._image_name][frame].get_width() 
+        bottom = (1 - self._origin[1]) * ImagesDict.images[self._image_name][frame].get_height() 
         return (pos[0] > left and pos[0] < right and pos[1] > top and pos[1] < bottom)
     
-    def assignMouseHover (self, function)->Self:
-        self.gm.assignMouseHover(self, function)
-        return self
-    def assignMouseDown (self, function)->Self:
-        self.gm.assignMouseDown(self, function)
-        return self
-    def assignMouseDrag (self, function)->Self:
-        self.gm.assignMouseDrag(self, function)
-        return self
-    def assignMouseUp (self, function)->Self:
-        self.gm.assignMouseUp(self, function)
-        return self
-    def assignDelete (self, function)->Self:
-        self.gm.assignDelete(self, function)
-        return self
-    def assignKeyPress (self, function)->Self:
-        self.gm.assignKeyPress(self, function)
-        return self
-    def assignButton (self, buttonname:str, function)->Self:
-        self.gm.assignButton(self, buttonname, function)
+    # def assign_mouse_hover (self, function)->Self:
+    #     self.on_hover.append(function)
+    #     return self
+    # def assign_mouse_down (self, function)->Self:
+    #     self.on_mouse_down.append(function)
+    #     return self
+    # def assign_mouse_drag (self, function)->Self:
+    #     self.on_mouse_drag.append(function)
+    #     return self
+    # def assign_mouse_up (self, function)->Self:
+    #     self.on_mouse_up.append(function)
+    #     return self
+    # def assign_delete (self, function)->Self:
+    #     self.on_delete.append(function)
+    #     return self
+    # def assign_key_press (self, function)->Self:
+    #     self.on_key_press.append(function)
+    #     return self
+    def assign_button (self, buttonname:str, function)->Self:
+        self.on_button.append((buttonname, function))
         return self
 
-    def deleteSelf (self) -> Self:
-        self.gm.removeGameObject(self)
+    def set_deleted (self, deleted:bool=True) -> Self:
+        self.deleted = deleted
         return self

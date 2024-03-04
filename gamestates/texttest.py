@@ -4,19 +4,20 @@ from gameobjects.mainpet import MainPet
 from gameobjects.strinput import StrInput
 
 class TextTest(GameState):
-    def getName(self)->str:
+    def get_name(self)->str:
         return "texttest"
-    def loadState(self, *args, **wargs)->None:
-        self.mainUI ("kitchen")
-        GameObject (self.gm).setImageText("1234567890", (255, 0, 255, 255), True).setPos((30, 6))
-        GameObject (self.gm).setImageText("!@#$%^&*()", (255, 0, 255, 255), True).setPos((30, 12))
-        GameObject (self.gm).setImageText("-_=+[]{}\\|", (255, 0, 255, 255), True).setPos((30, 18))
-        GameObject (self.gm).setImageText(",<.>/?;:'" + '"', (255, 0, 255, 255), True).setPos((30, 24))
-        GameObject (self.gm).setImageText("qwertyuiop", (255, 0, 255, 255), True).setPos((30, 30))
-        GameObject (self.gm).setImageText("asdfghjk l", (255, 0, 255, 255), True).setPos((30, 36))
-        GameObject (self.gm).setImageText("zxcv b n m", (255, 0, 255, 255), True).setPos((30, 42))
-        StrInput (self.gm).setPos ((1, 48)).setColor((0, 255, 255, 0))
+    def load_state(self, *args, **wargs)->None:
+        self.bg_color((0, 0, 0, 255))
+        self.add_game_object(GameObject ()).set_image_text("1234567890", (255, 255, 255, 255), True).set_pos((30, 6))
+        self.add_game_object(GameObject ()).set_image_text("!@#$%^&*()", (255, 255, 0, 255), True).set_pos((30, 12))
+        self.add_game_object(GameObject ()).set_image_text("-_=+[]{}\\|", (255, 0, 0, 255), True).set_pos((30, 18))
+        self.add_game_object(GameObject ()).set_image_text(",<.>/?;:'" + '"', (0, 0, 255, 255), True).set_pos((30, 24))
+        self.add_game_object(GameObject ()).set_image_text("qwertyuiop", (0, 255, 255, 255), True).set_pos((30, 30))
+        self.add_game_object(GameObject ()).set_image_text("asdfghjk l", (0, 255, 0, 255), True).set_pos((30, 36))
+        self.add_game_object(GameObject ()).set_image_text("zxcv b n m", (255, 255, 0, 122), True).set_pos((30, 42))
+        self.add_game_object(StrInput ()).set_pos ((1, 48)).set_color((255, 0, 255, 122))
 
-        backButton = GameObject (self.gm).setImageText("return", (255, 0, 0, 255), True).setPos((30, 69))
-        backButton.assignMouseUp(lambda: self.setState("mainmenu"))
-        backButton.assignButton("return", lambda:self.setState("mainmenu"))
+        back_button = GameObject ().set_image_text("return", (255, 0, 0, 255), True).set_pos((30, 69))
+        back_button.on_mouse_up.append(lambda: self.set_state("mainmenu"))
+        back_button.assign_button("return", lambda:self.set_state("mainmenu"))
+        self.add_game_object(back_button)

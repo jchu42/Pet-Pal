@@ -1,202 +1,133 @@
+from typing import Self
 import pygame
 from imagesdict import ImagesDict
-from typing import Self
-import gameobject as GameObject
+from gameobject import GameObject
 import gamestate
 #from imageset import loadImages
 
 # select from choice of filter (1-3)
-filterSelection = 2
 
-textDebug = False
 
 # frame rate stuff
-fps = 5
-clock = pygame.time.Clock()
-dt = 0
+FPS = 5
 
 class GameManager:
+    """
+    This class represents a blank game. 
 
+    ...
+
+    Attributes
+    ----------
+    scale : int
+        width/height of each pixel
+    pixels : tuple[int, int]
+        screen's pixel dimensions
+    screen_pixels : tuple[int, int]
+        screen's actual dimensions
+    drawing_surface : pygame.Surface
+        surface for gameobjects to draw themselves on
+    midi_out
+    """
     def __init__(self, scale: int, pixels:tuple[int, int])->None:
 
         self.scale = scale
         self.pixels = pixels
-        self.screenPixels = (pixels[0]*scale, pixels[1]*scale)
-        self.screen = pygame.display.set_mode(self.screenPixels)
-        self.drawingSurface = pygame.Surface (pixels) # surface to draw on with lower resolution than main screen. scaled when drawn onto main screen.
-        self.gridfilter = self.__generateGridSurface(scale, self.screenPixels)
+        self.screen_pixels = (pixels[0]*scale, pixels[1]*scale)
+        self.screen = pygame.display.set_mode(self.screen_pixels)
+        self.drawing_surface = pygame.Surface (pixels) # surface to draw on with lower resolution than main screen. scaled when drawn onto main screen.
+        self.__grid_filter = self.__generate_grid_surface(scale, self.screen_pixels)
 
-        self.midiout = pygame.midi.Output(pygame.midi.get_default_output_id())
-
-        #self.images = loadImages()
-        #self.gameObjects = []
-        ImagesDict.loadResources(self.drawingSurface)
+        self.__clock = pygame.time.Clock()
 
 
-        self.newState = 0
-        #self.onStateChange = None # define in MainGame
+        self.current_state = ""
+        self.state = None
         self.states = {}
-        self.currentState = ""
-        self.stateChanged = True
 
-        self.gos = []
+        # separate array for each object allows us to have a tonne of objects with less overhead
+        # self.go_mouse_hover = []
+        # self.go_mouse_down = []
+        # self.go_mouse_drag = []
+        # self.go_mouse_up = []
+        # self.on_delete = []
+        # self.on_key_press = []
+        # self.on_button = []
 
-        self.goMouseHover = [] # separate array for each object allows us to have a tonne of objects with less overhead?
-        self.goMouseDown = []
-        self.goMouseDrag = []
-        self.goMouseUp = []
-        self.onDelete = []
-        self.onKeyPress = []
-        self.onButton = []
-
-    def __generateGridSurface(self, scale:int, screenPixels: tuple[int, int])->pygame.Surface:
+    def __generate_grid_surface(self, scale:int, screen_pixels: tuple[int, int], filter_selection:int = 2)->pygame.Surface:
         color = max(255 - (scale - 1) * 50, 0)
         alpha = min((scale - 1) * 20, 255)
-        gridColor = (color, color, color, alpha)
-        gridfilter = pygame.Surface(screenPixels, pygame.SRCALPHA) #SRCALPHA to make the initial image all transparent (default is all black)
-        if (filterSelection == 1 or 3):#put into another function!!!
-                for x in range (0, screenPixels[0], scale):
-                    pygame.draw.line(gridfilter, gridColor, (x, 0), (x, screenPixels[1])) # draw black lines with 100/255 alpha
-                for y in range(0, screenPixels[1], scale):
-                    pygame.draw.line(gridfilter, gridColor, (0, y), (screenPixels[0], y))
-                if (filterSelection == 3):
-                    for x in range (0, screenPixels[0] + 1, scale):
-                        for y in range(0, screenPixels[1] + 1, scale):
-                            pygame.draw.polygon (gridfilter, gridColor, [(x - 2, y),(x, y - 2), (x + 2, y), (x, y + 2)])
-        if (filterSelection == 2):
-            gridfilter.fill(gridColor)
-            for x in range (int(scale/2), screenPixels[0], scale):
-                for y in range(int(scale/2), screenPixels[1], scale):
-                    pygame.draw.circle(gridfilter, (0, 0, 0, 0), (x, y), scale/2)
-        return gridfilter
+        grid_color = (color, color, color, alpha)
+        grid_filter = pygame.Surface(screen_pixels, pygame.SRCALPHA) #SRCALPHA to make the initial image all transparent (default is all black)
+        if (filter_selection == 1 or 3):#put into another function!!!
+                for x in range (0, screen_pixels[0], scale):
+                    pygame.draw.line(grid_filter, grid_color, (x, 0), (x, screen_pixels[1])) # draw black lines with 100/255 alpha
+                for y in range(0, screen_pixels[1], scale):
+                    pygame.draw.line(grid_filter, grid_color, (0, y), (screen_pixels[0], y))
+                if (filter_selection == 3):
+                    for x in range (0, screen_pixels[0] + 1, scale):
+                        for y in range(0, screen_pixels[1] + 1, scale):
+                            pygame.draw.polygon (grid_filter, grid_color, [(x - 2, y),(x, y - 2), (x + 2, y), (x, y + 2)])
+        if (filter_selection == 2):
+            grid_filter.fill(grid_color)
+            for x in range (int(scale/2), screen_pixels[0], scale):
+                for y in range(int(scale/2), screen_pixels[1], scale):
+                    pygame.draw.circle(grid_filter, (0, 0, 0, 0), (x, y), scale/2)
+        return grid_filter
     
-    def addState (self, state: gamestate)->Self:
-        self.states[state.getName()] = state
+    def add_state (self, state: gamestate)->Self:
+        self.states[state.get_name()] = state
         return self
-    def setState (self, newState:str, *args, **kwargs)->None:
-        self.newState = newState
-        self.stateChanged = True
-        self.args = args
-        self.kwargs = kwargs
-
-    def addGameObject (self, go:GameObject)->GameObject:
-        self.gos.append(go)
-        return go
-    def removeGameObject(self, go:GameObject)->GameObject:
-        if go in self.gos:
-            self.gos.remove(go)
-        for tup in self.goMouseHover:
-            if (tup[0] == go):
-                self.goMouseHover.remove(tup)
-        for tup in self.goMouseDown:
-            if (tup[0] == go):
-                self.goMouseDown.remove(tup)
-        for tup  in self.goMouseDrag:
-            if (tup[0] == go):
-                self.goMouseDrag.remove(tup)
-        for tup in self.goMouseUp:
-            if (tup[0] == go):
-                self.goMouseUp.remove(tup)
-        for tup in self.onDelete:
-            if (tup[0] == go):
-                tup[1](tup[0]) # AHAHAAHA
-                self.onDelete.remove(tup)
-        for tup in self.onKeyPress:
-            if (tup[0] == go):
-                self.onKeyPress.remove(tup)
-        for tup in self.onButton:
-            if (tup[0] == go):
-                self.onButton.remove(tup)
-
-    def handleTick(self)->None:
-        if (self.currentState != ''):
-            self.states[self.currentState].stateTick()
-        for go in self.gos:
-            go.tick()
-    def handleMeshes(self)->None:
-        for go in self.gos:
-            go.draw()
-
-    def assignMouseHover (self, go, function)->GameObject:
-        self.goMouseHover.append((go, function))
-        return go
-    def handleMouseHover (self, pos):
-        for go, function in self.goMouseHover:
-            if (go.contains ((pos[0] - go.getPos()[0], pos[1] - go.getPos()[1]))):
-                function()
-
-    def assignMouseDown (self, go:GameObject, function) -> GameObject:
-        self.goMouseDown.append((go, function))
-        return go
-    def handleMouseDown (self, pos):
-        for go, function in self.goMouseDown:
-            if (go.contains ((pos[0] - go.getPos()[0], pos[1] - go.getPos()[1]))):
-                function()
-
-    def assignMouseDrag (self, go:GameObject, function) -> GameObject:
-        self.goMouseDrag.append((go, function))
-        return go
-    def handleMouseDrag (self, pos):
-        for go, function in self.goMouseDrag:
-            if (go.contains ((pos[0] - go.getPos()[0], pos[1] - go.getPos()[1]))):
-                function()
-
-    def assignMouseUp (self, go:GameObject, function) -> GameObject:
-        self.goMouseUp.append((go, function))
-        return go
-    def handleMouseUp (self, pos):
-        for go, function in self.goMouseUp:
-            if (go.contains ((pos[0] - go.getPos()[0], pos[1] - go.getPos()[1]))):
-                function()
-
-    def assignDelete (self, go:GameObject, function) -> GameObject:
-        self.onDelete.append((go, function))
-        return go
-
-    def assignKeyPress (self, go:GameObject, function)->None:
-        self.onKeyPress.append((go, function))
-    def assignButton(self, go:GameObject, buttonname, function)->None:
-        self.onButton.append((go, buttonname, function))
-    def handleKeyPress(self, str)->None:
-        for go, function in self.onKeyPress:
-            if (textDebug):
-                print ("handlekeypress:", str)
-            function(str)
-        for go, buttonname, function in self.onButton:
-            if (str == buttonname):
-                if (textDebug):
-                    print ("handleButton:", str)
-                function()
     
-    def resetHandlers (self)->None:
-        for go, function in self.onDelete:
-            function(go)
-        self.onDelete = []
-        self.gos = []
-        self.goMouseHover = []
-        self.goMouseDown = []
-        self.goMouseDrag = []
-        self.goMouseUp = []
-        self.onKeyPress = []
-        self.onButton = []
 
-    def endFrame(self)->None:
+    def end_frame(self)->None:
         # draw scaled drawing surface to screen buffer
-        self.screen.blit (pygame.transform.scale_by(self.drawingSurface, self.scale), (0, 0)) 
+        self.screen.blit (pygame.transform.scale_by(self.drawing_surface, self.scale), (0, 0)) 
         # draw filter
-        self.screen.blit(self.gridfilter, (0, 0))
+        self.screen.blit(self.__grid_filter, (0, 0))
         # flip() the display to put your work on screen
         pygame.display.flip()
         
-        # dt is delta time in seconds since last frame, used for framerate-
-        # independent physics.
-        #dt = clock.tick(60) / 1000
-        clock.tick(fps)
+        self.__clock.tick(FPS)
 
-        if (self.stateChanged):
-            self.currentState = self.newState
-            self.stateChanged = False
-            # reset manager
-            self.resetHandlers()
-            #self.onStateChange(self, self.state, self.args, self.kwargs)
-            self.states[self.currentState].loadState(*self.args, **self.kwargs)
+        if (self.state.state_changed):
+            self.state.state_changed = False
+            self.state.reset_handlers()
+            self.current_state = self.state.new_state
+            self.states[self.current_state].load_state(*self.state.args, **self.state.kwargs)
+            self.state = self.states[self.current_state]
+
+
+
+    def run(self, start)->None:
+        self.current_state = start
+        self.states[self.current_state].load_state()
+        self.state = self.states[self.current_state]
+        # game loop
+        running = True
+        while running:
+            # poll for events
+            for event in pygame.event.get():
+                pos = pygame.mouse.get_pos()
+                if (pos):
+                    pos = (int(pos[0]/self.scale), int(pos[1]/self.scale))
+                    self.state.handle_mouse_hover(pos)
+                if event.type == pygame.QUIT:
+                    self.state.reset_handlers() # calls on delete for active objects if needed?
+                    running = False
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    self.state.handle_mouse_up(pos)
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    self.state.handle_mouse_down(pos)
+                elif event.type == pygame.MOUSEMOTION:
+                    self.state.handle_mouse_hover(pos)
+                elif event.type == pygame.KEYDOWN:
+                    self.state.handle_key_press(pygame.key.name(event.key))
+
+            if (self.current_state != ''):
+                self.states[self.current_state].stateTick()
+            self.state.handle_tick()
+            self.state.handle_meshes()
+
+            self.end_frame()
+        pygame.quit()

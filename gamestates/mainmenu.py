@@ -4,23 +4,24 @@ from gameobjects.mainpet import MainPet
 from gameobjects.strinput import StrInput
 
 class MainMenu(GameState):
-    def getName(self)->str:
+    def get_name(self)->str:
         return "mainmenu"
-    def loadState(self, *args, **wargs)->None:
-        self.bgColor ((0, 0, 0, 255))
+    def load_state(self, *args, **wargs)->None:
+        self.bg_color ((0, 0, 0, 255))
         
-        loginButton = GameObject (self.gm).setImageText("Login", (255, 0, 0, 255), True).setPos((30, 20))
-        loginButton.assignMouseUp(lambda: self.setState("login"))
-        loginButton.assignButton("return", lambda:self.setState("login"))
+        login_button = GameObject ().set_image_text("Login", (255, 0, 0, 255), True).set_pos((30, 20))
+        login_button.on_mouse_up.append(lambda: self.set_state("login"))
+        login_button.on_button.append(("return", lambda:self.set_state("login")))
+        self.add_game_object(login_button)
 
-        texttestButton = GameObject (self.gm).setImageText("Text Test", (255, 0, 0, 255), True).setPos((30, 35))
-        texttestButton.assignMouseUp(lambda: self.setState("texttest"))
-        texttestButton.assignButton("return", lambda:self.setState("texttest"))
+        text_test_button = self.add_game_object(GameObject ()).set_image_text("Text Test", (255, 0, 0, 255), True).set_pos((30, 35))
+        text_test_button.on_mouse_up.append(lambda: self.set_state("texttest"))
+        text_test_button.on_button.append(("return", lambda:self.set_state("texttest")))
 
-        audiotestButton = GameObject (self.gm).setImageText("Audio Test", (255, 0, 0, 255), True).setPos((30, 50))
-        audiotestButton.assignMouseUp(lambda: self.setState("audiotest"))
-        audiotestButton.assignButton("return", lambda:self.setState("audiotest"))
+        audio_test_button = self.add_game_object(GameObject ()).set_image_text("Audio Test", (255, 0, 0, 255), True).set_pos((30, 50))
+        audio_test_button.on_mouse_up.append(lambda: self.set_state("audiotest"))
+        audio_test_button.on_button.append(("return", lambda:self.set_state("audiotest")))
 
-    def changeToPassword (self)->None:
+    def change_to_password (self)->None:
         # todo - combine username and password states; add a back button to go from password back to username
         pass

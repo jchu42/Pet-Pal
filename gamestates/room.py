@@ -4,13 +4,15 @@ from gameobjects.mainpet import MainPet
 from gameobjects.strinput import StrInput
 
 class Room(GameState):
-    def getName(self)->str:
+    def get_name(self)->str:
         return "room"
 
-    def loadState(self, roomname:str, petname:str, *args, **wargs)->None:
-        self.mainUI(roomname)
+    def load_state(self, roomname:str, petname:str, *args, **wargs)->None:
+        self.main_ui(roomname)
 
-        mainPet = MainPet (self.gm, petname).setPos((30, 30))
+        main_pet = MainPet (petname).set_pos((30, 30))
+        self.add_game_object(main_pet)
         
-        textTest = GameObject (self.gm).setPos((30, 69)).setImageText("frefGvVB", (255, 0, 0, 255), True)
-        textTest.assignMouseUp(lambda: self.setState("texttest"))
+        text_test = GameObject ().set_pos((30, 69)).set_image_text("frefGvVB", (255, 0, 0, 255), True)
+        text_test.on_mouse_up.append(lambda: self.set_state("texttest"))
+        self.add_game_object(text_test)

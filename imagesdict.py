@@ -3,7 +3,7 @@ from os import listdir
 import pygame
 
 # debug option
-debug = False
+DEBUG = False
 
 class ImagesDict:
     images:dict[list:[pygame.Surface]] = {} # static variable
@@ -11,12 +11,12 @@ class ImagesDict:
     @staticmethod
     def __init__ (surface:pygame.Surface)->None:
         ImagesDict.surface = surface
-        ImagesDict.loadResources(surface)
+        ImagesDict.load_resources()
     @staticmethod
     def __getitem__(name:str)->list[pygame.Surface]:
         return ImagesDict.images[name]
     @staticmethod
-    def drawImage (imagename:str, pos=(0, 0), origin=(0.5,0.5), frame:int=0, mirrored=False)->None:
+    def draw_image (imagename:str, pos=(0, 0), origin=(0.5,0.5), frame:int=0, mirrored=False)->None:
         if (imagename == ""):
             return
         #print ("1", imagename, frame,  len(ImagesDict.images[imagename]))
@@ -45,10 +45,7 @@ class ImagesDict:
                                     pos[1] - origin[1] * img.get_height())
                                     )
         else:
-            try:
-                print ("Erorr: imagename: [" + imagename + "." + str(frame) + "] not found!")
-            except:
-                print (imagename, frame)
+            print ("Erorr: imagename: [" + imagename + "." + str(frame) + "] not found!")
 
     # def contains (self, frame, pos):
     #     left = - self.origin[0] * self[frame].get_width() - 1
@@ -58,13 +55,13 @@ class ImagesDict:
     #     return (pos[0] > left and pos[0] < right and pos[1] > top and pos[1] < bottom)
             
     @staticmethod
-    def loadResources(surface:pygame.Surface)->None:
+    def load_resources()->None:
         files = listdir("images/") # assuming all are files
         #imageDataFile = ""
         for filename in files:
             # https://stackoverflow.com/questions/4444923/get-filename-without-extension-in-python
             splitName = filename.split (".")
-            if debug:
+            if DEBUG:
                 print (splitName)
             name = splitName[0]
             if (len(splitName) == 2):

@@ -5,14 +5,14 @@ from gameobjects.strinput import StrInput
 from gameobjects.selector import Selector
 
 class PetSelector(GameState):
-    def getName(self)->str:
+    def get_name(self)->str:
         return "petselector"
-    def loadState(self, *args, **wargs)->None:
-        self.bgColor ((255, 255, 255, 255))
+    def load_state(self, *args, **wargs)->None:
+        self.bg_color ((255, 255, 255, 255))
 
-        selector = Selector(self.gm, ["pandaidle", "catidle"], color=(0, 0, 0, 255))
-
-        nextButton = GameObject (self.gm).setImageText("Next", (255, 0, 0, 255), True).setPos((30, 69))
-        nextButton.assignMouseUp(lambda: self.setState("roomselector", petname=selector.getOption().removesuffix("idle")))
-        nextButton.assignButton("return", lambda:self.setState("roomselector", petname=selector.getOption().removesuffix("idle")))
+        selector = Selector(["pandaidle", "catidle"], (0, 0, 0, 255))
+        self.add_game_object(selector)
+        nextButton = self.add_game_object(GameObject ()).set_image_text("Next", (255, 0, 0, 255), True).set_pos((30, 69))
+        nextButton.on_mouse_up.append(lambda: self.set_state("roomselector", petname=selector.get_option().removesuffix("idle")))
+        nextButton.on_button.append(("return", lambda:self.set_state("roomselector", petname=selector.get_option().removesuffix("idle"))))
        
