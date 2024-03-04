@@ -14,47 +14,35 @@
 
 # - collision events?
 
+# audio = pygame.mixer.Sound("audiotest2.mp3")
+# audio.set_volume(0.2)
+#audio.play()
+
 import sys
 import pygame
 import pygame.midi
 from gamemanager import GameManager
 from imagesdict import ImagesDict
-# from gamestates.room import Room
-# from gamestates.texttest import TextTest
-# from gamestates.login import Login
-# from gamestates.roomselector import RoomSelector
-# from gamestates.petselector import PetSelector
-# from gamestates.audiotest import AudioTest
 from gamestates.mainmenu import MainMenu
 from gameobject import GameObject
 
 # configure screen
-SCALE = 4
-PIXELS = (60, 70)
+SCALE = 4 # pixel width/height
+PIXELS = (60, 70) # number of pixels width/height for the screen
 
 def main() -> int:
+    """Initialize pygame, and run the pet game
+    """
     # pygame setup
-    pygame.init() # https://stackoverflow.com/questions/50569453/why-does-it-say-that-module-pygame-has-no-init-member
+    # https://stackoverflow.com/questions/50569453/why-does-it-say-that-module-pygame-has-no-init-member
+    pygame.init()
     pygame.midi.init()
     GameObject.midi_out = pygame.midi.Output(pygame.midi.get_default_output_id()) # ???
-
-    # audio = pygame.mixer.Sound("audiotest2.mp3")
-    # audio.set_volume(0.2)
-    #audio.play()
-
 
     # startup screen manager
     gm = GameManager(SCALE, PIXELS)
     ImagesDict(gm.drawing_surface) # static function call
-    # gm.add_state(Login())
-    # gm.add_state(TextTest())
-    # gm.add_state(RoomSelector())
-    # gm.add_state(PetSelector())
-    # gm.add_state(Room())
-    # gm.add_state(AudioTest())
-    # gm.add_state(MainMenu())
     gm.run(MainMenu())
-    #gm.run("mainmenu") # login screen
 
 if __name__ == '__main__':
     sys.exit(main())

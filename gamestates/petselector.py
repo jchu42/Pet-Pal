@@ -1,19 +1,18 @@
 from gamestate import GameState
 from gameobject import GameObject
-from gameobjects.mainpet import MainPet
-from gameobjects.strinput import StrInput
 from gameobjects.selector import Selector
 import gamestates.roomselector as rm
 
 class PetSelector(GameState):
+    """This is the pet selection screen state."""
     def __init__(self)->None:
         GameState.__init__(self)
 
-        self.bg_color ((255, 255, 255, 255))
+        self._bg_color ((255, 255, 255, 255))
 
-        selector = Selector(["pandaidle", "catidle"], (0, 0, 0, 255))
-        self.add_game_object(selector)
-        nextButton = self.add_game_object(GameObject ()).set_image_text("Next", (255, 0, 0, 255), True).set_pos((30, 69))
-        nextButton.on_mouse_up.append(lambda: self.set_state(rm.RoomSelector(petname=selector.get_option().removesuffix("idle"))))
-        nextButton.on_button.append(("return", lambda:self.set_state(rm.RoomSelector(petname=selector.get_option().removesuffix("idle")))))
+        selector = Selector(["pandaidle", "catidle"], color=(0, 0, 0, 255))
+        self._add_game_object(selector)
+        next_button = self._add_game_object(GameObject ()).set_image_text("Next", (255, 0, 0, 255)).set_pos((30, 69))
+        next_button.on_mouse_up.append(lambda: self._set_state(rm.RoomSelector(petname=selector.get_option().removesuffix("idle"))))
+        next_button.on_button.append(("return", lambda:self._set_state(rm.RoomSelector(petname=selector.get_option().removesuffix("idle")))))
        

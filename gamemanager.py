@@ -1,4 +1,3 @@
-from typing import Self
 import pygame
 from gamestate import GameState
 
@@ -6,8 +5,7 @@ from gamestate import GameState
 FPS = 5
 
 class GameManager:
-    """
-    This class represents a blank game. 
+    """This class represents a blank game. 
 
     ...
 
@@ -33,16 +31,10 @@ class GameManager:
         self.scale:int = scale
         self.screen_pixels:tuple[int, int] = (pixels[0]*scale, pixels[1]*scale)
         self.screen = pygame.display.set_mode(self.screen_pixels)
-        # surface to draw on with lower resolution than main screen.
-        # scaled when drawn onto main screen.
         self.drawing_surface = pygame.Surface (pixels)
         self.__grid_filter = self.__generate_grid_surface(scale, self.screen_pixels)
-
         self.__clock = pygame.time.Clock()
-
-        #self.current_state:str = ""
         self.state:GameState = None
-        #self.states:list[GameState] = {}
 
     def __generate_grid_surface(self, scale:int, screen_pixels: tuple[int, int],
                                 filter_selection:int = 2)->pygame.Surface:
@@ -67,13 +59,8 @@ class GameManager:
                 for y in range(int(scale/2), screen_pixels[1], scale):
                     pygame.draw.circle(grid_filter, (0, 0, 0, 0), (x, y), scale/2)
         return grid_filter
-
-    # def add_state (self, state: GameState)->Self:
-    #     """Add a gamestate object to the list of possible game states"""
-    #     self.states[state.get_name()] = state
-    #     return self
-
-    def end_frame(self)->None:
+    
+    def __end_frame(self)->None:
         # draw scaled drawing surface to screen buffer
         self.screen.blit (pygame.transform.scale_by(self.drawing_surface, self.scale), (0, 0)) 
         # draw filter
@@ -87,27 +74,26 @@ class GameManager:
             self.state.change_state = False
             self.state.reset_handlers() # cleanup
             self.state = self.state.new_state
-            #self.current_state = self.state.new_state
-            #self.states[self.current_state].load_state(*self.state.args, **self.state.kwargs)
-            #self.state = self.states[self.current_state]
-
-
 
     def run(self, start:GameState)->None:
+        """Starts running the game loop.
+
+        Parameters:
+            start : GameState
+                The initial GameState class for the game to start with
+        """
         self.state = start
-        #self.states[self.current_state].load_state()
-        #self.state = self.states[self.current_state]
         # game loop
         running = True
         while running:
             # poll for events
             for event in pygame.event.get():
                 pos = pygame.mouse.get_pos()
-                if (pos):
+                if pos:
                     pos = (int(pos[0]/self.scale), int(pos[1]/self.scale))
                     self.state.handle_mouse_hover(pos)
                 if event.type == pygame.QUIT:
-                    self.state.reset_handlers() # calls on delete for active objects if needed?
+                    self.state.reset_handlers()
                     running = False
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.state.handle_mouse_up(pos)
@@ -117,12 +103,7 @@ class GameManager:
                     self.state.handle_mouse_hover(pos)
                 elif event.type == pygame.KEYDOWN:
                     self.state.handle_key_press(pygame.key.name(event.key))
-
-            self.state.stateTick()
-            #if (self.current_state != ''):
-            #    self.states[self.current_state].stateTick()
             self.state.handle_tick()
             self.state.handle_meshes()
-
-            self.end_frame()
+            self.__end_frame()
         pygame.quit()
