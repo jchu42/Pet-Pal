@@ -1,12 +1,13 @@
 from gamestate import GameState
 from gameobject import GameObject
-from gameobjects.mainpet import MainPet
 from gameobjects.strinput import StrInput
+import gamestates.mainmenu as mm
+import gamestates.petselector as ps
 
 class Login(GameState):
-    def get_name(self)->str:
-        return "login"
-    def load_state(self, *args, **wargs)->None:
+    def __init__(self)->None:
+        GameState.__init__(self)
+        
         self.bg_color ((0, 0, 0, 255))
 
         self.enter_user = GameObject ().set_image_text("Enter Username", (255, 0, 0, 255), centered=False).set_pos((2, 10))
@@ -30,6 +31,6 @@ class Login(GameState):
         self.add_game_object(self.password)
 
         self.next_button = GameObject ().set_image_text("Next", (255, 0, 0, 255), True).set_pos((30, 69))
-        self.next_button.on_mouse_up.append(lambda: self.set_state("petselector"))
-        self.next_button.assign_button("return", lambda:self.set_state("petselector"))
+        self.next_button.on_mouse_up.append(lambda: self.set_state(ps.PetSelector()))
+        self.next_button.assign_button("return", lambda:self.set_state(ps.PetSelector()))
         self.add_game_object(self.next_button)

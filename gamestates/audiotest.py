@@ -3,11 +3,12 @@ from gameobject import GameObject
 from gameobjects.mainpet import MainPet
 from gameobjects.strinput import StrInput
 from gameobjects.selector import Selector
+import gamestates.mainmenu as mm
 
 class AudioTest(GameState):
-    def get_name(self)->str:
-        return "audiotest"
-    def load_state(self, *args, **wargs)->None:
+    def __init__(self)->None:
+        GameState.__init__(self)
+
         self.bg_color ((255, 255, 255, 255))
 
         self.add_game_object(GameObject ()).set_image_text("Pitch").set_pos((30, 7))
@@ -33,8 +34,8 @@ class AudioTest(GameState):
         self.add_game_object(self.play_button)
 
         login_button = GameObject ().set_image_text("Return", (255, 0, 0, 255), True).set_pos((30, 69))
-        login_button.on_mouse_up.append(lambda: self.set_state("mainmenu"))
-        login_button.assign_button("return", lambda:self.set_state("mainmenu"))
+        login_button.on_mouse_up.append(lambda: self.set_state(mm.MainMenu()))
+        login_button.assign_button("return", lambda:self.set_state(mm.MainMenu()))
         self.add_game_object(login_button)
 
     def buttonSound(self) -> None:

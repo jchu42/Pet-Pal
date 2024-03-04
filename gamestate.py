@@ -1,6 +1,6 @@
+from typing import Self
 from gameobject import GameObject
 from imagesdict import ImagesDict
-import pygame
 
 TEXT_DEBUG = False
 
@@ -8,14 +8,10 @@ class GameState:
     def __init__(self)->None:
         self.gos:list[GameObject] = []
         self.go_queue:list[GameObject] = []
-        self.new_state = ""
-        self.state_changed = False
-        self.args = []
-        self.kwargs = []
-    def get_name(self)->str:
-        pass
-    def load_state(self, *args, **wargs)->None:
-        pass
+        self.new_state:GameState = None
+        self.change_state:bool = False
+    #def load_state(self, *args, **wargs)->None:
+    #    pass
     def stateTick(self)->None:
         pass
 
@@ -23,11 +19,11 @@ class GameState:
         name = "bg" + ' '.join(map(str, color))
         #print (name)
         if name not in ImagesDict.images:
-            bgSurface = ImagesDict.images["bgwhite"][0].copy()#pygame.Surface(ImagesDict.images["bgwhite"][0].copy().get_size())
+            bg_surface = ImagesDict.images["bgwhite"][0].copy()#pygame.Surface(ImagesDict.images["bgwhite"][0].copy().get_size())
             #print (bgSurface.get_size())
-            bgSurface.fill(color)#, special_flags=pygame.BLEND_MAX)
+            bg_surface.fill(color)#, special_flags=pygame.BLEND_MAX)
             ImagesDict.images[name] = {}
-            ImagesDict.images[name][0] = bgSurface
+            ImagesDict.images[name][0] = bg_surface
         self.add_game_object(GameObject()).set_image_name(name).set_pos((0, 0)).set_origin((0, 0))
 
     def main_ui(self, room:str)->None:
@@ -37,11 +33,9 @@ class GameState:
 
         self.add_game_object(GameObject()).set_image_name("bgblack").set_pos((0, 0)).set_origin((0, 0))
 
-    def set_state (self, new_state:str, *args, **kwargs)->None:
+    def set_state (self, new_state:Self)->None:
         self.new_state = new_state
-        self.state_changed = True
-        self.args = args
-        self.kwargs = kwargs
+        self.change_state = True
 
     def add_game_object (self, go:GameObject)->GameObject:
         self.go_queue.append(go)

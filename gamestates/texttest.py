@@ -1,12 +1,12 @@
 from gamestate import GameState
 from gameobject import GameObject
-from gameobjects.mainpet import MainPet
 from gameobjects.strinput import StrInput
+import gamestates.mainmenu as mm
 
 class TextTest(GameState):
-    def get_name(self)->str:
-        return "texttest"
-    def load_state(self, *args, **wargs)->None:
+    def __init__(self)->None:
+        GameState.__init__(self)
+        
         self.bg_color((0, 0, 0, 255))
         self.add_game_object(GameObject ()).set_image_text("1234567890", (255, 255, 255, 255), True).set_pos((30, 6))
         self.add_game_object(GameObject ()).set_image_text("!@#$%^&*()", (255, 255, 0, 255), True).set_pos((30, 12))
@@ -18,6 +18,6 @@ class TextTest(GameState):
         self.add_game_object(StrInput ()).set_pos ((1, 48)).set_color((255, 0, 255, 122))
 
         back_button = GameObject ().set_image_text("return", (255, 0, 0, 255), True).set_pos((30, 69))
-        back_button.on_mouse_up.append(lambda: self.set_state("mainmenu"))
-        back_button.assign_button("return", lambda:self.set_state("mainmenu"))
+        back_button.on_mouse_up.append(lambda: self.set_state(mm.MainMenu()))
+        back_button.assign_button("return", lambda:self.set_state(mm.MainMenu()))
         self.add_game_object(back_button)

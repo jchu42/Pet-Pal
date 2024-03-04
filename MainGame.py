@@ -19,12 +19,12 @@ import pygame
 import pygame.midi
 from gamemanager import GameManager
 from imagesdict import ImagesDict
-from gamestates.room import Room
-from gamestates.texttest import TextTest
-from gamestates.login import Login
-from gamestates.roomselector import RoomSelector
-from gamestates.petselector import PetSelector
-from gamestates.audiotest import AudioTest
+# from gamestates.room import Room
+# from gamestates.texttest import TextTest
+# from gamestates.login import Login
+# from gamestates.roomselector import RoomSelector
+# from gamestates.petselector import PetSelector
+# from gamestates.audiotest import AudioTest
 from gamestates.mainmenu import MainMenu
 from gameobject import GameObject
 
@@ -46,15 +46,15 @@ def main() -> int:
     # startup screen manager
     gm = GameManager(SCALE, PIXELS)
     ImagesDict(gm.drawing_surface) # static function call
-    gm.add_state(Login())
-    gm.add_state(TextTest())
-    gm.add_state(RoomSelector())
-    gm.add_state(PetSelector())
-    gm.add_state(Room())
-    gm.add_state(AudioTest())
-    gm.add_state(MainMenu())
-
-    gm.run("mainmenu") # login screen
+    # gm.add_state(Login())
+    # gm.add_state(TextTest())
+    # gm.add_state(RoomSelector())
+    # gm.add_state(PetSelector())
+    # gm.add_state(Room())
+    # gm.add_state(AudioTest())
+    # gm.add_state(MainMenu())
+    gm.run(MainMenu())
+    #gm.run("mainmenu") # login screen
 
 if __name__ == '__main__':
     sys.exit(main())
