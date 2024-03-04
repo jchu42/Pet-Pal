@@ -1,14 +1,4 @@
 
-# TODO:
-# - database (store username/password, statuses, last time)
-# - stats; stats decreasing over time
-# - eating
-# - cleaning up poop animation
-# - hunger/health levels; display status
-# - pet movements / states depending on stat values
-# - login back button when entering password to edit the username
-
-
 # cool instruments:
 # 10, 32/34, 38, 45, 55, 81, 96, 120
 
@@ -16,7 +6,7 @@
 
 # audio = pygame.mixer.Sound("audiotest2.mp3")
 # audio.set_volume(0.2)
-#audio.play()
+# audio.play()
 
 import sys
 import pygame
@@ -35,13 +25,14 @@ def main() -> int:
     """
     # pygame setup
     # https://stackoverflow.com/questions/50569453/why-does-it-say-that-module-pygame-has-no-init-member
+    # add "--extension-pkg-whitelist=pygame" to Pylint:Args in Pylint extension settings
     pygame.init()
     pygame.midi.init()
-    GameObject.midi_out = pygame.midi.Output(pygame.midi.get_default_output_id()) # ???
+    GameObject.midi_out = pygame.midi.Output(pygame.midi.get_default_output_id())
 
     # startup screen manager
     gm = GameManager(SCALE, PIXELS)
-    ImagesDict(gm.drawing_surface) # static function call
+    ImagesDict.load_resources(gm.drawing_surface) # static function call
     gm.run(MainMenu())
 
 if __name__ == '__main__':

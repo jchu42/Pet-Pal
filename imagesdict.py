@@ -22,10 +22,7 @@ class ImagesDict:
     """
     images:dict[list:[pygame.Surface]] = {} # static variable
     surface:pygame.Surface = None
-    @staticmethod
-    def __init__ (surface:pygame.Surface)->None:
-        ImagesDict.surface = surface
-        ImagesDict.load_resources()
+
     @staticmethod
     def __getitem__(name:str)->list[pygame.Surface]:
         return ImagesDict.images[name]
@@ -81,8 +78,13 @@ class ImagesDict:
             print ("Erorr: imagename: [" + imagename + "." + str(frame) + "] not found!")
 
     @staticmethod
-    def load_resources()->None:
-        """Load images from the "images/" folder to the images dict."""
+    def load_resources(surface:pygame.Surface)->None:
+        """Load images from the "images/" folder to the images dict.
+        
+        Parameters:
+            surface : pygame.Surface
+                The surface on which to run draw commands on"""
+        ImagesDict.surface = surface
         files = listdir("images/") # assuming all are files
         #imageDataFile = ""
         for filename in files:
