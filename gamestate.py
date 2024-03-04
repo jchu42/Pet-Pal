@@ -101,7 +101,7 @@ class GameState:
             for function in go.on_delete:
                 function()
         self._gos = [go for go in self._gos if not go.deleted]
-            
+
 
     def handle_meshes(self)->None:
         """Draw all GameObjects to the screen."""

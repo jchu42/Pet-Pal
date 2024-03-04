@@ -125,4 +125,4 @@ class StrInput(GameObject):
                     key_sound = 41
                 else:
                     key_sound = 60
-            self._play_sound(127 - key_sound, 45)
+            self.play_sound(127 - key_sound, 45)

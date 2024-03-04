@@ -59,7 +59,7 @@ class GameManager:
                 for y in range(int(scale/2), screen_pixels[1], scale):
                     pygame.draw.circle(grid_filter, (0, 0, 0, 0), (x, y), scale/2)
         return grid_filter
-    
+
     def __end_frame(self)->None:
         # draw scaled drawing surface to screen buffer
         self.screen.blit (pygame.transform.scale_by(self.drawing_surface, self.scale), (0, 0)) 

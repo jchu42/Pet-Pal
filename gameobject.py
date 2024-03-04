@@ -135,7 +135,8 @@ class GameObject:
         Call _get_frame() to get the current frame of the animation
         """
         self._pos = self._next_pos
-        ImagesDict.draw_image(self._image_name, self._pos, self._origin, self._get_frame(), self._mirrored)
+        ImagesDict.draw_image(self._image_name, self._pos, 
+                              self._origin, self._get_frame(), self._mirrored)
         self._frame += self._frames_per_frame
         self._mirrored = False
 
@@ -172,7 +173,7 @@ class GameObject:
         self._next_pos = pos
         return self
 
-    def _play_sound (self, note:int, instrument:int=1, volume:int=100)->None:
+    def play_sound (self, note:int, instrument:int=1, volume:int=100)->None:
         """Have this GameObject play a sound. 
         The sound is stopped when this GameObject play another sound, or is deleted.
         

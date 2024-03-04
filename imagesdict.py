@@ -100,4 +100,4 @@ class ImagesDict:
             if extension in ("png", "jpg"):
                 if name not in ImagesDict.images:
                     ImagesDict.images[name] = {}
-                ImagesDict.images[name][num] = pygame.image.load("images/" + filename).convert_alpha()
+                ImagesDict.images[name][num] = pygame.image.load("images/"+filename).convert_alpha()

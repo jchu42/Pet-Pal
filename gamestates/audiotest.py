@@ -40,4 +40,6 @@ class AudioTest(GameState):
         self._add_game_object(login_button)
 
     def __button_sound(self) -> None:
-        self.play_button._play_sound(self.pitch.get_option(), self.instrument.get_option(), self.volume.get_option())
+        self.play_button.play_sound(self.pitch.get_option(),
+                                    self.instrument.get_option(),
+                                    self.volume.get_option())

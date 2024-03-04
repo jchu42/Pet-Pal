@@ -10,9 +10,12 @@ class PetSelector(GameState):
 
         self._bg_color ((255, 255, 255, 255))
 
-        selector = Selector(["pandaidle", "catidle"], color=(0, 0, 0, 255))
-        self._add_game_object(selector)
-        next_button = self._add_game_object(GameObject ()).set_image_text("Next", (255, 0, 0, 255)).set_pos((30, 69))
-        next_button.on_mouse_up.append(lambda: self._set_state(rm.RoomSelector(petname=selector.get_option().removesuffix("idle"))))
-        next_button.on_button.append(("return", lambda:self._set_state(rm.RoomSelector(petname=selector.get_option().removesuffix("idle")))))
-       
+        self.selector = Selector(["pandaidle", "catidle"], color=(0, 0, 0, 255))
+        self._add_game_object(self.selector)
+        next_button = self._add_game_object(GameObject ()).set_pos((30, 69))
+        next_button.set_image_text("Next", (255, 0, 0, 255))
+        next_button.on_mouse_up.append(self.__change_state)
+        next_button.on_button.append(("return", self.__change_state))
+
+    def __change_state(self):
+        self._set_state(rm.RoomSelector(petname=self.selector.get_option().removesuffix("idle")))
