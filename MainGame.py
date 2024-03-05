@@ -17,6 +17,7 @@ from gamestates.mainmenu import MainMenu
 from gameobject import GameObject
 
 # configure screen
+FPS = 5
 SCALE = 4 # pixel width/height -> config
 
 PIXELS = (60, 70) # number of pixels width/height for the screen -> keep here
@@ -31,7 +32,7 @@ def main() -> int:
     GameObject.midi_out = pygame.midi.Output(pygame.midi.get_default_output_id())
 
     # startup screen manager
-    gm = GameManager(SCALE, PIXELS)
+    gm = GameManager(FPS, SCALE, PIXELS)
     ImagesDict.load_resources(gm.drawing_surface) # static function call
     gm.run(MainMenu())
 

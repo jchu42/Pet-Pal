@@ -1,5 +1,5 @@
+"""This module contains the static class ImagesDict to load all files on game startup for use by the game."""
 from os import listdir
-#from typing import List
 import pygame
 
 # debug option
@@ -31,23 +31,28 @@ class ImagesDict:
                     frame:int=0, mirrored:bool=False)->None:
         """Draws the specified image to the screen.
         
-        Parameters:
-            imagename : str
-                The name of the imageset to use
-            pos : tuple[int, int]
-                The position to draw the image
-            origin : tuple[int, int]|str
-                The position of the image that 'pos' should be when drawn, 
-                as a percentage of the image, or as a descriptive string.
-                (0, 0) == "top left"
-                (0.5, 0) == "top middle"
-                (1, 0) == "top right"
-                (0, 0.5) == "middle left"
-                (0.5, 0.5) == "middle"
-                (1, 0.5) == "middle right"
-                (0, 1) == "bottom left"
-                (0.5, 1) == "bottom middle"
-                (1, 1) == "bottom right"
+        Parameters
+        ----------
+        imagename : str
+            The name of the imageset to use
+        pos : tuple[int, int]
+            The position to draw the image
+        origin : tuple[int, int]|str, default=(0.5, 0.5)
+            The position of the image that 'pos' should be when drawn, 
+            as a percentage of the image, or as a descriptive string.
+            (0, 0) == "top left"
+            (0.5, 0) == "top middle"
+            (1, 0) == "top right"
+            (0, 0.5) == "middle left"
+            (0.5, 0.5) == "middle"
+            (1, 0.5) == "middle right"
+            (0, 1) == "bottom left"
+            (0.5, 1) == "bottom middle"
+            (1, 1) == "bottom right"
+        frame : int, default=0
+            The frame of the image to use
+        mirrored : bool, default=False
+            Whether or not the drawn image should be horizontally mirrored
         """
         if imagename == "":
             return
@@ -81,9 +86,10 @@ class ImagesDict:
     def load_resources(surface:pygame.Surface)->None:
         """Load images from the "images/" folder to the images dict.
         
-        Parameters:
-            surface : pygame.Surface
-                The surface on which to run draw commands on"""
+        Parameters
+        ----------
+        surface : pygame.Surface
+            The surface on which to run draw commands on"""
         ImagesDict.surface = surface
         files = listdir("images/") # assuming all are files
         #imageDataFile = ""
