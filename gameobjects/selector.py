@@ -37,12 +37,12 @@ class Selector(GameObject):
 
         self.lessthan = self.add_child_object(GameObject()).set_image_text("<", self._color)
         self.lessthan.set_origin((0.5, 0.5))
-        self.lessthan.on_mouse_up.append(self.__decrement)
-        self.lessthan.on_button.append(("left", self.__decrement))
+        self.lessthan.on_mouse_up.append(self.decrement)
+        self.lessthan.on_button.append(("left", self.decrement))
         self.morethan = self.add_child_object(GameObject()).set_image_text(">", self._color)
         self.morethan.set_origin((0.5, 0.5))
-        self.morethan.on_mouse_up.append(self.__increment)
-        self.morethan.on_button.append(("right", self.__increment))
+        self.morethan.on_mouse_up.append(self.increment)
+        self.morethan.on_button.append(("right", self.increment))
 
         self.set_pos((30, 30))
         self.set_origin((0.5, 0.5))
@@ -76,13 +76,13 @@ class Selector(GameObject):
         """
         return self._options[self.__selection]
 
-    def __increment(self)->None:
+    def increment(self)->None:
         """Change to the next option"""
         self.queue_sound(71)
         self.__selection += 1
         if self.__selection >= len(self._options):
             self.__selection = 0
-    def __decrement(self)->None:
+    def decrement(self)->None:
         """Change to the previous option"""
         self.queue_sound(59)
         self.__selection -= 1
