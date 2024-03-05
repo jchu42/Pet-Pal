@@ -17,12 +17,12 @@ from gamestates.mainmenu import MainMenu
 from gameobject import GameObject
 
 # configure screen
-SCALE = 4 # pixel width/height
-PIXELS = (60, 70) # number of pixels width/height for the screen
+SCALE = 4 # pixel width/height -> config
+
+PIXELS = (60, 70) # number of pixels width/height for the screen -> keep here
 
 def main() -> int:
-    """Initialize pygame, and run the pet game
-    """
+    """Initialize pygame, and run the pet game"""
     # pygame setup
     # https://stackoverflow.com/questions/50569453/why-does-it-say-that-module-pygame-has-no-init-member
     # add "--extension-pkg-whitelist=pygame" to Pylint:Args in Pylint extension settings
