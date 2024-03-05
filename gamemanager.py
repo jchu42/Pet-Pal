@@ -1,3 +1,4 @@
+"""module docstrings; stick with one of the two styles; 'has a class that does xyz'"""
 import pygame
 from gamestate import GameState
 
@@ -27,7 +28,7 @@ class GameManager:
         the list of possible gamestates the game can be in
     """
     def __init__(self, scale: int, pixels:tuple[int, int])->None:
-
+        """private functions need docstrings too"""
         self.scale:int = scale
         self.screen_pixels:tuple[int, int] = (pixels[0]*scale, pixels[1]*scale)
         self.screen = pygame.display.set_mode(self.screen_pixels)

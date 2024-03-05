@@ -3,7 +3,7 @@ from os import listdir
 import pygame
 
 # debug option
-DEBUG = False
+DEBUG = False # put in a config file
 
 class ImagesDict:
     """This static class holds all of the images on the disk for use by the game.
