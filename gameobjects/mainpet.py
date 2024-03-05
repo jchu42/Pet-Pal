@@ -1,3 +1,4 @@
+"""This module contains the MainPet GameObject class."""
 from typing import Self
 import random
 from gameobject import GameObject
@@ -21,6 +22,13 @@ class MainPet(GameObject):
         The poops the pet has taken
     """
     def __init__ (self, pet_type:str)->None:
+        """Initializes the MainPet with default values (subject to change)
+
+        Parameters
+        ----------
+        pet_type : str
+            The pet selection. Currently available: panda, cat
+        """
         # pet selection?
         # idle, happyidle (default to idle if happyidle does not exist), 
         # movehori, movevert (default to movehori if does not exist)
@@ -49,12 +57,15 @@ class MainPet(GameObject):
     def set_image_name(self, name:str|list[str])->Self:
         """Set the image set to use. 
 
-        Parameters:
-            name : str|list[str]
-                str : sets the imageset to pet_type + name
-                list [str] : uses pet_type + list[pos] of the lowest 'pos' value that exists
+        Parameters
+        ----------
+        name : str|list[str]
+            str : sets the imageset to pet_type + name
+            list [str] : uses pet_type + list[pos] of the lowest 'pos' value that exists
 
-        Return:
+        Returns
+        -------
+        GameObject
             self
         """
         if isinstance(name, str):

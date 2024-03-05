@@ -1,7 +1,9 @@
+"""This module contains the GameObject class for use in GameState."""
 from typing import Callable, Self
 import pygame
 import pygame.midi
 from imagesdict import ImagesDict
+from exceptions import CharNotFoundException
 
 class GameObject:
     """An object for use in GameState.
@@ -10,6 +12,8 @@ class GameObject:
     
     Attributes
     ----------
+    midi_out : pygame.midi.Output, default=None
+        The object used to play sounds by the GameObject. Requires initialization.
     queued_child_game_objects : list[GameObject]
         A list of child objects this GameObject created that should be removed
         and added to GameManager's list of GameObjects
@@ -24,6 +28,9 @@ class GameObject:
     on_key_press : list[Callable[[str], None]]
         A list of functions that will be called when any keyboard button is pressed. 
         The keyboard button that was pressed will be passed into the function. 
+    on_key_release : list[Callable[[str], None]]
+        A list of functions that will be called when any keyboard button is released. 
+        The keyboard button that was released will be passed into the function. 
     on_button : list[(str, Callable[[], None])]
         A list of functions that will be called when the specified button is pressed
     on_delete : list[Callable[[], None]]
@@ -34,6 +41,14 @@ class GameObject:
     midi_out: pygame.midi.Output = None
 
     def __init__(self, pos:tuple[int, int]=(0, 0), origin:tuple[int, int]=(0.5, 1))->None:
+        """Initialize this GameObject.
+        
+        Parameters
+        ----------
+        pos : tuple[int, int], default=(0, 0)
+        ...
+
+        """
         self._origin = origin
 
         self._muted = False
@@ -43,15 +58,18 @@ class GameObject:
         self._frames_per_frame = 1
         self._frame = 0
         self._mirrored = False
-        self.__last_played = (0, 0)
 
         self.queued_child_game_objects:list[GameObject] = []
+
+        self.queued_sounds:list[tuple[int, int, int, int]] = []
+        self.__last_instrument:int = -1
 
         self.on_mouse_hover:list[Callable[[],None]] = []
         self.on_mouse_down:list[Callable[[],None]] = []
         self.on_mouse_drag:list[Callable[[],None]] = []
         self.on_mouse_up:list[Callable[[],None]] = []
         self.on_key_press:list[Callable[[str],None]] = []
+        self.on_key_release:list[Callable[[str],None]] = []
         self.on_button:list[(str, Callable[[],None])] = []
         self.on_delete:list[Callable[[],None]] = []
 
@@ -61,22 +79,30 @@ class GameObject:
     def add_child_object(self, go:Self)->Self:
         """This function queues the GameObject to be added to the game manager's list of objects
 
-        Parameters:
-            go : GameObject
-                The GameObject to be added to the game manager's list of objects
-        Return:
+        Parameters
+        ----------
+        go : GameObject
+            The GameObject to be added to the game manager's list of objects
+
+        Returns
+        -------
+        GameObject
             The child GameObject
         """
         self.queued_child_game_objects.append(go)
         return go
 
-    def set_muted (self, muted:bool)->Self:
+    def set_muted (self, muted:bool = True)->Self:
         """Set the mute state of this GameObject.
         
-        Parameters:
-            go : bool
-                Whether or not this GameObject should be muted
-        Return:
+        Parameters
+        ----------
+        go : bool, default=True
+            Whether or not this GameObject should be muted
+
+        Returns
+        -------
+        GameObject
             self
         """
         if muted:
@@ -85,19 +111,25 @@ class GameObject:
         return self
 
     def __delete_sound(self)->None:
-        self.midi_out.note_off(*self.__last_played)
+        """Turns off the last played MIDI note."""
+        if len(self.queued_sounds) > 0:
+            self.midi_out.note_off(self.queued_sounds[0][0], self.queued_sounds[0][2])
 
     def set_frames_per_frame (self, frames:int)->Self:
         """Set the animation speed of this GameObject.
         
-        Parameters:
-            frames : int
-                The number of frames each image in the animation should last for.
-                1 = every frame, the image should change = 5fps
-                2 = every 2 frames, the image should change = 2.5fps
-                5 = every 5 frames, the image should change = 1fps
-                While a float is accepted, the game runs strictly at 5fps, which may cause stutters.
-        Return:
+        Parameters
+        ----------
+        frames : int
+            The number of frames each image in the animation should last for.
+            1 = every frame, the image should change = 5fps
+            2 = every 2 frames, the image should change = 2.5fps
+            5 = every 5 frames, the image should change = 1fps
+            While a float is accepted, the game runs strictly at 5fps, which may cause stutters.
+
+        Returns
+        -------
+        GameObject
             self
         """
         self._frames_per_frame = 1.0/frames
@@ -105,9 +137,10 @@ class GameObject:
     def _get_frame (self)->int:
         """Get the current frame of this GameObject.
         
-        Return:
-            int
-                The frame of this GameObject that will be drawn to the screen
+        Returns
+        -------
+        int
+            The frame of this GameObject that will be drawn to the screen
         """
         return int(self._frame)
 
@@ -119,7 +152,9 @@ class GameObject:
     def _mirror(self)->Self:
         """Mirror this GameObject in the next draw call.
         
-        Return:
+        Returns
+        -------
+        GameObject
             self
         """
         self._mirrored = True
@@ -143,10 +178,14 @@ class GameObject:
     def set_origin (self, origin:tuple[int, int])->Self:
         """Set the origin of this GameObject.
         
-        Parameters:
-            origin : tuple[int, int]
-                The origin this GameObject should have
-        Return:
+        Parameters
+        ----------
+        origin : tuple[int, int]
+            The origin this GameObject should have
+
+        Returns
+        -------
+        GameObject
             self
         """
         self._origin = origin
@@ -154,9 +193,10 @@ class GameObject:
     def get_pos(self)->tuple[int, int]:
         """Get this GameObject's position.
 
-        Return:
-            tuple[int, int]
-                This GameObject's position
+        Returns
+        -------
+        tuple[int, int]
+            This GameObject's position
         """
         if self._pos is None: # if hasn't been initialized yet
             self._pos = self._next_pos
@@ -164,42 +204,64 @@ class GameObject:
     def set_pos(self, pos:tuple[int, int])->Self:
         """Set this GameObject's position.
 
-        Parameters:
-            pos : tuple[int, int]
-                The position this GameObject should be set to
-        Return:
+        Parameters
+        ----------
+        pos : tuple[int, int]
+            The position this GameObject should be set to
+
+        Returns
+        -------
+        GameObject
             self
         """
         self._next_pos = pos
         return self
 
-    def play_sound (self, note:int, instrument:int=1, volume:int=100)->None:
-        """Have this GameObject play a sound. 
+    def queue_sound (self, note:int, instrument:int=1, volume:int=100, duration:int=1)->None:
+        """Have this GameObject queue a sound to play. 
         The sound is stopped when this GameObject play another sound, or is deleted.
         
-        Parameters:
-            note : int
-                The note that should be played (0-127)
-            instrument : int
-                The MIDI instrument to be used (0-127)
-            volume : 
-                How loud this sound should be played (0-127)
+        Parameters
+        ----------
+        note : int
+            The note that should be played (0-127)
+        instrument : int
+            The MIDI instrument to be used (0-127)
+        volume : 
+            How loud this sound should be played (0-127)
         """
         if not self._muted:
-            self.midi_out.note_off(*self.__last_played)
-            self.midi_out.set_instrument(instrument)
-            self.__last_played = (note, volume)
-            self.midi_out.note_on(*self.__last_played)
+            self.queued_sounds.append((note, instrument, volume, duration))
 
+    def play_sound (self)->None:
+        """Play the next queued MIDI note"""
+        if len(self.queued_sounds) > 0:
+            note, instrument, volume, duration = self.queued_sounds[0]
+            if duration <= 0:
+                self.midi_out.note_off(note, volume)
+                self.queued_sounds.pop(0)
+            if len(self.queued_sounds) > 0:
+                note, instrument, volume, duration = self.queued_sounds[0]
+                self.queued_sounds[0] = (note, instrument, volume, duration - 1)
+                if self.__last_instrument != instrument:
+                    self.midi_out.set_instrument(instrument)
+                    self.__last_instrument = instrument
+                self.midi_out.note_on(note, volume)
+            else:
+                self.__last_instrument = -1
 
     def set_image_name(self, name:str)->Self:
         """The name of the image / animation this GameObject should have.
         The name must correspond to a file or set of files in the "images/" folder.
 
-        Parameters:
-            name : str
-                The name of the image / animation
-        Return:
+        Parameters
+        ----------
+        name : str
+            The name of the image / animation
+
+        Returns
+        -------
+        GameObject
             self
         """
         if name != self._image_name:
@@ -208,9 +270,26 @@ class GameObject:
         return self
 
     def __get_char_img (self, char:str)-> pygame.Surface:
+        """Get the image from ImageDict of the corresponding character.
+        
+        Parameters
+        ----------
+        char : str
+            The character to get the image of
+        
+        Returns
+        -------
+        pygame.Surface
+            The image of the character
+
+        Raises
+        ------
+        CharNotFoundException
+            If the font character(s) is not found in ImagesDict
+        """
         if char >= 'a' and char <= 'z':
-            char = char.upper()
-        if char >= 'A' and char <= 'Z':
+            img = ImagesDict.images["font" + char + "2"]
+        elif char >= 'A' and char <= 'Z':
             img = ImagesDict.images["font" + char]
         elif char == ".":
             img = ImagesDict.images["fontdot"]
@@ -235,10 +314,21 @@ class GameObject:
         elif "font" + char in ImagesDict.images:
             img = ImagesDict.images["font" + char]
         else:
-            print ("Cannot find character: ", char)
-            img = ImagesDict.images["fontunknown"]
+            raise CharNotFoundException ("Cannot find character: ", char)
         return img
     def __get_length_of_text (self, string:str) -> int:
+        """Get the number of pixels that the input string would take to display.
+        
+        Parameters
+        ----------
+        string : str
+            The string of text to use
+        
+        Returns
+        -------
+        int
+            The number of pixels
+        """
         start_x = -1 # account for extra space at the end of the text
         for char in string:
             img = self.__get_char_img(char)
@@ -248,12 +338,16 @@ class GameObject:
     def set_image_text(self, string:str, color:tuple[int, int, int, int]=(0, 0, 0, 255))->Self:
         """Set this GameObject image to a string of text. This uses the "font" images.
 
-        Parameters:
-            string : str
-                The text to display
-            color : tuple[int, int, int, int]
-                The color the text should be
-        Return:
+        Parameters
+        ----------
+        string : str
+            The text to display
+        color : tuple[int, int, int, int]
+            The color the text should be
+
+        Returns
+        -------
+        GameObject
             self
         """
         if string == "":
@@ -282,12 +376,15 @@ class GameObject:
     def contains (self, pos:tuple[int, int])->bool:
         """Check if the position is within the square of the image of this GameObject.
         
-        Parameters:
-            pos : tuple[int, int]
-                The position to check
-        Return:
-            bool
-                Whether or not the point is contained in thie GameObject's space
+        Parameters
+        ----------
+        pos : tuple[int, int]
+            The position to check
+
+        Returns
+        -------
+        bool
+            Whether or not the point is contained in thie GameObject's space
         """
         if self._image_name not in ImagesDict.images:
             return False
@@ -301,13 +398,17 @@ class GameObject:
     def assign_button (self, buttonname:str, function)->Self:
         """Add a button function for the corresponding button.
 
-        Parameters:
-            buttonname : str
-                The button to listen for.
-                Alphanumerics are alphanumerics
-                The 'enter' button is "return"
-                The 'spacebar' is "space"
-        Return:
+        Parameters
+        ----------
+        buttonname : str
+            The button to listen for.
+            Alphanumerics are alphanumerics
+            The 'enter' button is "return"
+            The 'spacebar' is "space"
+
+        Returns
+        -------
+        GameObject
             self
         """
         self.on_button.append((buttonname, function))
@@ -316,10 +417,14 @@ class GameObject:
     def set_deleted (self, deleted:bool=True) -> Self:
         """Queue this GameObject for destruction by the GameManager.
         
-        Parameters:
-            deleted : bool
-                Whether or not this GameObject should be queued for destruction
-        Return:
+        Parameters
+        ----------
+        deleted : bool
+            Whether or not this GameObject should be queued for destruction
+
+        Returns
+        -------
+        GameObject
             self
         """
         self.deleted = deleted

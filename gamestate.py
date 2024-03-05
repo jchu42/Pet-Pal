@@ -1,3 +1,4 @@
+"""Contains the GameState class"""
 from typing import Self
 from gameobject import GameObject
 from imagesdict import ImagesDict
@@ -23,6 +24,7 @@ class GameState:
         self.new_state:GameState = None
         self.change_state:bool = False
 
+
     def _state_tick(self)->None:
         """Derived classes may override this function. 
         This function is called each game tick before the GameObjects.
@@ -31,9 +33,10 @@ class GameState:
     def _bg_color(self, color:tuple[int, int, int, int]) -> None:
         """This function creates a GameObject to fill the background with the given color.
         
-        Parameters:
-            color : tuple[int, int, int, int]
-                The color to set the whole screen to
+        Parameters
+        ----------
+        color : tuple[int, int, int, int]
+            The color to set the whole screen to
         """
         name = "bg" + ' '.join(map(str, color))
         if name not in ImagesDict.images:
@@ -46,9 +49,10 @@ class GameState:
     def _main_ui(self, room:str)->None:
         """This function creates several GameObjects to fill the background.
         
-        Parameters:
-            room : str
-                The name of the background image to use
+        Parameters
+        ----------
+        room : str
+            The name of the background image to use
         """
         self._add_game_object(GameObject()).set_image_name("bgwhite").set_pos((30, 70))
         self._add_game_object(GameObject()).set_image_name(room).set_pos((30, 60))
@@ -57,9 +61,10 @@ class GameState:
     def _set_state (self, new_state:Self)->None:
         """Call this function to exit the current state and transition to the new state.
         
-        Parameters:
-            new_state : GameState
-                The new state to transition to
+        Parameters
+        ----------
+        new_state : GameState
+            The new state to transition to
         """
         self.new_state = new_state
         self.change_state = True
@@ -67,13 +72,15 @@ class GameState:
     def _add_game_object (self, go:GameObject)->GameObject:
         """Add a GameObject to the game state, so it will be used and appear on the screen.
         
-        Parameters:
-            go : GameObject
-                The GameObject to add to the current state
+        Parameters
+        ----------
+        go : GameObject
+            The GameObject to add to the current state
         
-        Return:
-            GameObject
-                The GameObject that was added
+        Returns
+        -------
+        GameObject
+            The GameObject that was added
         """
         self.__go_queue.append(go)
         return go
@@ -102,6 +109,10 @@ class GameState:
                 function()
         self._gos = [go for go in self._gos if not go.deleted]
 
+    def handle_sounds(self)->None:
+        """Play the queued sounds for the GameObjects"""
+        for go in self._gos:
+            go.play_sound()
 
     def handle_meshes(self)->None:
         """Draw all GameObjects to the screen."""
@@ -111,9 +122,10 @@ class GameState:
     def handle_mouse_hover (self, pos:tuple[int, int])->None:
         """Handle all GameObjects' mouse hover actions if the cursor is over it
         
-        Parameters:
-            pos : tuple[int, int]
-                The position of the mouse
+        Parameters
+        ----------
+        pos : tuple[int, int]
+            The position of the mouse
         """
         for go in self._gos:
             if len(go.on_mouse_hover) > 0:
@@ -124,9 +136,10 @@ class GameState:
     def handle_mouse_down (self, pos:tuple[int, int])->None:
         """Handle all GameObjects' mouse down actions if the cursor is over it
         
-        Parameters:
-            pos : tuple[int, int]
-                The position of the mouse
+        Parameters
+        ----------
+        pos : tuple[int, int]
+            The position of the mouse
         """
         for go in self._gos:
             if len(go.on_mouse_down) > 0:
@@ -137,9 +150,10 @@ class GameState:
     def handle_mouse_drag (self, pos:tuple[int, int])->None:
         """Handle all GameObjects' mouse drag actions if the cursor is over it
         
-        Parameters:
-            pos : tuple[int, int]
-                The position of the mouse
+        Parameters
+        ----------
+        pos : tuple[int, int]
+            The position of the mouse
         """
         for go in self._gos:
             if len(go.on_mouse_drag) > 0:
@@ -150,9 +164,10 @@ class GameState:
     def handle_mouse_up (self, pos:tuple[int, int])->None:
         """Handle all GameObjects' mouse up actions if the cursor is over it
         
-        Parameters:
-            pos : tuple[int, int]
-                The position of the mouse
+        Parameters
+        ----------
+        pos : tuple[int, int]
+            The position of the mouse
         """
         for go in self._gos:
             if len(go.on_mouse_up) > 0:
@@ -163,9 +178,10 @@ class GameState:
     def handle_key_press(self, button:str)->None:
         """Handle all GameObjects' keyboard actions
         
-        Parameters:
-            button : str
-                The key that was pressed
+        Parameters
+        ----------
+        button : str
+            The key that was pressed
         """
         for go in self._gos:
             if len(go.on_key_press) > 0:
@@ -180,6 +196,21 @@ class GameState:
                         if TEXT_DEBUG:
                             print ("handleButton:", button)
                         function()
+
+    def handle_key_release(self, button:str)->None:
+        """Handle all GameObjects' keyboard actions
+        
+        Parameters
+        ----------
+        button : str
+            The key that was pressed
+        """
+        for go in self._gos:
+            if len(go.on_key_release) > 0:
+                if TEXT_DEBUG:
+                    print ("handlekeyrelease:", button)
+                for function in go.on_key_release:
+                    function(button)
 
     def reset_handlers (self)->None:
         """Handle cleanup of all GameObjects"""
