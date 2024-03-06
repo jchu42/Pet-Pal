@@ -17,14 +17,14 @@ class MainPet(GameObject):
     ----------
     pet_type : str
         The name of the pet, determines the imageset to use
-    happy : int
+    hunger : int
         The happiness value of the pet
     action : str
         The description of the action the pet is currently performing
     poops : list[GameObject]
         The poops the pet has taken
     """
-    def __init__ (self, pet_type, pet_happy, poops)->None:
+    def __init__ (self, pet_type, pet_hunger, poops)->None:
         """Initializes the MainPet with default values (subject to change)
 
         Parameters
@@ -46,12 +46,13 @@ class MainPet(GameObject):
         #     raise exceptions.PetNotFoundException()
 
         self.pet_type = pet_type
-        self.happy = pet_happy
+       # self.happy = pet_happy
+        self.hunger = pet_hunger
         # do poop stuff
 
         self.set_image_name(self.pet_type + "idle")
 
-        self.__happy = 59
+        # self.__happy = 59
         # self.happy = 5
 
         self.status = Status()
@@ -106,10 +107,14 @@ class MainPet(GameObject):
         die (defaults to idle)
         poop (defaults to move)
         """
-        self.__happy -= 1
-        if self.__happy < 0:
-            self.__happy = 59
-
+       # self.__happy -= 1   
+        self.hunger += 1
+        if self.hunger <= 0:
+           # self.__happy = 59
+            food = GameObject()
+            food.on_mouse_up.append(lambda: setattr(self, 'hunger', self.hunger - 10))
+            food.set_pos(45, 10)
+            
             poop = GameObject()
             self.add_child_object(poop)
             poop.set_image_name("poop")
@@ -120,14 +125,15 @@ class MainPet(GameObject):
             if len(self.poops) > 3:
                 self.poops[0].set_deleted()
                 self.poops.remove(self.poops[0])
-        self.happy = int(self.__happy / 10)
+                self.hunger += 10
+       # self.hunger = int(self.hunger / 10)
 
         if self._change_action:
             self._change_action = False
             decision = random.random() * 5
-            if decision > self.happy:
+            if decision > self.hunger:
                 decision = random.random() * 5
-                if decision > self.happy:
+                if decision > self.hunger:
                     self.action = "sleep"
                     self._action_value = int(random.random()*30) + 30
                 else:
@@ -173,5 +179,6 @@ class MainPet(GameObject):
         if not self._right:
             self._mirror()
 
-        self.status.set_happiness(self.happy)
+        #self.status.set_happiness(self.happy)
+        self.status.set_hunger(self.hunger)
         self.status.set_pos((self.get_pos()[0], self.get_pos()[1] - 15))
