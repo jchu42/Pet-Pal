@@ -38,3 +38,6 @@ class MainMenu(GameState):
         quit_button.on_mouse_up.append(lambda: self._set_state(None))
         quit_button.on_button.append(("q", lambda:self._set_state(None)))
         quit_button.on_button.append(("escape", lambda:self._set_state(None)))
+
+        # rip = self._add_game_object(GameObject())
+        # rip.set_image_name("rip").set_pos((30, 30))

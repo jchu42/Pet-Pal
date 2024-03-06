@@ -19,9 +19,9 @@ class Room(GameState):
         """
         GameState.__init__(self)
 
-        pet_type, room_type, pet_happy, poops = db.get_pet(username)
+        pet_type, room_type, border_type, pet_happy, poops = db.get_pet(username)
 
-        self._main_ui(room_type)
+        self._main_ui(room_type, border_type)
         
         main_pet = MainPet (pet_type, pet_happy, poops).set_pos((30, 30))
         self._add_game_object(main_pet)

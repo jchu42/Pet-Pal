@@ -46,7 +46,7 @@ class GameState:
             ImagesDict.images[name][0] = bg_surface
         self._add_game_object(GameObject()).set_image_name(name).set_pos((30, 70))
 
-    def _main_ui(self, room:str)->None:
+    def _main_ui(self, room:str, border:str)->None:
         """This function creates several GameObjects to fill the background.
         
         Parameters
@@ -56,7 +56,8 @@ class GameState:
         """
         self._add_game_object(GameObject()).set_image_name("bgwhite").set_pos((30, 70))
         self._add_game_object(GameObject()).set_image_name(room).set_pos((30, 60))
-        self._add_game_object(GameObject()).set_image_name("bgblack").set_pos((30, 70))
+        self._add_game_object(GameObject()).set_image_name(border).set_pos((30, 62))
+        #self._add_game_object(GameObject()).set_image_name("bgblack2").set_pos((30, 70))
 
     def _set_state (self, new_state:Self)->None:
         """Call this function to exit the current state and transition to the new state.

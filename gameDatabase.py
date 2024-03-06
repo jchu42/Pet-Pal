@@ -1,21 +1,3 @@
-# this file holds the rough code on how to connect python and postgres
-
-## CITATION (the code below is referenced for the following link): https://www.youtube.com/watch?v=M2NzvnfS-hI
-
-
-#step 1: in a terminal window type: pip3 install psycopg2
-
-#step 2: in postgres account (assumming a new database is already made), 
-#we'll need the following info:
-#hostname  
-#database 
-#pwd
-#port_id
-
-########## To uncomment CTRL+K+U #######
-
-
-####### IMPLEMENTATION BELOW ############
 
 import psycopg2
 import traceback
@@ -62,17 +44,17 @@ def add_user(user_name, user_password):
     values = (user_name, user_password, "")
     run_command(command, values)
 
-def get_pet(username)->tuple[str, str, int, int]:
-    ret = run_command("SELECT pet_type, room_type, pet_happy, poops FROM users WHERE user_name='" + username + "'")
+def get_pet(username)->tuple[str, str, str, int, int]:
+    ret = run_command("SELECT pet_type, room_type, border_type, pet_happy, poops FROM users WHERE user_name='" + username + "'")
     print ("GET PET: ", ret)
     return ret
 
-def set_pet(username, pet_type, room_type, pet_happy, poops):
+def set_pet(username, pet_type, room_type, border_type, pet_happy, poops):
     command = """UPDATE users
-        SET pet_type = %s, room_type = %s, pet_happy = %s, poops = %s
+        SET pet_type = %s, room_type = %s, border_type = %s, pet_happy = %s, poops = %s
         WHERE user_name = %s
         """
-    values = (pet_type, room_type, pet_happy, poops, username)
+    values = (pet_type, room_type, border_type, pet_happy, poops, username)
     run_command(command, values)
 
 
@@ -84,6 +66,7 @@ if __name__ == '__main__':
             user_password VARCHAR(255) NOT NULL,
             pet_type VARCHAR(255),
             room_type VARCHAR(255),
+            border_type VARCHAR(255),
             pet_happy INT,
             poops INT
                     )""")
