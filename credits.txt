@@ -5,6 +5,8 @@ panda       https://www.patreon.com/posts/red-panda-98152976
 cat         https://www.patreon.com/posts/cat-sprites-40356299
 borders     https://bdragon1727.itch.io/border-and-panels-menu-part-3
 
+numpy docstrings convention https://numpydoc.readthedocs.io/en/latest/format.html
+
 Lucky Day by Sakura Girl | https://soundcloud.com/sakuragirl_official
 Music promoted by https://www.chosic.com/free-music/all/
 Creative Commons CC BY 3.0

@@ -49,7 +49,7 @@ class MainMenu(GameState):
         quit_button.on_button.append(("q", lambda:self._set_state(None)))
         quit_button.on_button.append(("escape", lambda:self._set_state(None)))
 
-        self.music_button = self._add_game_object(GameObject()).set_pos((0, 61)).set_origin((0, 1))
+        self.music_button = self._add_game_object(GameObject()).set_pos((0, 60)).set_origin((0, 1))
         self.music_button.on_mouse_up = [self.set_music_button]
         self.music_button.on_button = [ (("m", self.set_music_button))]
         self.playing = music.get_busy()

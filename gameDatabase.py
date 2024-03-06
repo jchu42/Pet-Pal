@@ -1,7 +1,6 @@
 
 import psycopg2
 import traceback
-from config import load_config
 
 
 def run_command (*args, **wargs)->tuple|None:

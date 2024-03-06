@@ -25,6 +25,7 @@ class RoomSelector(GameState):
         border_names = []
         for i in range(20):
             border_names.append("border" + str(i))
+        border_names.append("")
         self.border_selector = Selector(border_names, color=(255, 255, 255, 255))
         self.border_selector.lessthan.set_pos((5, 59)).set_origin((0.5, 1))
         self.border_selector.morethan.set_pos((55, 59)).set_origin((0.5, 1))

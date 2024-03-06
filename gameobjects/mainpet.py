@@ -4,8 +4,6 @@ import random
 from gameobject import GameObject
 from gameobjects.status import Status
 from imagesdict import ImagesDict
-import exceptions
-import gameDatabase as db
 
 
 class MainPet(GameObject):
@@ -113,7 +111,7 @@ class MainPet(GameObject):
            # self.__happy = 59
             food = GameObject()
             food.on_mouse_up.append(lambda: setattr(self, 'hunger', self.hunger - 10))
-            food.set_pos(45, 10)
+            food.set_pos((45, 10))
             
             poop = GameObject()
             self.add_child_object(poop)
