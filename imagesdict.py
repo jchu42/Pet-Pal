@@ -1,6 +1,7 @@
 """This module contains the static class ImagesDict to load all files on game startup for use by the game."""
 from os import listdir
 import pygame
+import traceback
 
 # debug option
 DEBUG = False # put in a config file
@@ -81,6 +82,7 @@ class ImagesDict:
                                     )
         else:
             print ("Erorr: imagename: [" + imagename + "." + str(frame) + "] not found!")
+            traceback.print_exc()
 
     @staticmethod
     def load_resources(surface:pygame.Surface)->None:

@@ -31,12 +31,12 @@ class AudioTest(GameState):
         self.volume.morethan.on_mouse_up.append(self.__button_sound)
         self._add_game_object(self.volume)
 
-        self.play_button = GameObject().set_pos((30, 58)).set_image_text("PLAY", (255, 0, 255, 255))
+        self.play_button = GameObject().set_pos((30, 57)).set_image_text("PLAY", (255, 0, 255, 255))
         self.play_button.on_mouse_down.append(self.__button_sound)
         self._add_game_object(self.play_button)
 
         login_button = GameObject ().set_image_text("RETURN", (255, 0, 0, 255))
-        login_button.set_pos((30, 69))
+        login_button.set_pos((30, 63))
         login_button.on_mouse_up.append(lambda: self._set_state(mm.MainMenu()))
         login_button.assign_button("escape", lambda:self._set_state(mm.MainMenu()))
         self._add_game_object(login_button)
