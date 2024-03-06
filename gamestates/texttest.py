@@ -22,7 +22,7 @@ class TextTest(GameState):
         self._add_game_object(self.input)
         self.input.set_pos ((59, 47)).set_color((255, 0, 255, 122)).set_char_limit(99999999).set_origin((1, 1))
 
-        back_button = GameObject ().set_image_text("RETURN", (255, 0, 0, 255)).set_pos((30, 63))
+        back_button = GameObject ().set_image_text("RETURN", (255, 0, 0, 255)).set_pos((30, 59))
         back_button.on_mouse_up.append(lambda: self._set_state(mm.MainMenu()))
         back_button.assign_button("escape", lambda:self._set_state(mm.MainMenu()))
         self._add_game_object(back_button)

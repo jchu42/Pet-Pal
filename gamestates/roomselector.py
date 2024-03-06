@@ -26,13 +26,13 @@ class RoomSelector(GameState):
         for i in range(20):
             border_names.append("border" + str(i))
         self.border_selector = Selector(border_names, color=(255, 255, 255, 255))
-        self.border_selector.lessthan.set_pos((5, 63)).set_origin((0.5, 1))
-        self.border_selector.morethan.set_pos((55, 63)).set_origin((0.5, 1))
+        self.border_selector.lessthan.set_pos((5, 59)).set_origin((0.5, 1))
+        self.border_selector.morethan.set_pos((55, 59)).set_origin((0.5, 1))
         self.border_selector.lessthan.on_button.append(("a", self.border_selector.decrement))
         self.border_selector.morethan.on_button.append(("d", self.border_selector.increment))
         self._add_game_object(self.border_selector)
 
-        next_button = GameObject ().set_image_text("NEXT", (255, 0, 0, 255)).set_pos((30, 63))
+        next_button = GameObject ().set_image_text("NEXT", (255, 0, 0, 255)).set_pos((30, 59))
         next_button.on_mouse_up.append(self.__change_state)
         next_button.assign_button("return", self.__change_state)
         next_button.on_button.append(("space", self.__change_state))

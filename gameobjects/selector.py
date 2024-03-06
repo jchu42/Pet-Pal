@@ -44,7 +44,7 @@ class Selector(GameObject):
         self.morethan.on_mouse_up.append(self.increment)
         self.morethan.on_button.append(("right", self.increment))
 
-        self.set_pos((32, 32))
+        self.set_pos((30, 30))
         self.set_origin((0.5, 0.5))
 
     def set_pos(self, pos:tuple[int, int])->Self:

@@ -39,7 +39,7 @@ from gamestates.mainmenu import MainMenu
 from gameobject import GameObject
 
 
-PIXELS = (64, 64) # number of pixels width/height for the screen -> keep here
+PIXELS = (60, 60) # number of pixels width/height for the screen -> keep here
 
 def main() -> int:
     """Initialize pygame, and run the pet game"""
