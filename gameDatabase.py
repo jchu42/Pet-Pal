@@ -16,54 +16,83 @@
 
 
 ####### IMPLEMENTATION BELOW ############
+
 import psycopg2
+from config import load_config
 
-hostname = ''
-database = ''
-username = ''
-pwd = ''
-port_id = ''
+# if you have your old postgres acc info it would go here 
+con = psycopg2.connect(
+database='game_data',
+user='btran37',
+password='tk6cqTyGZK4I',
+host='ep-soft-breeze-a5w3y270.us-east-2.aws.neon.tech',
+port= '5432'
+)
 
-conn = None
-cur = None
+cursor_obj = con.cursor() 
 
-try:
-    conn = psycopg2.connect(
-            host = hostname,
-            dbname = database,
-            user = username,
-            password = pwd,
-            port = port_id)
+#print(cursor_obj.fetchall())
 
-#a cursor to perfor database operations
-    cur = conn.cursor()
+#cursor_obj.execute("SELECT * FROM game_data")
 
-    create_script = ''' CREATE TABLE IF NOT EXISTS player (
-                            id int PRIMARY KEY
-                            username varchar(40) NOT NULL
-                            password varchar(40) NOT NULL)'''
-    cur.execute(create_script)
+def create_tables():
+    """ Create tables in the PostgreSQL database"""
+    commands = (
+        """CREATE TABLE users (
+            user_id SERIAL PRIMARY KEY,
+            user_name VARCHAR(255) NOT NULL,
+            user_password VARCHAR(255) NOT NULL
+        )""",
+        """CREATE TABLE pets (
+            pet_id SERIAL PRIMARY KEY,
+            pet_type VARCHAR(255) NOT NULL,
+            pet_happy INT,
+            pet_action VARCHAR(255),
+            poops JSONB[]
+        )"""
+    )
+    try:
+        config = load_config()  # Load the configuration
+        with psycopg2.connect(**config) as conn:
+            with conn.cursor() as cur:
+                # execute the CREATE TABLE statement
+                for command in commands:
+                    cur.execute(command)
+    except (psycopg2.DatabaseError, Exception) as error:
+        print(error)
 
-    #an example to insert a value into table player
-    #the %s are palce holders
-    insert_script = 'INSERT INTO player (id, username, password) VALUES (%s, %s, %s)'
-    insert_value = (1, 'Yikes', 'pwd1234')
+# for adding a user or pet
+def add_user(user_name, user_password):
+    """Add a new user to the users table."""
+    try:
+        config = load_config()
+        with psycopg2.connect(**config) as conn:
+            with conn.cursor() as cur:
+                cur.execute("INSERT INTO users (user_name, user_password) VALUES (%s, %s)", (user_name, user_password))
+                conn.commit()
+    except (psycopg2.DatabaseError, Exception) as error:
+        print(error)
 
-    cur.execute(insert_script, insert_value)
+def add_pet(pet_type, pet_happy, pet_action, poops):
+    """Add a new pet to the pets table."""
+    try:
+        config = load_config()
+        with psycopg2.connect(**config) as conn:
+            with conn.cursor() as cur:
+                cur.execute("INSERT INTO pets (pet_type, pet_happy, pet_action, poops) VALUES (%s, %s, %s, %s)", (pet_type, pet_happy, pet_action, poops))
+                con.commit()
+    except (psycopg2.DatabaseError, Exception) as error:
+        print(error)
+        con.commit()
+    con.close()
+    # except Exception as error:
+    #     print(error)
+    # finally:
+    #     if cur is not None:
+    #         cur.close()
+    #     if con is not None:
+    #         con.close()
 
-    ##Insert mulitple records
-
-    ##FETCH data from PostgreSQL Table and display in Python program
-    #cur.fetchall()
-
-    ##UPDATE table record 
-
-    conn.commit()
-except Exception as error:
-    print(error)
-
-finally:
-    if cur is not None:
-        cur.close()
-    if conn is not None:
-        conn.close()
+if __name__ == '__main__':
+    create_tables()
+    

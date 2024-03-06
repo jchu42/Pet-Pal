@@ -16,7 +16,7 @@ from gamemanager import GameManager
 from imagesdict import ImagesDict
 from gamestates.mainmenu import MainMenu
 from gameobject import GameObject
-
+from gameDatabase import create_tables
 
 PIXELS = (60, 70) # number of pixels width/height for the screen -> keep here
 
@@ -30,6 +30,7 @@ def main() -> int:
         # configure screen
         fps = int(config['Screen']['fps'])
         scale = int(config['Screen']['scale'])
+        create_tables() # added this here idk if this is the best spot for it
     except (KeyError, configparser.MissingSectionHeaderError):
         config['Screen'] = {'fps' : '5', 'scale' : '5'}
         with open('config.ini', 'w', encoding="utf8") as configfile:

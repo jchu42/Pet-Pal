@@ -4,6 +4,8 @@ import random
 from gameobject import GameObject
 from gameobjects.status import Status
 from imagesdict import ImagesDict
+from gameDatabase import add_pet
+
 
 class MainPet(GameObject):
     """The star of the show.
@@ -53,6 +55,10 @@ class MainPet(GameObject):
         self._change_action = True
 
         self.poops:list[GameObject] = []
+        
+        #in mainpet.py
+        add_pet(self.pet_type, self.__happy, self.action, self.poops) # test to see if its actually added to db
+
 
     def set_image_name(self, name:str|list[str])->Self:
         """Set the image set to use. 
