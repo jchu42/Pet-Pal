@@ -6,10 +6,10 @@ import gamestates.roomselector as rm
 
 class PetSelector(GameState):
     """This is the pet selection screen state."""
-    def __init__(self)->None:
+    def __init__(self, username)->None:
         """Initializese the pet selection screen, which uses a Selector for the user to select a pet"""
         GameState.__init__(self)
-
+        self.username = username
         self._bg_color ((255, 255, 255, 255))
 
         self.selector = Selector(["pandaidle", "catidle"], color=(0, 0, 0, 255))
@@ -27,4 +27,4 @@ class PetSelector(GameState):
         """Go to the next GameState"""
         
         self.selector.queue_sound(63) # play a sound when going to next state
-        self._set_state(rm.RoomSelector(petname=self.selector.get_option().removesuffix("idle")))
+        self._set_state(rm.RoomSelector(username=self.username, petname=self.selector.get_option().removesuffix("idle")))

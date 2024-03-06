@@ -3,14 +3,17 @@ from gamestate import GameState
 from gameobject import GameObject
 from gameobjects.strinput import StrInput
 import gamestates.mainmenu as mm
+import gamestates.room as rm
 import gamestates.petselector as ps
+import gamestates.error as err
 import gameDatabase as db
 
 class Login(GameState):
     """This is the login screen state."""
-    def __init__(self, username="")->None:
+    def __init__(self, isRegisterScreen, username="")->None:
         """Initialize the login screen to the username entry"""
         GameState.__init__(self)
+        self.isRegisterScreen = isRegisterScreen
 
         self._bg_color ((0, 0, 0, 255))
 
@@ -31,6 +34,7 @@ class Login(GameState):
         self.next_button.set_image_text("NEXT", (255, 0, 0, 255))
         self.next_button.on_mouse_up.append(self.__change_to_password)
         self.next_button.assign_button("return", self.__change_to_password)
+        self.next_button.assign_button("tab", self.__change_to_password)
         self._add_game_object(self.next_button)
 
         self.enter_pass = None
@@ -59,10 +63,25 @@ class Login(GameState):
 
         self.next_button = GameObject ().set_pos((30, 69))
         self.next_button.set_image_text("NEXT", (255, 0, 0, 255))
-        self.next_button.on_mouse_up.append(self.__change_state)
-        self.next_button.assign_button("return", self.__change_state)
+        self.next_button.on_mouse_up.append(self.__verify_credentials)
+        self.next_button.assign_button("return", self.__verify_credentials)
         self._add_game_object(self.next_button)
 
-    def __change_state(self)->None:
-        self._set_state(ps.PetSelector())
-        db.add_user(self.username.get_text(), self.password.get_text())
+    def __verify_credentials(self)->None:
+        if self.isRegisterScreen:
+            if db.get_pet (self.username.get_text()) is None:
+                db.add_user(self.username.get_text(), self.password.get_text())
+                self._set_state(ps.PetSelector(self.username.get_text()))
+            else:
+                self._set_state(err.Error("Error", ["Username already", "exists!"], Login(True)))
+        else:
+            if db.verify_user(self.username.get_text(), self.password.get_text()):
+                # if verified, proceed
+                pet_type, pet_room, pet_happy, poops = db.get_pet(self.username.get_text())
+                # go to pet selector if current pet is none
+                if pet_type == "":
+                    self._set_state(ps.PetSelector(self.username.get_text()))
+                else:
+                    self._set_state(rm.Room(self.username.get_text()))
+            else:
+                self._set_state(err.Error("Error", ["Wrong username", "/password!"], Login(False, self.username.get_text())))

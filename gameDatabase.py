@@ -18,10 +18,11 @@
 ####### IMPLEMENTATION BELOW ############
 
 import psycopg2
+import traceback
 from config import load_config
 
 
-def run_command (command : str | list[str]):
+def run_command (*args, **wargs)->tuple|None:
     con = psycopg2.connect(
         database='game_data',
         user='btran37',
@@ -30,43 +31,59 @@ def run_command (command : str | list[str]):
         port= '5432'
     )
     cursor_obj = con.cursor() 
-    if type(command) == str:
-        try:
-            cursor_obj.execute(command)
-        except (psycopg2.DatabaseError, Exception) as error:
-            print("FERGFSR", error)
-    else:
-        for one_command in command:
-            try:
-                cursor_obj.execute(one_command)
-            except (psycopg2.DatabaseError, Exception) as error:
-                print("FERGFSR", error)
+
+    try:
+        cursor_obj.execute(*args, **wargs)
+    except psycopg2.DatabaseError:
+        print("command error")
+        traceback.print_exc()
+    #if cursor_obj.rowcount > 0:
+    try:
+        res = cursor_obj.fetchone()
+    except psycopg2.ProgrammingError: # if execute did not return any data
+        res = None
     con.commit()
     con.close()
 
+    return res
 
-def create_tables():
-
-    """ Create tables in the PostgreSQL database"""
-    run_command (["""CREATE TABLE users (
-            user_id SERIAL PRIMARY KEY,
-            user_name VARCHAR(255) NOT NULL,
-            user_password VARCHAR(255) NOT NULL
-        )""","""CREATE TABLE pets (
-            pet_id SERIAL PRIMARY KEY,
-            pet_type VARCHAR(255) NOT NULL,
-            pet_happy INT,
-            pet_action VARCHAR(255),
-            poops JSONB[]
-        )"""])
+def verify_user (username, password) -> bool:
+    """Returns True if username+password combo exists in database"""
+    command = """SELECT * FROM users WHERE user_name = %s AND user_password = %s"""
+    values = (username, password)
+    res = run_command(command, values)
+    return res is not None
 
 # for adding a user or pet
 def add_user(user_name, user_password):
-    run_command("INSERT INTO users (user_name, user_password) VALUES ('" + user_name + "', '" + user_password + "')")
+    command = """INSERT INTO users (user_name, user_password, pet_type)
+        VALUES (%s, %s, %s)
+    """
+    values = (user_name, user_password, "")
+    run_command(command, values)
 
-def add_pet(pet_type, pet_happy, pet_action, poops):
-    run_command("INSERT INTO pets (pet_type, pet_happy, pet_action, poops) VALUES ('" + pet_type + "', '" + str(pet_happy) + "', '" + pet_action + "', '" + str(len(poops)) + "')")
+def get_pet(username)->tuple[str, str, int, int]:
+    ret = run_command("SELECT pet_type, room_type, pet_happy, poops FROM users WHERE user_name='" + username + "'")
+    print ("GET PET: ", ret)
+    return ret
+
+def set_pet(username, pet_type, room_type, pet_happy, poops):
+    command = """UPDATE users
+        SET pet_type = %s, room_type = %s, pet_happy = %s, poops = %s
+        WHERE user_name = %s
+        """
+    values = (pet_type, room_type, pet_happy, poops, username)
+    run_command(command, values)
+
 
 if __name__ == '__main__':
-    create_tables()
-    
+    run_command("""DROP TABLE users""")
+
+    run_command ("""CREATE TABLE users (
+            user_name VARCHAR(255) PRIMARY KEY,
+            user_password VARCHAR(255) NOT NULL,
+            pet_type VARCHAR(255),
+            room_type VARCHAR(255),
+            pet_happy INT,
+            poops INT
+                    )""")

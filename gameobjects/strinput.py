@@ -144,7 +144,7 @@ class StrInput(GameObject):
             self._backspace_held = True
         elif len(self.text) >= self.char_limit:
             return
-        elif key in ("return", "escape"):
+        elif key in ("return", "escape", "tab"):
             return
         elif (key.isalnum() and len(key) == 1):
             if self._shift_pressed:

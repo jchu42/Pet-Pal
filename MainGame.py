@@ -1,4 +1,8 @@
+"""This module contains the code to run the game itself
 
+TODO:
+- database stuff
+"""
 # cool instruments:
 # 10, 32/34, 38, 45, 55, 81, 96, 120
 
@@ -30,7 +34,7 @@ def main() -> int:
         # configure screen
         fps = int(config['Screen']['fps'])
         scale = int(config['Screen']['scale'])
-        db.create_tables() # added this here idk if this is the best spot for it
+        #db.create_tables() # added this here idk if this is the best spot for it
         print ("Tables created")
     except (KeyError, configparser.MissingSectionHeaderError):
         config['Screen'] = {'fps' : '5', 'scale' : '5'}

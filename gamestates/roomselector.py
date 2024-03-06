@@ -3,12 +3,14 @@ from gamestate import GameState
 from gameobject import GameObject
 from gameobjects.selector import Selector
 import gamestates.room as rm
+import gameDatabase as db
 
 class RoomSelector(GameState):
     """This is the room selection screen state"""
-    def __init__(self, petname:str)->None:
+    def __init__(self, username, petname)->None:
         """Initialize the room selection screen, which uses a Selector for the user to peruse and select a room"""
         GameState.__init__(self)
+        self.username = username
         self.petname = petname
 
         self._bg_color ((0, 0, 0, 255))
@@ -28,4 +30,5 @@ class RoomSelector(GameState):
 
     def __change_state(self):
         """Go to the next GameState"""
-        self._set_state(rm.Room(roomname=self.selector.get_option(), petname=self.petname))
+        db.set_pet(self.username, self.petname, self.selector.get_option(), 5, 0)
+        self._set_state(rm.Room(username=self.username))

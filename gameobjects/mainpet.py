@@ -4,7 +4,8 @@ import random
 from gameobject import GameObject
 from gameobjects.status import Status
 from imagesdict import ImagesDict
-from gameDatabase import add_pet
+import exceptions
+import gameDatabase as db
 
 
 class MainPet(GameObject):
@@ -23,7 +24,7 @@ class MainPet(GameObject):
     poops : list[GameObject]
         The poops the pet has taken
     """
-    def __init__ (self, pet_type:str)->None:
+    def __init__ (self, pet_type, pet_happy, poops)->None:
         """Initializes the MainPet with default values (subject to change)
 
         Parameters
@@ -40,11 +41,18 @@ class MainPet(GameObject):
 
         GameObject.__init__(self, [0.5, 1])
 
+        # self.username, self.pet_type, self.pet_happy, poop = db.get_pet(username)
+        # if self.pet_type == "":
+        #     raise exceptions.PetNotFoundException()
+
         self.pet_type = pet_type
+        self.happy = pet_happy
+        # do poop stuff
+
         self.set_image_name(self.pet_type + "idle")
 
         self.__happy = 59
-        self.happy = 5
+        # self.happy = 5
 
         self.status = Status()
         self.add_child_object(self.status)
@@ -57,7 +65,7 @@ class MainPet(GameObject):
         self.poops:list[GameObject] = []
         
         #in mainpet.py
-        add_pet(self.pet_type, self.__happy, self.action, self.poops) # test to see if its actually added to db
+        #set_pet(self.pet_type, self.__happy, self.poops) # test to see if its actually added to db
 
 
     def set_image_name(self, name:str|list[str])->Self:
