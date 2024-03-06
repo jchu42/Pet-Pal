@@ -2,6 +2,23 @@
 
 TODO:
 - database stuff
+
+
+rejection tone
+    pitch 35, instrument 6, volume 100
+poopy sound
+    20/25, 7, 100
+
+    
+happiness icon = fullness - poops
+when poops, 
+    fullness decreases
+    when fullness is 0, pet dies
+    at 5 poops, pet dies
+when eats, 
+    fullness increases
+
+when hungry, more squirming than moving
 """
 # cool instruments:
 # 10, 32/34, 38, 45, 55, 81, 96, 120
@@ -20,7 +37,6 @@ from gamemanager import GameManager
 from imagesdict import ImagesDict
 from gamestates.mainmenu import MainMenu
 from gameobject import GameObject
-import gameDatabase as db
 
 from pygame import mixer
 pygame.mixer.init()

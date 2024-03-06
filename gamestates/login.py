@@ -10,16 +10,23 @@ import gameDatabase as db
 
 class Login(GameState):
     """This is the login screen state."""
-    def __init__(self, isRegisterScreen, username="")->None:
+    def __init__(self, is_register_screen, username="")->None:
         """Initialize the login screen to the username entry"""
         GameState.__init__(self)
-        self.isRegisterScreen = isRegisterScreen
+        self.is_register_screen = is_register_screen
 
         self._bg_color ((0, 0, 0, 255))
 
-        self.enter_user = GameObject ().set_pos((2, 10))
+        title = GameObject().set_pos ((30, 10))
+        if is_register_screen:
+            title.set_image_text("Register", (255, 255, 255, 255))
+        else:
+            title.set_image_text("Login", (255, 255, 255, 255))
+        self._add_game_object(title)
+
+        self.enter_user = GameObject ().set_pos((2, 22))
         self.enter_user.set_image_text("Enter Username", (255, 0, 0, 255)).set_origin((0, 1))
-        self.username = StrInput ().set_pos ((4, 16)).set_color((0, 255, 255, 0))
+        self.username = StrInput ().set_pos ((4, 28)).set_color((0, 255, 255, 0))
         self.username.set_text(username)
         self._add_game_object(self.enter_user)
         self._add_game_object(self.username)
@@ -47,7 +54,7 @@ class Login(GameState):
         self.back_button.set_deleted()
 
         self.enter_user.set_image_text("Enter Username", (122, 0, 0, 255)).set_origin((0, 1))
-        user_text = self._add_game_object(GameObject ()).set_pos((4, 16)).set_origin((0, 1))
+        user_text = self._add_game_object(GameObject ()).set_pos((4, 28)).set_origin((0, 1))
         user_text.set_image_text(self.username.get_text(), (0, 122, 122, 255))
 
         back_button = GameObject ().set_image_text("BACK", (255, 0, 0, 255))
@@ -56,9 +63,9 @@ class Login(GameState):
         back_button.assign_button("escape", lambda:self._set_state(Login(self.username.get_text())))
         self._add_game_object(back_button)
 
-        self.enter_pass = self._add_game_object(GameObject ()).set_pos((2, 28)).set_origin((0, 1))
+        self.enter_pass = self._add_game_object(GameObject ()).set_pos((2, 40)).set_origin((0, 1))
         self.enter_pass.set_image_text("Enter Password", (255, 0, 0, 255))
-        self.password = StrInput ().set_pos ((4, 34)).set_color((0, 255, 255, 0)).set_censored(True)
+        self.password = StrInput ().set_pos ((4, 46)).set_color((0, 255, 255, 0)).set_censored(True)
         self._add_game_object(self.password)
 
         self.next_button = GameObject ().set_pos((30, 69))
@@ -68,20 +75,25 @@ class Login(GameState):
         self._add_game_object(self.next_button)
 
     def __verify_credentials(self)->None:
-        if self.isRegisterScreen:
+        """Call database to verify credentials, giving user an error if necessary"""
+        if self.is_register_screen:
+            if (self.username.get_text() == "" or self.password.get_text() == ""):
+                self._set_state(err.Error("Error", ["Please enter a", "username and", "password"], Login(True)))
             if db.get_pet (self.username.get_text()) is None:
                 db.add_user(self.username.get_text(), self.password.get_text())
                 self._set_state(ps.PetSelector(self.username.get_text()))
             else:
-                self._set_state(err.Error("Error", ["Username already", "exists!"], Login(True)))
+                self._set_state(err.Error("Error", ["Username", "already exists!"], Login(True)))
         else:
+            if (self.username.get_text() == "" or self.password.get_text() == ""):
+                self._set_state(err.Error("Error", ["Please enter a", "username and", "password"], Login(False)))
             if db.verify_user(self.username.get_text(), self.password.get_text()):
                 # if verified, proceed
-                pet_type, pet_room, pet_happy, poops = db.get_pet(self.username.get_text())
+                pet_type, pet_room, border_type, pet_happy, poops = db.get_pet(self.username.get_text())
                 # go to pet selector if current pet is none
                 if pet_type == "":
                     self._set_state(ps.PetSelector(self.username.get_text()))
                 else:
                     self._set_state(rm.Room(self.username.get_text()))
             else:
-                self._set_state(err.Error("Error", ["Wrong username", "/password!"], Login(False, self.username.get_text())))
+                self._set_state(err.Error("Error", ["Wrong", "username", "/password!"], Login(False, self.username.get_text())))
