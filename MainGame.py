@@ -38,13 +38,8 @@ from imagesdict import ImagesDict
 from gamestates.mainmenu import MainMenu
 from gameobject import GameObject
 
-from pygame import mixer
-pygame.mixer.init()
-pygame.mixer.music.load('Sakura-Girl-Lucky-Day.wav')
-pygame.mixer.music.play(-1)
-pygame.mixer.music.set_volume(0.1)
 
-PIXELS = (60, 70) # number of pixels width/height for the screen -> keep here
+PIXELS = (64, 64) # number of pixels width/height for the screen -> keep here
 
 def main() -> int:
     """Initialize pygame, and run the pet game"""
