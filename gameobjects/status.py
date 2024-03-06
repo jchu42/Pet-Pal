@@ -18,9 +18,9 @@ class Status(GameObject):
     def __init__ (self)->None:
         """Initialize the Status GameObject"""
         GameObject.__init__(self)
-        self.happiness = 0
+        self.hunger = 0
         self.set_origin ((0.5, 1))
-    def set_happiness (self, value:int)->Self:
+    def set_hunger (self, value:int)->Self:
         """Set the happiness value image
 
         Parameters
@@ -33,7 +33,7 @@ class Status(GameObject):
         GameObject
             self
         """
-        self.happiness = value
+        self.hunger = value
         return self
     def tick(self)->None:
-        self.set_image_name("happy" + str(self.happiness))
+        self.set_image_name("hunger" + str(self.hunger))
