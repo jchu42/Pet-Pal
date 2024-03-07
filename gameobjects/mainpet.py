@@ -170,7 +170,7 @@ class MainPet(GameObject):
             elif self.get_pos()[0] == self._action_value:
                 self._change_action = True
         elif self.action == "movevert":
-            self.set_image_name(["movevert", "move", "idle"])
+            self.set_image_name(["movevert", "jump", "move", "idle"])
             if self.get_pos()[1] < self._action_value:
                 self.set_pos ((self.get_pos()[0], self.get_pos()[1] + 1))
             elif self.get_pos()[1] > self._action_value:

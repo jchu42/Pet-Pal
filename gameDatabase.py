@@ -92,7 +92,6 @@ def get_pet(username, fields:tuple)->tuple:
             raise err.FieldNotFoundException("Unknown field: " + fields)
         command = "SELECT " + fields + " FROM users WHERE user_name='" + username + "'"
     ret = run_command(command)
-    print ("GET PET: ", ret)
     return ret
 
 def set_pet(username, pet_type:str=None, room_type:str=None, border_type:str=None, pet_happy:int=None, poops:int=None)->None:

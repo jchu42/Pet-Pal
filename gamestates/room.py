@@ -1,5 +1,7 @@
 """Contains the Room class"""
 from gamestate import GameState
+import gamestates.mainmenu as mm
+from gameobject import GameObject
 from gameobjects.mainpet import MainPet
 import gameDatabase as db
 
@@ -27,6 +29,8 @@ class Room(GameState):
         
         main_pet = MainPet (pet_type, pet_happy, poops, pos=(30, 30))
         self._add_game_object(main_pet)
+
+        invis_back_button = self._add_game_object(GameObject(on_button=[("escape", lambda: self._set_state(mm.MainMenu()))]))
 
         # text_test = GameObject ().set_pos((30, 59)).set_image_text("TEXT TEST", (255, 0, 0, 255))
         # text_test.on_mouse_up.append(lambda: self._set_state(tt.TextTest()))

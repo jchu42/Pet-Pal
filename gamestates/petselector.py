@@ -12,7 +12,7 @@ class PetSelector(GameState):
         self.username = username
         self._bg_color ((255, 255, 255, 255))
 
-        self.selector = Selector(options=["pandaidle", "catidle"], color=(0, 0, 0, 255))
+        self.selector = Selector(options=["pandaidle", "catidle", "pigidle"], color=(0, 0, 0, 255))
         self.selector.lessthan.on_button.append(("a", self.selector.decrement))
         self.selector.morethan.on_button.append(("d", self.selector.increment))
         self._add_game_object(self.selector)
