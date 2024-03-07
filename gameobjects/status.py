@@ -36,4 +36,4 @@ class Status(GameObject):
         self.hunger = value
         return self
     def tick(self)->None:
-        self.set_image_name("hunger" + str(self.hunger))
+        pass#self.set_image_name("hunger" + str(self.hunger))

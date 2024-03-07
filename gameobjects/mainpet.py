@@ -4,8 +4,6 @@ import random
 from gameobject import GameObject
 from gameobjects.status import Status
 from imagesdict import ImagesDict
-import exceptions
-import gameDatabase as db
 
 
 class MainPet(GameObject):
@@ -113,12 +111,12 @@ class MainPet(GameObject):
            # self.__happy = 59
             food = GameObject()
             food.on_mouse_up.append(lambda: setattr(self, 'hunger', self.hunger - 10))
-            food.set_pos(45, 10)
+            food.set_pos((45, 10))
             
             poop = GameObject()
             self.add_child_object(poop)
             poop.set_image_name("poop")
-            poop.set_pos((int(random.random()*40 + 10), int(random.random()*40+10)))
+            poop.set_pos((int(random.random()*40 + 12), int(random.random()*40+12)))
             poop.set_frames_per_frame(3)
             poop.on_mouse_up.append(poop.set_deleted)
             self.poops.append (poop)
@@ -142,7 +140,7 @@ class MainPet(GameObject):
             else:
                 if random.random() > 0.5:
                     self.action = "move"
-                    self._action_value = int(random.random()*40) + 10
+                    self._action_value = int(random.random()*40) + 12
                 else:
                     self.action = "movevert"
                     self._action_value = int(random.random()*25) + 30

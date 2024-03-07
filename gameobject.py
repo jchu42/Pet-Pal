@@ -40,13 +40,15 @@ class GameObject:
     """
     midi_out: pygame.midi.Output = None
 
-    def __init__(self, pos:tuple[int, int]=(0, 0), origin:tuple[int, int]=(0.5, 1))->None:
+    def __init__(self, pos:tuple[int, int]=(0, 0), origin:tuple[float, float]=(0.5, 1))->None:
         """Initialize this GameObject.
         
         Parameters
         ----------
         pos : tuple[int, int], default=(0, 0)
-        ...
+            The position this GameObject should be when initialized
+        origin : tuple[float, float], default=(0.5, 1)
+            The origin of the position this GameObejct should have
 
         """
         self._origin = origin
@@ -175,12 +177,12 @@ class GameObject:
         self._frame += self._frames_per_frame
         self._mirrored = False
 
-    def set_origin (self, origin:tuple[int, int])->Self:
+    def set_origin (self, origin:tuple[float, float])->Self:
         """Set the origin of this GameObject.
         
         Parameters
         ----------
-        origin : tuple[int, int]
+        origin : tuple[float, float]
             The origin this GameObject should have
 
         Returns

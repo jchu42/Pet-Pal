@@ -32,12 +32,12 @@ class Login(GameState):
         self._add_game_object(self.username)
 
         self.back_button = GameObject ().set_image_text("BACK", (255, 0, 0, 255))
-        self.back_button.set_pos((1, 69)).set_origin((0, 1))
+        self.back_button.set_pos((1, 59)).set_origin((0, 1))
         self.back_button.on_mouse_up.append(lambda: self._set_state(mm.MainMenu()))
         self.back_button.assign_button("escape", lambda:self._set_state(mm.MainMenu()))
         self._add_game_object(self.back_button)
 
-        self.next_button = GameObject ().set_pos((30, 69))
+        self.next_button = GameObject ().set_pos((30, 59))
         self.next_button.set_image_text("NEXT", (255, 0, 0, 255))
         self.next_button.on_mouse_up.append(self.__change_to_password)
         self.next_button.assign_button("return", self.__change_to_password)
@@ -58,7 +58,7 @@ class Login(GameState):
         user_text.set_image_text(self.username.get_text(), (0, 122, 122, 255))
 
         back_button = GameObject ().set_image_text("BACK", (255, 0, 0, 255))
-        back_button.set_pos((1, 69)).set_origin((0, 1))
+        back_button.set_pos((1, 59)).set_origin((0, 1))
         back_button.on_mouse_up.append(lambda: self._set_state(Login(self.username.get_text())))
         back_button.assign_button("escape", lambda:self._set_state(Login(self.username.get_text())))
         self._add_game_object(back_button)
@@ -68,7 +68,7 @@ class Login(GameState):
         self.password = StrInput ().set_pos ((4, 46)).set_color((0, 255, 255, 0)).set_censored(True)
         self._add_game_object(self.password)
 
-        self.next_button = GameObject ().set_pos((30, 69))
+        self.next_button = GameObject ().set_pos((30, 59))
         self.next_button.set_image_text("NEXT", (255, 0, 0, 255))
         self.next_button.on_mouse_up.append(self.__verify_credentials)
         self.next_button.assign_button("return", self.__verify_credentials)
@@ -89,7 +89,7 @@ class Login(GameState):
                 self._set_state(err.Error("Error", ["Please enter a", "username and", "password"], Login(False)))
             if db.verify_user(self.username.get_text(), self.password.get_text()):
                 # if verified, proceed
-                pet_type, pet_room, border_type, pet_happy, poops = db.get_pet(self.username.get_text())
+                pet_type, _, _, _, _ = db.get_pet(self.username.get_text())
                 # go to pet selector if current pet is none
                 if pet_type == "":
                     self._set_state(ps.PetSelector(self.username.get_text()))
