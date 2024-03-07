@@ -96,7 +96,6 @@ class ImagesDict:
         files = listdir("images/") # assuming all are files
         #imageDataFile = ""
         for filename in files:
-            # https://stackoverflow.com/questions/4444923/get-filename-without-extension-in-python
             split_name = filename.split (".")
             if DEBUG:
                 print (split_name)

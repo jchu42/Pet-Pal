@@ -37,10 +37,15 @@ class RoomSelector(GameState):
                                   pos=(30, 59),
                                   on_mouse_up=[self.__change_state],
                                   on_button=[("return", self.__change_state),
-                                             "space", self.__change_state])
+                                             ("space", self.__change_state)])
         self._add_game_object(next_button)
 
     def __change_state(self):
         """Go to the next GameState"""
-        db.set_pet(self.username, self.petname, self.room_selector.get_option(), self.border_selector.get_option(), 5, 0)
+        db.set_pet(self.username,
+                   pet_type=self.petname,
+                   room_type=self.room_selector.get_option(),
+                   border_type=self.border_selector.get_option(),
+                   pet_happy=5,
+                   poops=0)
         self._set_state(rm.Room(username=self.username))

@@ -1,8 +1,6 @@
 """Contains the Room class"""
 from gamestate import GameState
-from gameobject import GameObject
 from gameobjects.mainpet import MainPet
-import gamestates.texttest as tt
 import gameDatabase as db
 
 class Room(GameState):
@@ -19,7 +17,11 @@ class Room(GameState):
         """
         GameState.__init__(self)
 
-        pet_type, room_type, border_type, pet_happy, poops = db.get_pet(username)
+        pet_type, room_type, border_type, pet_happy, poops = db.get_pet(username, (db.PET_TYPE, 
+                                                                                   db.ROOM_TYPE,
+                                                                                   db.BORDER_TYPE,
+                                                                                   db.PET_HAPPY,
+                                                                                   db.POOPS))
 
         self._main_ui(room_type, border_type)
         

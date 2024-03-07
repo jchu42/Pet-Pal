@@ -6,3 +6,5 @@ class KeyException (Exception):
     """Raised when a key press isn't recognized in StrInput"""
 class PetNotFoundException(Exception):
     """Raised when the pet type isn't found"""
+class FieldNotFoundException(Exception):
+    """Raised when a db field can't be found"""

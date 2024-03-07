@@ -15,12 +15,13 @@ class Selector(GameObject):
     morethan : GameObject
         The clickable ">" GameObject that increments the selection option
     """
-    def __init__(self,  
-                 options:list[str], 
+    def __init__(self,
+                 options:list[str],
+                 origin=(0.5, 0.5),
                  initial_selection:int=0,
                  color:tuple[int, int, int, int]=(0, 0, 0, 255),
                  pos_all:tuple[int, int]=(30, 30),
-                 *args, **wargs)->None:
+                 **wargs)->None:
         """Initialize the Selector and its arrow button GameObjects
         
         Parameters
@@ -32,7 +33,7 @@ class Selector(GameObject):
         color : tuple[int, int, int, int], default=(0, 0, 0, 255)
             The color the left and right arrows should be
         """
-        GameObject.__init__(self, *args, **wargs)
+        GameObject.__init__(self, **wargs)
 
         self._options = options
         self._color = color
@@ -50,7 +51,7 @@ class Selector(GameObject):
         self.morethan.on_button.append(("right", self.increment))
 
         self.set_pos_all(pos_all)
-        self.set_origin((0.5, 0.5))
+        self.set_origin(origin)
 
     def set_pos_all(self, pos:tuple[int, int])->Self:
         """Set the position of this Selector and its arrow button GameObjects

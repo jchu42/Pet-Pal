@@ -46,14 +46,15 @@ class GameObject:
                  pos:tuple[int, int]=(0, 0),
                  origin:tuple[float, float]=(0.5, 1),
                  muted:bool=False,
-                 on_mouse_hover:list[Callable[[], None]]=[],
-                 on_mouse_down:list[Callable[[], None]]=[],
-                 on_mouse_drag:list[Callable[[], None]]=[],
-                 on_mouse_up:list[Callable[[], None]]=[],
-                 on_key_press:list[Callable[[str], None]]=[],
-                 on_key_release:list[Callable[[str], None]]=[],
-                 on_button:list[(str, Callable[[], None])]=[],
-                 on_delete:list[Callable[[], None]]=[])->None:
+                 # https://pylint.readthedocs.io/en/latest/user_guide/messages/warning/dangerous-default-value.html
+                 on_mouse_hover:list[Callable[[], None]]=None,
+                 on_mouse_down:list[Callable[[], None]]=None,
+                 on_mouse_drag:list[Callable[[], None]]=None,
+                 on_mouse_up:list[Callable[[], None]]=None,
+                 on_key_press:list[Callable[[str], None]]=None,
+                 on_key_release:list[Callable[[str], None]]=None,
+                 on_button:list[tuple[str, Callable[[], None]]]=None,
+                 on_delete:list[Callable[[], None]]=None)->None:
         """Initialize this GameObject.
         
         Parameters
@@ -78,7 +79,7 @@ class GameObject:
             Functions to add to the key press event
         on_key_release : list[Callable[[str], None]], default=[]
             Functions to add to the key release event
-        on_button : list[(str, Callable[[], None])], default=[]
+        on_button : list[tuple[str, Callable[[], None]]], default=[]
             Functions to add to a button press event
         on_delete : list[Callable[[], None]], default=[]
             Functions to add to call when this GameObject is deleted
@@ -90,7 +91,7 @@ class GameObject:
         self.set_origin(origin)
         self._image_name = ""
         if imagename == "":
-            if type(imagetext) == str:
+            if isinstance(imagetext, str):
                 self.set_image_text(imagetext)
             else:
                 self.set_image_text(*imagetext)
@@ -106,21 +107,29 @@ class GameObject:
         self.__last_instrument:int = -1
 
         self.on_mouse_hover:list[Callable[[],None]] = []
-        self.on_mouse_hover.extend(on_mouse_hover)
+        if on_mouse_hover is not None:
+            self.on_mouse_hover.extend(on_mouse_hover)
         self.on_mouse_down:list[Callable[[],None]] = []
-        self.on_mouse_down.extend(on_mouse_down)
+        if on_mouse_down is not None:
+            self.on_mouse_down.extend(on_mouse_down)
         self.on_mouse_drag:list[Callable[[],None]] = []
-        self.on_mouse_drag.extend(on_mouse_drag)
+        if on_mouse_drag is not None:
+            self.on_mouse_drag.extend(on_mouse_drag)
         self.on_mouse_up:list[Callable[[],None]] = []
-        self.on_mouse_up.extend(on_mouse_up)
+        if on_mouse_up is not None:
+            self.on_mouse_up.extend(on_mouse_up)
         self.on_key_press:list[Callable[[str],None]] = []
-        self.on_key_press.extend(on_key_press)
+        if on_key_press is not None:
+            self.on_key_press.extend(on_key_press)
         self.on_key_release:list[Callable[[str],None]] = []
-        self.on_key_release.extend(on_key_release)
-        self.on_button:list[(str, Callable[[],None])] = []
-        self.on_button.extend(on_button)
+        if on_key_release is not None:
+            self.on_key_release.extend(on_key_release)
+        self.on_button:list[tuple[str, Callable[[],None]]] = []
+        if on_button is not None:
+            self.on_button.extend(on_button)
         self.on_delete:list[Callable[[],None]] = []
-        self.on_delete.extend(on_delete)
+        if on_delete is not None:
+            self.on_delete.extend(on_delete)
 
         self.on_delete.append(self.__delete_sound)
         self.deleted = False
