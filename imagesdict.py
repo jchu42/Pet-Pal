@@ -76,8 +76,8 @@ class ImagesDict:
             img = ImagesDict.images[imagename][frame]
             if mirrored:
                 img = pygame.transform.flip(img, True, False)
-            ImagesDict.surface.blit (img, 
-                                    (pos[0] - origin[0] * img.get_width(), 
+            ImagesDict.surface.blit (img,
+                                    (pos[0] - origin[0] * img.get_width(),
                                     pos[1] - origin[1] * img.get_height())
                                     )
         else:

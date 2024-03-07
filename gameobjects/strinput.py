@@ -17,17 +17,21 @@ class StrInput(GameObject):
     char_limit : int
         The maximum number of characters that can be entered into this StrInput
     """
-    def __init__(self)->None:
+    def __init__(self,
+                 color:tuple[int, int, int, int]=(0, 0, 0, 255),
+                 initial_text = "",
+                 censored=False,
+                 origin:tuple[float, float]=(0, 1),
+                 **wargs)->None:
         """Initialize the StrInput class"""
-        GameObject.__init__(self)
+        GameObject.__init__(self, origin=origin, **wargs)
         self.on_key_press.append(self._handle_key_press)
         self.on_key_release.append(self._handle_key_release)
-        self.text = ""
-        self._color = (0, 0, 0, 255)
-        self._censored = False
+        self.text = initial_text
+        self._color = color
+        self._censored = censored
         self._cursor_frame_cnt = 0
         self._cursor_on = True
-        self.set_origin((0, 1))
 
         self.char_limit = 12
         self._shift_pressed = False
