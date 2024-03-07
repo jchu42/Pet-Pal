@@ -1,6 +1,7 @@
+"""This module contains database functions"""
 
-import psycopg2
 import traceback
+import psycopg2
 import exceptions as err
 
 def run_command (*args, **wargs)->tuple|None:
