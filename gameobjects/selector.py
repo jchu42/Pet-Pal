@@ -15,8 +15,12 @@ class Selector(GameObject):
     morethan : GameObject
         The clickable ">" GameObject that increments the selection option
     """
-    def __init__(self,  options:list[str], initial_selection:int=0,
-                 color:tuple[int, int, int, int]=(0, 0, 0, 255))->None:
+    def __init__(self,  
+                 options:list[str], 
+                 initial_selection:int=0,
+                 color:tuple[int, int, int, int]=(0, 0, 0, 255),
+                 pos_all:tuple[int, int]=(30, 30),
+                 *args, **wargs)->None:
         """Initialize the Selector and its arrow button GameObjects
         
         Parameters
@@ -28,26 +32,27 @@ class Selector(GameObject):
         color : tuple[int, int, int, int], default=(0, 0, 0, 255)
             The color the left and right arrows should be
         """
-        GameObject.__init__(self)
+        GameObject.__init__(self, *args, **wargs)
 
         self._options = options
         self._color = color
 
         self.__selection = initial_selection
 
-        self.lessthan = self.add_child_object(GameObject()).set_image_text("<", self._color)
+        self.lessthan = self.add_child_object(GameObject(imagetext=("<", color),
+                                                         on_mouse_up=[Selector.decrement]))
+        self.morethan = self.add_child_object(GameObject(imagetext=(">", color)))
         self.lessthan.set_origin((0.5, 0.5))
-        self.lessthan.on_mouse_up.append(self.decrement)
+        #self.lessthan.on_mouse_up.append(self.decrement)
         self.lessthan.on_button.append(("left", self.decrement))
-        self.morethan = self.add_child_object(GameObject()).set_image_text(">", self._color)
         self.morethan.set_origin((0.5, 0.5))
         self.morethan.on_mouse_up.append(self.increment)
         self.morethan.on_button.append(("right", self.increment))
 
-        self.set_pos((30, 30))
+        self.set_pos_all(pos_all)
         self.set_origin((0.5, 0.5))
 
-    def set_pos(self, pos:tuple[int, int])->Self:
+    def set_pos_all(self, pos:tuple[int, int])->Self:
         """Set the position of this Selector and its arrow button GameObjects
 
         Parameters

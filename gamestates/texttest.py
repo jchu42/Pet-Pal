@@ -10,14 +10,33 @@ class TextTest(GameState):
         GameState.__init__(self)
 
         self._bg_color((0, 0, 0, 255))
-        self._add_game_object(GameObject ()).set_image_text("`1234567890-=", (255, 255, 255, 255)).set_pos((30, 5))
-        self._add_game_object(GameObject ()).set_image_text("~!@#$%^&*()_+", (255, 255, 0, 255)).set_pos((30, 10))
-        self._add_game_object(GameObject ()).set_image_text("qwertyuiop[]\\", (255, 0, 0, 255)).set_pos((30, 15))
-        self._add_game_object(GameObject ()).set_image_text("QWERTYUIOP{}|", (0, 0, 255, 255)).set_pos((30, 20))
-        self._add_game_object(GameObject ()).set_image_text("asdfghjkl;'", (0, 255, 255, 255)).set_pos((30, 25))
-        self._add_game_object(GameObject ()).set_image_text('ASDFGHJKL:"', (0, 255, 0, 255)).set_pos((30, 30))
-        self._add_game_object(GameObject ()).set_image_text("zxcvbnm,./", (255, 122, 0, 122)).set_pos((30, 35))
-        self._add_game_object(GameObject ()).set_image_text("ZXCVBNM<>?", (0, 122, 255, 255)).set_pos((30, 40))
+
+        text = ["`1234567890-=",
+                "~!@#$%^&*()_+",
+                "qwertyuiop[]\\",
+                "QWERTYUIOP{}|",
+                "asdfghjkl;'",
+                'ASDFGHJKL:"',
+                "zxcvbnm,./",
+                "ZXCVBNM<>?"]
+
+        for y, line in enumerate(text):
+            for x, char in enumerate(line):
+                r = 255 - max(255/len(line)*x*2 - 255, 0)
+                g = min(255/len(line)*x*2, 255)
+                b = 255/len(text)*y
+                self._add_game_object(GameObject(imagetext=(char, (r, g, b, 255)),
+                                                 pos=(1+4*x, 6+6*y),
+                                                 origin=(0, 1)))
+
+        # self._add_game_object(GameObject ()).set_image_text((255, 255, 255, 255)).set_pos((30, 5))
+        # self._add_game_object(GameObject ()).set_image_text((255, 255, 0, 255)).set_pos((30, 10))
+        # self._add_game_object(GameObject ()).set_image_text( (255, 0, 0, 255)).set_pos((30, 15))
+        # self._add_game_object(GameObject ()).set_image_text((0, 0, 255, 255)).set_pos((30, 20))
+        # self._add_game_object(GameObject ()).set_image_text((0, 255, 255, 255)).set_pos((30, 25))
+        # self._add_game_object(GameObject ()).set_image_text((0, 255, 0, 255)).set_pos((30, 30))
+        # self._add_game_object(GameObject ()).set_image_text((255, 122, 0, 122)).set_pos((30, 35))
+        # self._add_game_object(GameObject ()).set_image_text(, (0, 122, 255, 255)).set_pos((30, 40))
         self.input = StrInput ()
         self._add_game_object(self.input)
         self.input.set_pos ((59, 47)).set_color((255, 0, 255, 122)).set_char_limit(99999999).set_origin((1, 1))

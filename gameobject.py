@@ -40,23 +40,62 @@ class GameObject:
     """
     midi_out: pygame.midi.Output = None
 
-    def __init__(self, pos:tuple[int, int]=(0, 0), origin:tuple[float, float]=(0.5, 1))->None:
+    def __init__(self, 
+                 imagename:str="",
+                 imagetext:tuple[str, tuple[int, int, int, int]]|tuple[str]=("", (0, 0, 0, 255)),
+                 pos:tuple[int, int]=(0, 0),
+                 origin:tuple[float, float]=(0.5, 1),
+                 muted:bool=False,
+                 on_mouse_hover:list[Callable[[], None]]=[],
+                 on_mouse_down:list[Callable[[], None]]=[],
+                 on_mouse_drag:list[Callable[[], None]]=[],
+                 on_mouse_up:list[Callable[[], None]]=[],
+                 on_key_press:list[Callable[[str], None]]=[],
+                 on_key_release:list[Callable[[str], None]]=[],
+                 on_button:list[(str, Callable[[], None])]=[],
+                 on_delete:list[Callable[[], None]]=[])->None:
         """Initialize this GameObject.
         
         Parameters
         ----------
+        imagename : str, default=""
+            The name of the image to use. If empty, imagetext is used instead.
+        imagetext : tuple[str, tuple[int, int, int, int]]
+            Only used if imagename is empty. Sets the text of this GameObject.
         pos : tuple[int, int], default=(0, 0)
             The position this GameObject should be when initialized
         origin : tuple[float, float], default=(0.5, 1)
             The origin of the position this GameObejct should have
-
+        on_mouse_hover : list[Callable[[], None]], default=[]
+            Functions to add to the mouse hover event
+        on_mouse_down : list[Callable[[], None]], default=[]
+            Functions to add to the mouse down event
+        on_mouse_drag : list[Callable[[], None]], default=[]
+            Functions to add to the mouse drag event
+        on_mouse_up : list[Callable[[], None]], default=[]
+            Functions to add to the mouse up event
+        on_key_press : list[Callable[[str], None]], default=[]
+            Functions to add to the key press event
+        on_key_release : list[Callable[[str], None]], default=[]
+            Functions to add to the key release event
+        on_button : list[(str, Callable[[], None])], default=[]
+            Functions to add to a button press event
+        on_delete : list[Callable[[], None]], default=[]
+            Functions to add to call when this GameObject is deleted
         """
-        self._origin = origin
 
-        self._muted = False
+        self._muted = muted
         self._pos = None
-        self._next_pos = pos
+        self.set_pos(pos)
+        self.set_origin(origin)
         self._image_name = ""
+        if imagename == "":
+            if type(imagetext) == str:
+                self.set_image_text(imagetext)
+            else:
+                self.set_image_text(*imagetext)
+        else:
+            self.set_image_name(imagename)
         self._frames_per_frame = 1
         self._frame = 0
         self._mirrored = False
@@ -67,13 +106,21 @@ class GameObject:
         self.__last_instrument:int = -1
 
         self.on_mouse_hover:list[Callable[[],None]] = []
+        self.on_mouse_hover.extend(on_mouse_hover)
         self.on_mouse_down:list[Callable[[],None]] = []
+        self.on_mouse_down.extend(on_mouse_down)
         self.on_mouse_drag:list[Callable[[],None]] = []
+        self.on_mouse_drag.extend(on_mouse_drag)
         self.on_mouse_up:list[Callable[[],None]] = []
+        self.on_mouse_up.extend(on_mouse_up)
         self.on_key_press:list[Callable[[str],None]] = []
+        self.on_key_press.extend(on_key_press)
         self.on_key_release:list[Callable[[str],None]] = []
+        self.on_key_release.extend(on_key_release)
         self.on_button:list[(str, Callable[[],None])] = []
+        self.on_button.extend(on_button)
         self.on_delete:list[Callable[[],None]] = []
+        self.on_delete.extend(on_delete)
 
         self.on_delete.append(self.__delete_sound)
         self.deleted = False
@@ -172,7 +219,7 @@ class GameObject:
         Call _get_frame() to get the current frame of the animation
         """
         self._pos = self._next_pos
-        ImagesDict.draw_image(self._image_name, self._pos, 
+        ImagesDict.draw_image(self._image_name, self._pos,
                               self._origin, self._get_frame(), self._mirrored)
         self._frame += self._frames_per_frame
         self._mirrored = False
