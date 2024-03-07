@@ -23,7 +23,7 @@ class AudioTest(GameState):
         self._add_game_object(self.pitch)
 
         self._add_game_object(GameObject (imagetext=("INSTRUMENT"), pos=(30, 22)))
-        self.instrument = Selector(options=[x for x in range (128)], 
+        self.instrument = Selector(options=[x for x in range (128)],
                                    color=(255, 0, 0, 255),
                                    pos_all=(30, 29),
                                    muted=True)

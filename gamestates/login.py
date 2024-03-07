@@ -57,9 +57,9 @@ class Login(GameState):
         self.back_button.set_deleted()
 
         self.enter_user.set_image_text("Enter Username", (122, 0, 0, 255))
-        user_text = self._add_game_object(GameObject (imagetext=(self.username.get_text(), (0, 122, 122, 255)),
-                                                      pos=(4, 28),
-                                                      origin=(0, 1)))
+        self._add_game_object(GameObject (imagetext=(self.username.get_text(), (0, 122, 122, 255)),
+                                          pos=(4, 28),
+                                          origin=(0, 1)))
 
         back_button = GameObject (imagetext=("BACK", (255, 0, 0, 255)),
                                   pos=(1, 59),
@@ -87,7 +87,7 @@ class Login(GameState):
         if self.is_register_screen:
             if (self.username.get_text() == "" or self.password.get_text() == ""):
                 self._set_state(err.Error("Error", ["Please enter a", "username and", "password"], Login(True)))
-            if db.get_pet (self.username.get_text()) is None:
+            if db.get_pet (self.username.get_text(), db.USERNAME) is None:
                 db.add_user(self.username.get_text(), self.password.get_text())
                 self._set_state(ps.PetSelector(self.username.get_text()))
             else:
@@ -97,7 +97,7 @@ class Login(GameState):
                 self._set_state(err.Error("Error", ["Please enter a", "username and", "password"], Login(False)))
             if db.verify_user(self.username.get_text(), self.password.get_text()):
                 # if verified, proceed
-                pet_type, _, _, _, _ = db.get_pet(self.username.get_text())
+                pet_type = db.get_pet(self.username.get_text(), db.PET_TYPE)
                 # go to pet selector if current pet is none
                 if pet_type == "":
                     self._set_state(ps.PetSelector(self.username.get_text()))

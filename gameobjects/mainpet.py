@@ -22,7 +22,7 @@ class MainPet(GameObject):
     poops : list[GameObject]
         The poops the pet has taken
     """
-    def __init__ (self, pet_type, pet_hunger, poops, *args, **wargs)->None:
+    def __init__ (self, pet_type, pet_hunger, poops, **wargs)->None:
         """Initializes the MainPet with default values (subject to change)
 
         Parameters
@@ -39,14 +39,17 @@ class MainPet(GameObject):
 
         self.pet_type = pet_type
 
-        GameObject.__init__(self, origin=[0.5, 1], *args, **wargs)
+        GameObject.__init__(self, origin=[0.5, 1], **wargs)
 
         # self.username, self.pet_type, self.pet_happy, poop = db.get_pet(username)
         # if self.pet_type == "":
         #     raise exceptions.PetNotFoundException()
 
        # self.happy = pet_happy
-        self.hunger = pet_hunger
+        if pet_hunger is not None:
+            self.hunger = pet_hunger
+        else:
+            self.hunger = 5 # whatever the initial value should be
         # do poop stuff
 
         self.set_image_name(self.pet_type + "idle")

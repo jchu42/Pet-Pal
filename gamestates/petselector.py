@@ -17,11 +17,11 @@ class PetSelector(GameState):
         self.selector.morethan.on_button.append(("d", self.selector.increment))
         self._add_game_object(self.selector)
 
-        next_button = self._add_game_object(GameObject (pos=(30, 59),
-                                                        imagetext=("NEXT", (255, 0, 0, 255)),
-                                                        on_mouse_up=[self.__change_state],
-                                                        on_button=[("return", self.__change_state),
-                                                                   ("space", self.__change_state)]))
+        self._add_game_object(GameObject (pos=(30, 59),
+                                          imagetext=("NEXT", (255, 0, 0, 255)),
+                                          on_mouse_up=[self.__change_state],
+                                          on_button=[("return", self.__change_state),
+                                                     ("space", self.__change_state)]))
         #next_button.set_image_text("NEXT", (255, 0, 0, 255))
         #next_button.on_mouse_up.append(self.__change_state)
         # next_button.on_button.append(("return", self.__change_state))
