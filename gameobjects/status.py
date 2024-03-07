@@ -15,9 +15,9 @@ class Status(GameObject):
     happiness : int
         The happiness value to show
     """
-    def __init__ (self)->None:
+    def __init__ (self, *args, **wargs)->None:
         """Initialize the Status GameObject"""
-        GameObject.__init__(self)
+        GameObject.__init__(self, *args, **wargs)
         self.hunger = 0
         self.set_origin ((0.5, 1))
     def set_hunger (self, value:int)->Self:

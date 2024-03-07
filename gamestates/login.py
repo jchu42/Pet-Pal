@@ -17,31 +17,34 @@ class Login(GameState):
 
         self._bg_color ((0, 0, 0, 255))
 
-        title = GameObject().set_pos ((30, 10))
+        title = GameObject(pos=(30, 10))
         if is_register_screen:
             title.set_image_text("Register", (255, 255, 255, 255))
         else:
             title.set_image_text("Login", (255, 255, 255, 255))
         self._add_game_object(title)
 
-        self.enter_user = GameObject ().set_pos((2, 22))
-        self.enter_user.set_image_text("Enter Username", (255, 0, 0, 255)).set_origin((0, 1))
-        self.username = StrInput ().set_pos ((4, 28)).set_color((0, 255, 255, 0))
-        self.username.set_text(username)
+        self.enter_user = GameObject (imagetext=("Enter Username", (255, 0, 0, 255)),
+                                      pos=(2,22),
+                                      origin=(0, 1))
         self._add_game_object(self.enter_user)
+        self.username = StrInput (pos=(4, 28),
+                                  color=(0, 255, 255, 0),
+                                  initial_text=username)
         self._add_game_object(self.username)
 
-        self.back_button = GameObject ().set_image_text("BACK", (255, 0, 0, 255))
-        self.back_button.set_pos((1, 59)).set_origin((0, 1))
-        self.back_button.on_mouse_up.append(lambda: self._set_state(mm.MainMenu()))
-        self.back_button.assign_button("escape", lambda:self._set_state(mm.MainMenu()))
+        self.back_button = GameObject (imagetext=("BACK", (255, 0, 0, 255)),
+                                       pos=(1, 59),
+                                       origin=(0, 1),
+                                       on_mouse_up=[lambda: self._set_state(mm.MainMenu())],
+                                       on_button=[("escape", lambda:self._set_state(mm.MainMenu()))])
         self._add_game_object(self.back_button)
 
-        self.next_button = GameObject ().set_pos((30, 59))
-        self.next_button.set_image_text("NEXT", (255, 0, 0, 255))
-        self.next_button.on_mouse_up.append(self.__change_to_password)
-        self.next_button.assign_button("return", self.__change_to_password)
-        self.next_button.assign_button("tab", self.__change_to_password)
+        self.next_button = GameObject (imagetext=("NEXT", (255, 0, 0, 255)),
+                                       pos=(30, 59),
+                                       on_mouse_up=[self.__change_to_password],
+                                       on_button=[("return", self.__change_to_password),
+                                                  ("tab", self.__change_to_password)])
         self._add_game_object(self.next_button)
 
         self.enter_pass = None
@@ -53,25 +56,30 @@ class Login(GameState):
         self.next_button.set_deleted()
         self.back_button.set_deleted()
 
-        self.enter_user.set_image_text("Enter Username", (122, 0, 0, 255)).set_origin((0, 1))
-        user_text = self._add_game_object(GameObject ()).set_pos((4, 28)).set_origin((0, 1))
-        user_text.set_image_text(self.username.get_text(), (0, 122, 122, 255))
+        self.enter_user.set_image_text("Enter Username", (122, 0, 0, 255))
+        user_text = self._add_game_object(GameObject (imagetext=(self.username.get_text(), (0, 122, 122, 255)),
+                                                      pos=(4, 28),
+                                                      origin=(0, 1)))
 
-        back_button = GameObject ().set_image_text("BACK", (255, 0, 0, 255))
-        back_button.set_pos((1, 59)).set_origin((0, 1))
-        back_button.on_mouse_up.append(lambda: self._set_state(Login(self.username.get_text())))
-        back_button.assign_button("escape", lambda:self._set_state(Login(self.username.get_text())))
+        back_button = GameObject (imagetext=("BACK", (255, 0, 0, 255)),
+                                  pos=(1, 59),
+                                  origin=(0, 1),
+                                  on_mouse_up=[lambda: self._set_state(Login(self.username.get_text()))],
+                                  on_button=[("escape", lambda:self._set_state(Login(self.username.get_text())))])
         self._add_game_object(back_button)
 
-        self.enter_pass = self._add_game_object(GameObject ()).set_pos((2, 40)).set_origin((0, 1))
-        self.enter_pass.set_image_text("Enter Password", (255, 0, 0, 255))
-        self.password = StrInput ().set_pos ((4, 46)).set_color((0, 255, 255, 0)).set_censored(True)
+        self.enter_pass = self._add_game_object(GameObject (imagetext=("Enter Password", (255, 0, 0, 255)),
+                                                            pos=(2, 40),
+                                                            origin=(0, 1)))
+        self.password = StrInput (pos=(4, 46),
+                                  color=(0, 255, 255, 0),
+                                  censored=True)
         self._add_game_object(self.password)
 
-        self.next_button = GameObject ().set_pos((30, 59))
-        self.next_button.set_image_text("NEXT", (255, 0, 0, 255))
-        self.next_button.on_mouse_up.append(self.__verify_credentials)
-        self.next_button.assign_button("return", self.__verify_credentials)
+        self.next_button = GameObject (imagetext=("NEXT", (255, 0, 0, 255)),
+                                       pos=(30, 59),
+                                       on_mouse_up=[self.__verify_credentials],
+                                       on_button=[("return", self.__verify_credentials)])
         self._add_game_object(self.next_button)
 
     def __verify_credentials(self)->None:

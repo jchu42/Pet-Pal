@@ -54,9 +54,15 @@ class GameState:
         room : str
             The name of the background image to use
         """
-        self._add_game_object(GameObject()).set_image_name("bgwhite").set_pos((30, 30)).set_origin((0.5, 0.5))
-        self._add_game_object(GameObject()).set_image_name(room).set_pos((30, 30)).set_origin((0.5, 0.5))
-        self._add_game_object(GameObject()).set_image_name(border).set_pos((30, 30)).set_origin((0.5, 0.5))
+        self._add_game_object(GameObject(imagename="bgwhite",
+                                         pos=(30, 30),
+                                         origin=(0.5, 0.5)))
+        self._add_game_object(GameObject(imagename=room,
+                                         pos=(30, 30),
+                                         origin=(0.5, 0.5)))
+        self._add_game_object(GameObject(imagename=border,
+                                         pos=(30, 30),
+                                         origin=(0.5, 0.5)))
         #self._add_game_object(GameObject()).set_image_name("bgblack2").set_pos((30, 70))
 
     def _set_state (self, new_state:Self)->None:
