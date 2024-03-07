@@ -97,9 +97,9 @@ class Login(GameState):
                 self._set_state(err.Error("Error", ["Please enter a", "username and", "password"], Login(False)))
             if db.verify_user(self.username.get_text(), self.password.get_text()):
                 # if verified, proceed
-                pet_type = db.get_pet(self.username.get_text(), db.PET_TYPE)
+                (pet_type,) = db.get_pet(self.username.get_text(), db.PET_TYPE)
                 # go to pet selector if current pet is none
-                if pet_type == "":
+                if pet_type == "" or pet_type is None:
                     self._set_state(ps.PetSelector(self.username.get_text()))
                 else:
                     self._set_state(rm.Room(self.username.get_text()))

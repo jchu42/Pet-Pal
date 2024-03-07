@@ -64,9 +64,10 @@ USERNAME = "user_name"
 PET_TYPE = "pet_type"
 ROOM_TYPE = "room_type"
 BORDER_TYPE = "border_type"
-PET_HAPPY = "pet_happy"
+PET_HUNGER = "pet_hunger"
 POOPS = "poops"
-FIELD_OPTIONS = (USERNAME, PET_TYPE, ROOM_TYPE, BORDER_TYPE, PET_HAPPY, POOPS)
+LAST_UPDATED = "last_updated"
+FIELD_OPTIONS = (USERNAME, PET_TYPE, ROOM_TYPE, BORDER_TYPE, PET_HUNGER, POOPS, LAST_UPDATED)
 
 def get_pet(username, fields:tuple)->tuple:
     """Get the selected fields from the database with the given username
@@ -75,7 +76,7 @@ def get_pet(username, fields:tuple)->tuple:
     ----------
     fields : tuple
         The fields to get from the database
-        options: pet_Type, room_Type, border_type, pet_happy, poops
+        options: pet_Type, room_Type, border_type, pet_hunger, poops, last_updated
 
     Returns
     -------
@@ -94,23 +95,27 @@ def get_pet(username, fields:tuple)->tuple:
     ret = run_command(command)
     return ret
 
-def set_pet(username, pet_type:str=None, room_type:str=None, border_type:str=None, pet_happy:int=None, poops:int=None)->None:
+def set_pet(username:str, pet_type:str=None, room_type:str=None, border_type:str=None, pet_hunger:int=None, poops:int=None, last_updated:int=None)->None:
     """Set the particular fields to the values in the database
     
     Parameters
     ----------
+    username : str
+        The username to use with the database
     pet_type : str
     room_type : str
     border_type : str
-    pet_happy : int
+    pet_hunger : int
     poops : int
+    last_updated : float
     """
     command = "UPDATE users SET "
     data = [("pet_type", pet_type), 
             ("room_type", room_type),
             ("border_type", border_type),
-            ("pet_happy", pet_happy),
-            ("poops", poops)]
+            ("pet_hunger", pet_hunger),
+            ("poops", poops),
+            ("last_updated", last_updated)]
     prev_used:bool = False
     for param, val in data:
         if val is not None:
@@ -130,11 +135,13 @@ if __name__ == '__main__':
     run_command("""DROP TABLE users""")
 
     run_command ("""CREATE TABLE users (
-            user_name VARCHAR(255) PRIMARY KEY,
-            user_password VARCHAR(255) NOT NULL,
-            pet_type VARCHAR(255),
-            room_type VARCHAR(255),
-            border_type VARCHAR(255),
-            pet_happy INT,
-            poops INT
-                    )""")
+                 user_name VARCHAR(255) PRIMARY KEY,
+                 user_password VARCHAR(255) NOT NULL,
+                 pet_type VARCHAR(255),
+                 room_type VARCHAR(255),
+                 border_type VARCHAR(255),
+                 pet_hunger INT,
+                 poops INT,
+                 last_updated FLOAT(53)
+                 )""")
+    print ("Table created.")

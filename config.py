@@ -1,13 +1,24 @@
-def load_config():
-    """Load configuration settings."""
-    return {
-        'database': {
-            'database':'game_data',
-            'user':'btran37',
-            'password':'tk6cqTyGZK4I',
-            'host':'ep-soft-breeze-a5w3y270.us-east-2.aws.neon.tech',
-            'port':'5432'
-        },
-       # 'api_key': 'your_api_key_here',
-       # 'debug_mode': True
-    }
+"""Contains the static Config class"""
+import configparser
+
+class Config:
+    """Read and get configuration"""
+    config:configparser.ConfigParser = configparser.ConfigParser()
+    @staticmethod
+    def load_config():
+        """Load configuration settings."""
+        try:
+            Config.config.read('config.ini')
+        except (KeyError, configparser.MissingSectionHeaderError):
+            Config.write_default()
+    @staticmethod
+    def write_default():
+        """Create default configuration settings"""
+        Config.config['Screen'] = {'fps' : '5', 'scale' : '5'}
+        Config.config['Poop'] = {'interval' : '10', 'max' : '5'}
+        with open('config.ini', 'w', encoding="utf8") as configfile:
+            Config.config.write(configfile)
+
+if __name__ == '__main__':
+    Config.write_default()
+    print ("default config written")

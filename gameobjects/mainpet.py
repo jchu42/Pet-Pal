@@ -3,8 +3,11 @@ from typing import Self
 import random
 from gameobject import GameObject
 from gameobjects.status import Status
+from gameobjects.poop import Poop
 from imagesdict import ImagesDict
-
+import gameDatabase as db
+import time
+from config import Config
 
 class MainPet(GameObject):
     """The star of the show.
@@ -13,6 +16,8 @@ class MainPet(GameObject):
 
     Attributes
     ----------
+    username : str
+        The user's username for use with the database
     pet_type : str
         The name of the pet, determines the imageset to use
     hunger : int
@@ -22,7 +27,7 @@ class MainPet(GameObject):
     poops : list[GameObject]
         The poops the pet has taken
     """
-    def __init__ (self, pet_type, pet_hunger, poops, **wargs)->None:
+    def __init__ (self, username:str, pet_type:str, pet_hunger:int, poops:int, last_updated:float, **wargs)->None:
         """Initializes the MainPet with default values (subject to change)
 
         Parameters
@@ -36,7 +41,7 @@ class MainPet(GameObject):
         # eat (default to movevert, and then to movehori if does not exist)
         # dead (ends at last frame and then stays still) 
         #  (decrement self.__frame in tick to stay at last/second-last frame)
-
+        self.username = username
         self.pet_type = pet_type
 
         GameObject.__init__(self, origin=[0.5, 1], **wargs)
@@ -50,26 +55,34 @@ class MainPet(GameObject):
             self.hunger = pet_hunger
         else:
             self.hunger = 5 # whatever the initial value should be
-        # do poop stuff
+
+        self.poops:list[Poop] = []
+        if poops is not None:
+            for _ in range(poops):
+                self._make_poop()
+        if last_updated is not None:
+            self.last_updated = last_updated
+        else:
+            self.last_updated = time.time() # start of game
+        self.poop_interval = int(Config.config["Poop"]["interval"])
+        self.poop_max = int(Config.config["Poop"]["max"])
 
         self.set_image_name(self.pet_type + "idle")
 
-        # self.__happy = 59
-        # self.happy = 5
-
-        self.status = Status()
-        self.add_child_object(self.status)
+        #self.status = Status()
+        #self.add_child_object(self.status)
 
         self._right = True
         self.action = "idle"
         self._action_value = 0
         self._change_action = True
 
-        self.poops:list[GameObject] = []
-        
-        #in mainpet.py
-        #set_pet(self.pet_type, self.__happy, self.poops) # test to see if its actually added to db
+        self.on_delete.append(self.update_db)
+        self.goodbye_forever = False
 
+    def update_db(self)->None:
+        """Update the database when game exiting"""
+        db.set_pet(self.username, poops=self._get_num_poops(), last_updated=time.time())
 
     def set_image_name(self, name:str|list[str])->Self:
         """Set the image set to use. 
@@ -109,6 +122,19 @@ class MainPet(GameObject):
         die (defaults to idle)
         poop (defaults to move)
         """
+        # TODO: complicated poop calculations here
+        # TODO: also has to ignore sleep time somehow?
+        cur_time = time.time()
+        timediff = cur_time - self.last_updated
+        timediff = int(timediff / self.poop_interval)
+        for _ in range(timediff):
+            # don't really have to update database unless exit or death
+            self.last_updated = self.last_updated + self.poop_interval # retain accuracy
+            if self._get_num_poops() == self.poop_max:
+                self.goodbye_forever = True # trigger state change in room
+            else:
+                self._make_poop()
+
        # self.__happy -= 1   
         self.hunger += 1
         if self.hunger <= 0:
@@ -117,13 +143,8 @@ class MainPet(GameObject):
             food.on_mouse_up.append(lambda: setattr(self, 'hunger', self.hunger - 10))
             food.set_pos((45, 10))
             
-            poop = GameObject()
-            self.add_child_object(poop)
-            poop.set_image_name("poop")
-            poop.set_pos((int(random.random()*40 + 12), int(random.random()*40+12)))
-            poop.set_frames_per_frame(3)
-            poop.on_mouse_up.append(poop.set_deleted)
-            self.poops.append (poop)
+            self._make_poop()
+
             if len(self.poops) > 3:
                 self.poops[0].set_deleted()
                 self.poops.remove(self.poops[0])
@@ -182,5 +203,16 @@ class MainPet(GameObject):
             self._mirror()
 
         #self.status.set_happiness(self.happy)
-        self.status.set_hunger(self.hunger)
-        self.status.set_pos((self.get_pos()[0], self.get_pos()[1] - 15))
+        #self.status.set_hunger(self.hunger)
+        #self.status.set_pos((self.get_pos()[0], self.get_pos()[1] - 15))
+
+    def _get_num_poops(self)->int:
+        self.poops = list(filter(lambda poop: not poop.deleted, self.poops))
+        return len(self.poops)
+
+    def _make_poop(self)->None:
+        poop = Poop()
+        self.add_child_object(poop)
+        self.poops.append (poop)
+        self.poops = list(filter(lambda poop: not poop.deleted, self.poops))
+        

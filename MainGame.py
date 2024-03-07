@@ -29,7 +29,6 @@ when hungry, more squirming than moving
 # audio.set_volume(0.2)
 # audio.play()
 
-import configparser
 import sys
 import pygame
 import pygame.midi
@@ -37,26 +36,16 @@ from gamemanager import GameManager
 from imagesdict import ImagesDict
 from gamestates.mainmenu import MainMenu
 from gameobject import GameObject
-
+from config import Config
 
 PIXELS = (60, 60) # number of pixels width/height for the screen -> keep here
 
 def main() -> int:
     """Initialize pygame, and run the pet game"""
+    Config.load_config()
 
-    try:
-        config = configparser.ConfigParser()
-        config.read('config.ini')
-        config.sections()
-        # configure screen
-        fps = int(config['Screen']['fps'])
-        scale = int(config['Screen']['scale'])
-    except (KeyError, configparser.MissingSectionHeaderError):
-        config['Screen'] = {'fps' : '5', 'scale' : '5'}
-        with open('config.ini', 'w', encoding="utf8") as configfile:
-            config.write(configfile)
-        fps = int(config['Screen']['fps'])
-        scale = int(config['Screen']['scale'])
+    fps = int(Config.config['Screen']['fps'])
+    scale = int(Config.config['Screen']['scale'])
 
     # pygame setup
     # https://stackoverflow.com/questions/50569453/why-does-it-say-that-module-pygame-has-no-init-member

@@ -1,10 +1,11 @@
 """Contains the MainMenu class"""
+import pygame
 from gamestate import GameState
 from gameobject import GameObject
 import gamestates.login as lg
 import gamestates.texttest as tt
 import gamestates.audiotest as at
-import pygame
+import gameobjects.poop as pp
 
 pygame.mixer.init()
 music = pygame.mixer.music

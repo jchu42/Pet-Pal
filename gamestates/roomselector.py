@@ -1,4 +1,5 @@
 """Contains the RoomSelector class"""
+import time
 from gamestate import GameState
 from gameobject import GameObject
 from gameobjects.selector import Selector
@@ -46,6 +47,5 @@ class RoomSelector(GameState):
                    pet_type=self.petname,
                    room_type=self.room_selector.get_option(),
                    border_type=self.border_selector.get_option(),
-                   pet_happy=5,
-                   poops=0)
+                   last_updated=time.time())
         self._set_state(rm.Room(username=self.username))

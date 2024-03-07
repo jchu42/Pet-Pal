@@ -192,6 +192,15 @@ class GameObject:
         """
         self._frames_per_frame = 1.0/frames
         return self
+    def _num_frames(self)->int:
+        """Get the number of frames for the current image
+        
+        Returns
+        -------
+        int
+            Number of frames in the current image
+        """
+        return len(ImagesDict.images[self._image_name])
     def _get_frame (self)->int:
         """Get the current frame of this GameObject.
         
