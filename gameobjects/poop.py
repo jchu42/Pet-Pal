@@ -21,6 +21,7 @@ class Poop(GameObject):
         self.set_frames_per_frame(3)
         self.on_mouse_up.append(self.poopydi_scoop)
 
+        self.queue_sound(20, 7, 100) # poopy sound
         self.__animate_poop_pop = False
 
     def poopydi_scoop (self)->None:

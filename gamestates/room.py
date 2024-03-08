@@ -13,10 +13,8 @@ class Room(GameState):
         
         Parameters
         ----------
-        roomname : str
-            The background image to use
-        petname : str
-            The name of the pet to use
+        username : str
+            The user's username
         """
         GameState.__init__(self)
         self.username = username
@@ -32,7 +30,7 @@ class Room(GameState):
         self.main_pet = MainPet (username, pet_type, pet_hunger, poops, last_updated, pos=(30, 30))
         self._add_game_object(self.main_pet)
 
-        invis_back_button = self._add_game_object(GameObject(on_button=[("escape", lambda: self._set_state(mm.MainMenu()))]))
+        self._add_game_object(GameObject(on_button=[("escape", lambda: self._set_state(mm.MainMenu()))]))
 
         # text_test = GameObject ().set_pos((30, 59)).set_image_text("TEXT TEST", (255, 0, 0, 255))
         # text_test.on_mouse_up.append(lambda: self._set_state(tt.TextTest()))
