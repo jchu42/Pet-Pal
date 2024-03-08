@@ -8,6 +8,12 @@ import gamestates.petselector as ps
 import gamestates.error as err
 import gameDatabase as db
 
+
+# (0, 125, 255, 255) dark blue
+# (127, 209, 255, 255) light blue (main bg colour)
+# (235, 250, 122, 255) yellow 
+# (188, 107, 242, 255) purple 
+
 class Login(GameState):
     """This is the login screen state."""
     def __init__(self, is_register_screen, username="")->None:
@@ -15,7 +21,7 @@ class Login(GameState):
         GameState.__init__(self)
         self.is_register_screen = is_register_screen
 
-        self._bg_color ((0, 0, 0, 255))
+        self._bg_color ((0, 125, 255, 255))
 
         title = GameObject(pos=(30, 10))
         if is_register_screen:
