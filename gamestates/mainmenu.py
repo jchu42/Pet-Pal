@@ -5,7 +5,6 @@ from gameobject import GameObject
 import gamestates.login as lg
 import gamestates.texttest as tt
 import gamestates.audiotest as at
-import gameobjects.poop as pp
 
 pygame.mixer.init()
 music = pygame.mixer.music
@@ -71,7 +70,3 @@ class MainMenu(GameState):
         else:
             self.music_button.set_image_name("musicoff")
             music.stop()
-
-
-        # rip = self._add_game_object(GameObject())
-        # rip.set_image_name("rip").set_pos((30, 30))

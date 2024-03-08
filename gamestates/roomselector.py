@@ -47,5 +47,7 @@ class RoomSelector(GameState):
                    pet_type=self.petname,
                    room_type=self.room_selector.get_option(),
                    border_type=self.border_selector.get_option(),
-                   last_updated=time.time())
+                   pet_hunger=None,
+                   poops=None,
+                   last_updated=None)
         self._set_state(rm.Room(username=self.username))

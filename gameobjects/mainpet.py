@@ -1,12 +1,12 @@
 """This module contains the MainPet GameObject class."""
-from typing import Self
+import time
 import random
+from typing import Self
 from gameobject import GameObject
 from gameobjects.status import Status
 from gameobjects.poop import Poop
 from imagesdict import ImagesDict
 import gameDatabase as db
-import time
 from config import Config
 
 class MainPet(GameObject):
@@ -27,7 +27,13 @@ class MainPet(GameObject):
     poops : list[GameObject]
         The poops the pet has taken
     """
-    def __init__ (self, username:str, pet_type:str, pet_hunger:int, poops:int, last_updated:float, **wargs)->None:
+    def __init__ (self,
+                  username:str,
+                  pet_type:str,
+                  pet_hunger:int,
+                  poops:int,
+                  last_updated:float,
+                  **wargs)->None:
         """Initializes the MainPet with default values (subject to change)
 
         Parameters
