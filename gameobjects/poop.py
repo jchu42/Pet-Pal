@@ -12,16 +12,20 @@ class Poop(GameObject):
     ----------
     
     """
-    def __init__ (self, **wargs)->None:
+    def __init__ (self, layer:int=1, **wargs)->None:
         """Poop the poop"""
-        GameObject.__init__(self, **wargs)
+        GameObject.__init__(self, layer=layer, **wargs)
 
         self.set_image_name("poop")
         self.set_pos((int(random.random()*40 + 12), int(random.random()*40 + 12)))
         self.set_frames_per_frame(3)
         self.on_mouse_up.append(self.poopydi_scoop)
 
-        self.queue_sound(20, 7, 100) # poopy sound
+        self.queue_sound([x +20 for x in range(10)][int(random.random()*10)], 
+                         [20, 25, 7][int(random.random()*3)], 
+                         [x + 100 for x in range(20)][int(random.random()*20)]) # poopy sound
+
+        self._mirrored = random.random()>0.5
         self.__animate_poop_pop = False
 
     def poopydi_scoop (self)->None:

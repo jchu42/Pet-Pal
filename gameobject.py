@@ -43,6 +43,7 @@ class GameObject:
     def __init__(self, 
                  imagename:str="",
                  imagetext:tuple[str, tuple[int, int, int, int]]|tuple[str]=("", (0, 0, 0, 255)),
+                 layer:int=3,
                  pos:tuple[int, int]=(0, 0),
                  origin:tuple[float, float]=(0.5, 1),
                  muted:bool=False,
@@ -54,7 +55,8 @@ class GameObject:
                  on_key_press:list[Callable[[str], None]]=None,
                  on_key_release:list[Callable[[str], None]]=None,
                  on_button:list[tuple[str, Callable[[], None]]]=None,
-                 on_delete:list[Callable[[], None]]=None)->None:
+                 on_delete:list[Callable[[], None]]=None
+                 )->None:
         """Initialize this GameObject.
         
         Parameters
@@ -63,6 +65,8 @@ class GameObject:
             The name of the image to use. If empty, imagetext is used instead.
         imagetext : tuple[str, tuple[int, int, int, int]]
             Only used if imagename is empty. Sets the text of this GameObject.
+        layer : int
+            The layer to draw this GameObject on. May be negative. 
         pos : tuple[int, int], default=(0, 0)
             The position this GameObject should be when initialized
         origin : tuple[float, float], default=(0.5, 1)
@@ -87,6 +91,7 @@ class GameObject:
 
         self._muted = muted
         self._pos = None
+        self.layer = layer
         self.set_pos(pos)
         self.set_origin(origin)
         self._image_name = ""

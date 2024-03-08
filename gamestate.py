@@ -1,5 +1,6 @@
 """Contains the GameState class"""
 from typing import Self
+
 from gameobject import GameObject
 from imagesdict import ImagesDict
 
@@ -20,6 +21,7 @@ class GameState:
     """
     def __init__(self)->None:
         self._gos:list[GameObject] = []
+        self._gos_draw_order:dict[list[GameObject]] = {}
         self.__go_queue:list[GameObject] = []
         self.new_state:GameState = None
         self.change_state:bool = False
@@ -44,7 +46,9 @@ class GameState:
             bg_surface.fill(color)
             ImagesDict.images[name] = {}
             ImagesDict.images[name][0] = bg_surface
-        self._add_game_object(GameObject()).set_image_name(name).set_pos((30, 60))
+        self._add_game_object(GameObject(imagename=name,
+                                         pos=(30, 60),
+                                         layer=-1))
 
     def _main_ui(self, room:str, border:str)->None:
         """This function creates several GameObjects to fill the background.
@@ -56,13 +60,16 @@ class GameState:
         """
         self._add_game_object(GameObject(imagename="bgwhite",
                                          pos=(30, 30),
-                                         origin=(0.5, 0.5)))
+                                         origin=(0.5, 0.5),
+                                         layer=-2))
         self._add_game_object(GameObject(imagename=room,
                                          pos=(30, 30),
-                                         origin=(0.5, 0.5)))
+                                         origin=(0.5, 0.5),
+                                         layer=-1))
         self._add_game_object(GameObject(imagename=border,
                                          pos=(30, 30),
-                                         origin=(0.5, 0.5)))
+                                         origin=(0.5, 0.5),
+                                         layer=10))
         #self._add_game_object(GameObject()).set_image_name("bgblack2").set_pos((30, 70))
 
     def _set_state (self, new_state:Self)->None:
@@ -97,6 +104,10 @@ class GameState:
         self._state_tick()
 
         self._gos.extend(self.__go_queue)
+        for go in self.__go_queue:
+            if go.layer not in self._gos_draw_order:
+                self._gos_draw_order[go.layer] = []
+            self._gos_draw_order[go.layer].append(go)
         self.__go_queue.clear()
 
         for go in self._gos:
@@ -107,6 +118,11 @@ class GameState:
         for go in self._gos:
             for go2 in go.queued_child_game_objects:
                 go2.tick()
+
+                if go2.layer not in self._gos_draw_order:
+                    self._gos_draw_order[go2.layer] = []
+                self._gos_draw_order[go2.layer].append(go2)
+
             self._gos.extend(go.queued_child_game_objects)
             go.queued_child_game_objects.clear()
 
@@ -115,6 +131,8 @@ class GameState:
             for function in go.on_delete:
                 function()
         self._gos = [go for go in self._gos if not go.deleted]
+        for key in self._gos_draw_order.keys():
+            self._gos_draw_order[key] = [go for go in self._gos_draw_order[key] if not go.deleted]
 
     def handle_sounds(self)->None:
         """Play the queued sounds for the GameObjects"""
@@ -123,8 +141,9 @@ class GameState:
 
     def handle_meshes(self)->None:
         """Draw all GameObjects to the screen."""
-        for go in self._gos:
-            go.draw()
+        for _, layer in sorted(self._gos_draw_order.items()):
+            for go in layer:
+                go.draw()
 
     def handle_mouse_hover (self, pos:tuple[int, int])->None:
         """Handle all GameObjects' mouse hover actions if the cursor is over it

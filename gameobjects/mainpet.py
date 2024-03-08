@@ -57,19 +57,12 @@ class MainPet(GameObject):
         #     raise exceptions.PetNotFoundException()
 
        # self.happy = pet_happy
-        if pet_hunger is not None:
-            self.hunger = pet_hunger
-        else:
-            self.hunger = 5 # whatever the initial value should be
+        self.hunger = pet_hunger
 
         self.poops:list[Poop] = []
-        if poops is not None:
-            for _ in range(poops):
-                self._make_poop()
-        if last_updated is not None:
-            self.last_updated = last_updated
-        else:
-            self.last_updated = time.time() # start of game
+        for _ in range(poops):
+            self._make_poop()
+        self.last_updated = last_updated
         self.poop_interval = int(Config.config["Poop"]["interval"])
         self.poop_max = int(Config.config["Poop"]["max"])
 

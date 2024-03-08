@@ -41,15 +41,13 @@ class Selector(GameObject):
         self.__selection = initial_selection
 
         self.lessthan = self.add_child_object(GameObject(imagetext=("<", color),
-                                                         on_mouse_up=[self.decrement]))
+                                                         on_mouse_up=[self.decrement],
+                                                         on_button=[("left", self.decrement)],
+                                                         origin=(0.5, 0.5)))
         self.morethan = self.add_child_object(GameObject(imagetext=(">", color),
-                                                         on_mouse_up=[self.increment]))
-        self.lessthan.set_origin((0.5, 0.5))
-        #self.lessthan.on_mouse_up.append(self.decrement)
-        self.lessthan.on_button.append(("left", self.decrement))
-        self.morethan.set_origin((0.5, 0.5))
-        self.morethan.on_mouse_up.append(self.increment)
-        self.morethan.on_button.append(("right", self.increment))
+                                                         on_mouse_up=[self.increment],
+                                                         on_button=[("right", self.increment)],
+                                                         origin=(0.5, 0.5)))
 
         self.set_pos_all(pos_all)
         self.set_origin(origin)
