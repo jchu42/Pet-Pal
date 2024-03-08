@@ -4,7 +4,7 @@ import gamestates.mainmenu as mm
 import gamestates.death as dt
 from gameobject import GameObject
 from gameobjects.mainpet import MainPet
-import gameDatabase as db
+from gamedatabase import GameDatabase as db
 
 class Room(GameState):
     """This is the main room screen state."""
@@ -36,5 +36,6 @@ class Room(GameState):
         # text_test.on_mouse_up.append(lambda: self._set_state(tt.TextTest()))
         # self._add_game_object(text_test)
     def _state_tick(self) -> None:
+        """Check if the pet has died each frame. If dead, trigger death screen."""
         if self.main_pet.goodbye_forever:
             self._set_state(dt.Death(self.username))

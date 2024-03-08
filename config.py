@@ -1,4 +1,5 @@
-"""Contains the static Config class"""
+"""Contains the static Config class.
+To reset the config file, run this module."""
 import configparser
 
 class Config:
@@ -14,8 +15,9 @@ class Config:
     @staticmethod
     def write_default():
         """Create default configuration settings"""
-        Config.config['Screen'] = {'fps' : '5', 'scale' : '5'}
-        Config.config['Poop'] = {'interval' : '10', 'max' : '5'}
+        Config.config['Screen'] = {'fps' : '5', 'scale' : '5', 'filter' : '2'}
+        Config.config['Poop'] = {'interval' : 10, 'max' : 5}
+        Config.config['Debug'] = {'text' : False, 'images':False}
         with open('config.ini', 'w', encoding="utf8") as configfile:
             Config.config.write(configfile)
 

@@ -10,6 +10,12 @@ class Selector(GameObject):
 
     Attributes
     ----------
+    _options : list[str]
+        The options for the user to select from. Image if exists, text otherwise.
+    _color : tuple[int, int, int, int]
+        The color of the side selection arrows
+    __selection : int
+        The currently selected option index
     lessthan : GameObject
         The clickable "<" GameObject that decrements the selection option
     morethan : GameObject
@@ -17,10 +23,10 @@ class Selector(GameObject):
     """
     def __init__(self,
                  options:list[str],
-                 origin=(0.5, 0.5),
                  initial_selection:int=0,
                  color:tuple[int, int, int, int]=(0, 0, 0, 255),
                  pos_all:tuple[int, int]=(30, 30),
+                 origin_all:tuple[float, float]=(0.5, 0.5),
                  **wargs)->None:
         """Initialize the Selector and its arrow button GameObjects
         
@@ -31,7 +37,11 @@ class Selector(GameObject):
         initial_selection : int, default=0
             The initial selection this Selector should show to the user
         color : tuple[int, int, int, int], default=(0, 0, 0, 255)
-            The color the left and right arrows should be
+            The color the left and right arrows should be, and middle if it is text
+        pos_all : tuple[int, int], default=(30, 30)
+            The position to set the options. Arrows go 20 pixels left and right of this position.
+        origin_all : tuple[float, float], defualt=(0.5, 0.5)
+            The origin the options and arrows should be set to
         """
         GameObject.__init__(self, **wargs)
 
@@ -41,18 +51,16 @@ class Selector(GameObject):
         self.__selection = initial_selection
 
         self.lessthan = self.add_child_object(GameObject(imagetext=("<", color),
-                                                         on_mouse_up=[self.decrement]))
+                                                         on_mouse_up=[self.decrement],
+                                                         on_button=[("left", self.decrement)],
+                                                         origin=(0.5, 0.5)))
         self.morethan = self.add_child_object(GameObject(imagetext=(">", color),
-                                                         on_mouse_up=[self.increment]))
-        self.lessthan.set_origin((0.5, 0.5))
-        #self.lessthan.on_mouse_up.append(self.decrement)
-        self.lessthan.on_button.append(("left", self.decrement))
-        self.morethan.set_origin((0.5, 0.5))
-        self.morethan.on_mouse_up.append(self.increment)
-        self.morethan.on_button.append(("right", self.increment))
+                                                         on_mouse_up=[self.increment],
+                                                         on_button=[("right", self.increment)],
+                                                         origin=(0.5, 0.5)))
 
         self.set_pos_all(pos_all)
-        self.set_origin(origin)
+        self.set_origin_all(origin_all)
 
     def set_pos_all(self, pos:tuple[int, int])->Self:
         """Set the position of this Selector and its arrow button GameObjects
@@ -71,6 +79,23 @@ class Selector(GameObject):
         self._next_pos = pos
         self.lessthan.set_pos((pos[0] - 20, pos[1]))
         self.morethan.set_pos((pos[0] + 20, pos[1]))
+        return self
+    def set_origin_all(self, origin:tuple[float, float])->Self:
+        """Set the position of this Selector and its arrow button GameObjects
+
+        Parameters
+        ----------
+        origin : tuple[float, float]
+            The origins for this selector and its arrows
+
+        Returns
+        -------
+        Selector
+            self
+        """
+        self._origin = origin
+        self.lessthan.set_origin(origin)
+        self.morethan.set_origin(origin)
         return self
 
     def get_option (self)->str:

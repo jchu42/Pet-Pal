@@ -1,21 +1,14 @@
 """Contains the MainMenu class"""
-import pygame
 from gamestate import GameState
 from gameobject import GameObject
 import gamestates.login as lg
 import gamestates.texttest as tt
 import gamestates.audiotest as at
 
-pygame.mixer.init()
-music = pygame.mixer.music
-music.load('Sakura-Girl-Lucky-Day.wav')
-music.play(-1)
-music.set_volume(0.1)
-
 class MainMenu(GameState):
     """This is the main menu screen state."""
     def __init__(self)->None:
-        """Loads the main menu screen with login, text test, audio test, and quit"""
+        """Loads the main menu screen with login, new, quit, and test buttons"""
         GameState.__init__(self)
 
         self._bg_color ((0, 0, 0, 255))
@@ -52,21 +45,3 @@ class MainMenu(GameState):
                                          on_mouse_up=[lambda: self._set_state(None)],
                                          on_button=[("q",lambda: self._set_state(None)),
                                                     ("escape",lambda: self._set_state(None))]))
-
-        self.playing = music.get_busy()
-        self.music_button = self._add_game_object(GameObject(pos=(0, 60),
-                                                             imagename="musicon" if self.playing else "musicoff",
-                                                             origin=(0, 1),
-                                                             on_mouse_up=[self.set_music_button],
-                                                             on_button=[("m", self.set_music_button)]))
-            
-    
-    def set_music_button (self):
-        """Toggles music and button"""
-        self.playing = not self.playing
-        if self.playing:
-            self.music_button.set_image_name("musicon")
-            music.play(-1)
-        else:
-            self.music_button.set_image_name("musicoff")
-            music.stop()

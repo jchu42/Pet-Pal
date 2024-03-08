@@ -2,7 +2,7 @@
 from gamestate import GameState
 from gameobject import GameObject
 from gamestates.petselector import PetSelector
-import gameDatabase as db
+from gamedatabase import GameDatabase as db
 
 class Death(GameState):
     """This is the pet death screen state."""

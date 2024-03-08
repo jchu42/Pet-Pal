@@ -1,8 +1,8 @@
 """Contains the AudioTest module"""
 from gamestate import GameState
 from gameobject import GameObject
-from gameobjects.selector import Selector
 import gamestates.mainmenu as mm
+from gameobjects.selector import Selector
 
 class AudioTest(GameState):
     """This is the audio test state, used to test MIDI pitch, instrument, and volume parameters"""
@@ -17,7 +17,8 @@ class AudioTest(GameState):
                               initial_selection=50,
                               muted=True,
                               color=(255, 0, 0, 255),
-                              pos_all=(30, 14))
+                              pos_all=(30, 14),
+                              origin_all=(0.5, 1))
         self.pitch.lessthan.on_mouse_up.append(self.__button_sound)
         self.pitch.morethan.on_mouse_up.append(self.__button_sound)
         self._add_game_object(self.pitch)
@@ -26,7 +27,8 @@ class AudioTest(GameState):
         self.instrument = Selector(options=[x for x in range (128)],
                                    color=(255, 0, 0, 255),
                                    pos_all=(30, 29),
-                                   muted=True)
+                                   muted=True,
+                                   origin_all=(0.5, 1))
         self.instrument.lessthan.on_mouse_up.append(self.__button_sound)
         self.instrument.morethan.on_mouse_up.append(self.__button_sound)
         self._add_game_object(self.instrument)
@@ -36,7 +38,8 @@ class AudioTest(GameState):
                                initial_selection=25,
                                color=(255, 0, 0, 255),
                                pos_all=(30, 44),
-                               muted=True)
+                               muted=True,
+                               origin_all=(0.5, 1))
         self.volume.lessthan.on_mouse_up.append(self.__button_sound)
         self.volume.morethan.on_mouse_up.append(self.__button_sound)
         self._add_game_object(self.volume)
@@ -49,11 +52,11 @@ class AudioTest(GameState):
         login_button = GameObject (imagetext=("RETURN", (255, 0, 0, 255)),
                                    pos=(30, 59),
                                    on_mouse_up=[lambda: self._set_state(mm.MainMenu())],
-                                   on_button=("escape", lambda:self._set_state(mm.MainMenu())))
+                                   on_button=[("escape", lambda:self._set_state(mm.MainMenu()))])
         self._add_game_object(login_button)
 
     def __button_sound(self) -> None:
         """Play the MIDI with the currently selected options"""
         self.play_button.queue_sound(self.pitch.get_option(),
-                                    self.instrument.get_option(),
-                                    self.volume.get_option())
+                                     self.instrument.get_option(),
+                                     self.volume.get_option())

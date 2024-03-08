@@ -1,13 +1,14 @@
 """Contains the PetSelector class"""
 from gamestate import GameState
 from gameobject import GameObject
+import gamestates.roomselector as rs
+import gamestates.login as lg
 from gameobjects.selector import Selector
-import gamestates.roomselector as rm
 
 class PetSelector(GameState):
     """This is the pet selection screen state."""
     def __init__(self, username)->None:
-        """Initializese the pet selection screen, which uses a Selector for the user to select a pet"""
+        """Initializese the pet selection screen; uses a Selector for the user to select a pet."""
         GameState.__init__(self)
         self.username = username
         self._bg_color ((255, 255, 255, 255))
@@ -27,9 +28,13 @@ class PetSelector(GameState):
         # next_button.on_button.append(("return", self.__change_state))
         # next_button.on_button.append(("space", self.__change_state))
 
+        self._add_game_object(GameObject (imagetext=("BACK", (255, 0, 0, 255)),
+                                          pos=(1, 59),
+                                          origin=(0, 1),
+                                          on_mouse_up=[lambda: self._set_state(lg.Login(is_register_screen=False, username=username))],
+                                          on_button=[("escape", lambda:self._set_state(lg.Login(is_register_screen=False, username=username)))]))
+
     def __change_state(self):
         """Go to the next GameState"""
-        
-        self.selector.queue_sound(63) # play a sound when going to next state
-        self._set_state(rm.RoomSelector(username=self.username, 
+        self._set_state(rs.RoomSelector(username=self.username, 
                                         petname=self.selector.get_option().removesuffix("idle")))

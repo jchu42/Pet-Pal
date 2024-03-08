@@ -13,10 +13,31 @@ class GameObject:
     Attributes
     ----------
     midi_out : pygame.midi.Output, default=None
-        The object used to play sounds by the GameObject. Requires initialization.
+        Statis object used to play sounds by the GameObject. Requires initialization.
+    _muted : bool
+        Whether or not this GameObject's sounds shouold be muted
+    _next_pos : tuple[int, int]
+        The position this GameObject is queued to be in this frame
+        Reduces 'first added' bias when comparing object positions with each other during ticks
+    _pos : tuple[int, int]
+        This GameObject's position in the GameState when drawn
+    _origin : tuple[float, float]
+        This GameObject's image 'zoro' point
+    _image_name : str
+        The image name this references in ImagesDict
+    _frames_per_frame : int
+        The number of frames each frame if exists) of this GameObject should last for
+    _frame : int
+        The current frame of this GameObject (if current image is animated)
+    _mirrored : bool
+        If this GameObject's image should be flipped
     queued_child_game_objects : list[GameObject]
         A list of child objects this GameObject created that should be removed
-        and added to GameManager's list of GameObjects
+        and added to GameState's list of GameObjects
+    queued_sounds : list[tuple[int, int, int, int]]
+        A list of sound parameters that have been queued to be played
+    __last_instrument
+        The last instrument that was played by this GameObject
     on_mouse_hover : list[Callable[[], None]]
         A list of functions that will be called when the mouse hovers over it
     on_mouse_down : list[Callable[[], None]]
@@ -40,9 +61,10 @@ class GameObject:
     """
     midi_out: pygame.midi.Output = None
 
-    def __init__(self, 
+    def __init__(self,
                  imagename:str="",
                  imagetext:tuple[str, tuple[int, int, int, int]]|tuple[str]=("", (0, 0, 0, 255)),
+                 layer:int=3,
                  pos:tuple[int, int]=(0, 0),
                  origin:tuple[float, float]=(0.5, 1),
                  muted:bool=False,
@@ -54,7 +76,8 @@ class GameObject:
                  on_key_press:list[Callable[[str], None]]=None,
                  on_key_release:list[Callable[[str], None]]=None,
                  on_button:list[tuple[str, Callable[[], None]]]=None,
-                 on_delete:list[Callable[[], None]]=None)->None:
+                 on_delete:list[Callable[[], None]]=None
+                 )->None:
         """Initialize this GameObject.
         
         Parameters
@@ -63,10 +86,14 @@ class GameObject:
             The name of the image to use. If empty, imagetext is used instead.
         imagetext : tuple[str, tuple[int, int, int, int]]
             Only used if imagename is empty. Sets the text of this GameObject.
+        layer : int
+            The layer to draw this GameObject on. May be negative. 
         pos : tuple[int, int], default=(0, 0)
             The position this GameObject should be when initialized
         origin : tuple[float, float], default=(0.5, 1)
             The origin of the position this GameObejct should have
+        muted : bool, default=False
+            Whether or not this GameObject should be muted
         on_mouse_hover : list[Callable[[], None]], default=[]
             Functions to add to the mouse hover event
         on_mouse_down : list[Callable[[], None]], default=[]
@@ -87,6 +114,7 @@ class GameObject:
 
         self._muted = muted
         self._pos = None
+        self.layer = layer
         self.set_pos(pos)
         self.set_origin(origin)
         self._image_name = ""
@@ -216,15 +244,20 @@ class GameObject:
         This function is called each game tick.
         """
 
-    def _mirror(self)->Self:
+    def _mirror(self, mirror:bool)->Self:
         """Mirror this GameObject in the next draw call.
         
+        Parameters
+        ----------
+        mirror : bool
+            Whether or not to mirror this GameObject
+
         Returns
         -------
         GameObject
             self
         """
-        self._mirrored = True
+        self._mirrored = mirror
         return self
     def draw(self)->None:
         """Use internal variables to draw this object.
@@ -240,7 +273,6 @@ class GameObject:
         ImagesDict.draw_image(self._image_name, self._pos,
                               self._origin, self._get_frame(), self._mirrored)
         self._frame += self._frames_per_frame
-        self._mirrored = False
 
     def set_origin (self, origin:tuple[float, float])->Self:
         """Set the origin of this GameObject.

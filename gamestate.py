@@ -1,9 +1,9 @@
 """Contains the GameState class"""
 from typing import Self
+import pygame
 from gameobject import GameObject
 from imagesdict import ImagesDict
-
-TEXT_DEBUG = False
+from config import Config
 
 class GameState:
     """This class represents a state of the game. 
@@ -12,18 +12,50 @@ class GameState:
 
     Attributes
     ----------
+    _gos : list[GameObject], default=[]
+        The list of GameObjects in this GameState. 
+    _gos_draw_order : dict[list[GameObject]] = {}
+        The same list of GameObjects in this GameState put in a dictionary
+        in order to draw them in the correct layer order
+    __go_queue : list[GameObject] = []
+        The list of GameObjects that are queued to be added to the main lists.
+        This is required to prevent events from triggering on newly created GameObjects.
+        When a GameObject triggers additions to a GameState's GameObjects, 
+            they must be added *after* the event actions are all triggered, 
+            or else they themselves will also trigger on the same action event queue items.
     new_state : GameState
         The new state to switch to, if change_state is True
     change_state : bool
         When True, this state is indicating that it wants to be replaced by the next state new_state
-
     """
     def __init__(self)->None:
+        """Initialize the GameState to a safe empty state."""
         self._gos:list[GameObject] = []
+        self._gos_draw_order:dict[list[GameObject]] = {}
         self.__go_queue:list[GameObject] = []
         self.new_state:GameState = None
         self.change_state:bool = False
-
+        self.text_debug = Config.config['Debug']['text'] == 'True'
+        #self._add_game_object(GameObject()).queue_sound(63) # play a sound when going to next state
+        
+        self.music = pygame.mixer.music
+        self.playing = self.music.get_busy()
+        self.music_button = self._add_game_object(GameObject(pos=(60, 60),
+                                                             imagename="musicon" if self.playing else "musicoff",
+                                                             origin=(1, 1),
+                                                             layer=11,
+                                                             on_mouse_up=[self.set_music_button]))
+            
+    
+    def set_music_button (self):
+        """Toggles music and button"""
+        self.playing = not self.playing
+        if self.playing:
+            self.music_button.set_image_name("musicon")
+            self.music.play(-1)
+        else:
+            self.music_button.set_image_name("musicoff")
+            self.music.stop()
 
     def _state_tick(self)->None:
         """Derived classes may override this function. 
@@ -44,7 +76,9 @@ class GameState:
             bg_surface.fill(color)
             ImagesDict.images[name] = {}
             ImagesDict.images[name][0] = bg_surface
-        self._add_game_object(GameObject()).set_image_name(name).set_pos((30, 60))
+        self._add_game_object(GameObject(imagename=name,
+                                         pos=(30, 60),
+                                         layer=-1))
 
     def _main_ui(self, room:str, border:str)->None:
         """This function creates several GameObjects to fill the background.
@@ -53,16 +87,21 @@ class GameState:
         ----------
         room : str
             The name of the background image to use
+        border : str
+            The name of the border image to use
         """
         self._add_game_object(GameObject(imagename="bgwhite",
                                          pos=(30, 30),
-                                         origin=(0.5, 0.5)))
+                                         origin=(0.5, 0.5),
+                                         layer=-2))
         self._add_game_object(GameObject(imagename=room,
                                          pos=(30, 30),
-                                         origin=(0.5, 0.5)))
+                                         origin=(0.5, 0.5),
+                                         layer=-1))
         self._add_game_object(GameObject(imagename=border,
                                          pos=(30, 30),
-                                         origin=(0.5, 0.5)))
+                                         origin=(0.5, 0.5),
+                                         layer=10))
         #self._add_game_object(GameObject()).set_image_name("bgblack2").set_pos((30, 70))
 
     def _set_state (self, new_state:Self)->None:
@@ -97,6 +136,10 @@ class GameState:
         self._state_tick()
 
         self._gos.extend(self.__go_queue)
+        for go in self.__go_queue:
+            if go.layer not in self._gos_draw_order:
+                self._gos_draw_order[go.layer] = []
+            self._gos_draw_order[go.layer].append(go)
         self.__go_queue.clear()
 
         for go in self._gos:
@@ -107,6 +150,11 @@ class GameState:
         for go in self._gos:
             for go2 in go.queued_child_game_objects:
                 go2.tick()
+
+                if go2.layer not in self._gos_draw_order:
+                    self._gos_draw_order[go2.layer] = []
+                self._gos_draw_order[go2.layer].append(go2)
+
             self._gos.extend(go.queued_child_game_objects)
             go.queued_child_game_objects.clear()
 
@@ -115,6 +163,8 @@ class GameState:
             for function in go.on_delete:
                 function()
         self._gos = [go for go in self._gos if not go.deleted]
+        for key in self._gos_draw_order.keys():
+            self._gos_draw_order[key] = [go for go in self._gos_draw_order[key] if not go.deleted]
 
     def handle_sounds(self)->None:
         """Play the queued sounds for the GameObjects"""
@@ -123,8 +173,9 @@ class GameState:
 
     def handle_meshes(self)->None:
         """Draw all GameObjects to the screen."""
-        for go in self._gos:
-            go.draw()
+        for _, layer in sorted(self._gos_draw_order.items()):
+            for go in layer:
+                go.draw()
 
     def handle_mouse_hover (self, pos:tuple[int, int])->None:
         """Handle all GameObjects' mouse hover actions if the cursor is over it
@@ -192,7 +243,7 @@ class GameState:
         """
         for go in self._gos:
             if len(go.on_key_press) > 0:
-                if TEXT_DEBUG:
+                if self.text_debug:
                     print ("handlekeypress:", button)
                 for function in go.on_key_press:
                     function(button)
@@ -200,7 +251,7 @@ class GameState:
             if len(go.on_button) > 0:
                 for buttonname, function in go.on_button:
                     if button == buttonname:
-                        if TEXT_DEBUG:
+                        if self.text_debug:
                             print ("handleButton:", button)
                         function()
 
@@ -214,7 +265,7 @@ class GameState:
         """
         for go in self._gos:
             if len(go.on_key_release) > 0:
-                if TEXT_DEBUG:
+                if self.text_debug:
                     print ("handlekeyrelease:", button)
                 for function in go.on_key_release:
                     function(button)
@@ -225,3 +276,4 @@ class GameState:
             for function in go.on_delete:
                 function()
         self._gos = []
+        self._gos_draw_order = {}
