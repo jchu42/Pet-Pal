@@ -1,10 +1,8 @@
 """This module contains the static class ImagesDict to load all files on game startup for use by the game."""
 from os import listdir
-import pygame
 import traceback
-
-# debug option
-DEBUG = False # put in a config file
+import pygame
+from config import Config
 
 class ImagesDict:
     """This static class holds all of the images on the disk for use by the game.
@@ -24,9 +22,6 @@ class ImagesDict:
     images:dict[list:[pygame.Surface]] = {} # static variable
     surface:pygame.Surface = None
 
-    @staticmethod
-    def __getitem__(name:str)->list[pygame.Surface]:
-        return ImagesDict.images[name]
     @staticmethod
     def draw_image (imagename:str, pos:tuple[int, int], origin:tuple[float, float]|str=(0.5,0.5),
                     frame:int=0, mirrored:bool=False)->None:
@@ -92,12 +87,13 @@ class ImagesDict:
         ----------
         surface : pygame.Surface
             The surface on which to run draw commands on"""
+        debug_images = Config.config['Debug']['images'] == 'True'
         ImagesDict.surface = surface
         files = listdir("images/") # assuming all are files
         #imageDataFile = ""
         for filename in files:
             split_name = filename.split (".")
-            if DEBUG:
+            if debug_images:
                 print (split_name)
             name = split_name[0]
             if len(split_name) == 2:

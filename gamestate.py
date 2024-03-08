@@ -1,10 +1,9 @@
 """Contains the GameState class"""
 from typing import Self
-
+import pygame
 from gameobject import GameObject
 from imagesdict import ImagesDict
-
-TEXT_DEBUG = False
+from config import Config
 
 class GameState:
     """This class represents a state of the game. 
@@ -13,19 +12,50 @@ class GameState:
 
     Attributes
     ----------
+    _gos : list[GameObject], default=[]
+        The list of GameObjects in this GameState. 
+    _gos_draw_order : dict[list[GameObject]] = {}
+        The same list of GameObjects in this GameState put in a dictionary
+        in order to draw them in the correct layer order
+    __go_queue : list[GameObject] = []
+        The list of GameObjects that are queued to be added to the main lists.
+        This is required to prevent events from triggering on newly created GameObjects.
+        When a GameObject triggers additions to a GameState's GameObjects, 
+            they must be added *after* the event actions are all triggered, 
+            or else they themselves will also trigger on the same action event queue items.
     new_state : GameState
         The new state to switch to, if change_state is True
     change_state : bool
         When True, this state is indicating that it wants to be replaced by the next state new_state
-
     """
     def __init__(self)->None:
+        """Initialize the GameState to a safe empty state."""
         self._gos:list[GameObject] = []
         self._gos_draw_order:dict[list[GameObject]] = {}
         self.__go_queue:list[GameObject] = []
         self.new_state:GameState = None
         self.change_state:bool = False
-
+        self.text_debug = Config.config['Debug']['text'] == 'True'
+        #self._add_game_object(GameObject()).queue_sound(63) # play a sound when going to next state
+        
+        self.music = pygame.mixer.music
+        self.playing = self.music.get_busy()
+        self.music_button = self._add_game_object(GameObject(pos=(60, 60),
+                                                             imagename="musicon" if self.playing else "musicoff",
+                                                             origin=(1, 1),
+                                                             layer=11,
+                                                             on_mouse_up=[self.set_music_button]))
+            
+    
+    def set_music_button (self):
+        """Toggles music and button"""
+        self.playing = not self.playing
+        if self.playing:
+            self.music_button.set_image_name("musicon")
+            self.music.play(-1)
+        else:
+            self.music_button.set_image_name("musicoff")
+            self.music.stop()
 
     def _state_tick(self)->None:
         """Derived classes may override this function. 
@@ -57,6 +87,8 @@ class GameState:
         ----------
         room : str
             The name of the background image to use
+        border : str
+            The name of the border image to use
         """
         self._add_game_object(GameObject(imagename="bgwhite",
                                          pos=(30, 30),
@@ -211,7 +243,7 @@ class GameState:
         """
         for go in self._gos:
             if len(go.on_key_press) > 0:
-                if TEXT_DEBUG:
+                if self.text_debug:
                     print ("handlekeypress:", button)
                 for function in go.on_key_press:
                     function(button)
@@ -219,7 +251,7 @@ class GameState:
             if len(go.on_button) > 0:
                 for buttonname, function in go.on_button:
                     if button == buttonname:
-                        if TEXT_DEBUG:
+                        if self.text_debug:
                             print ("handleButton:", button)
                         function()
 
@@ -233,7 +265,7 @@ class GameState:
         """
         for go in self._gos:
             if len(go.on_key_release) > 0:
-                if TEXT_DEBUG:
+                if self.text_debug:
                     print ("handlekeyrelease:", button)
                 for function in go.on_key_release:
                     function(button)
@@ -244,3 +276,4 @@ class GameState:
             for function in go.on_delete:
                 function()
         self._gos = []
+        self._gos_draw_order = {}

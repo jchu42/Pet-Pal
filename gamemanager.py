@@ -1,10 +1,7 @@
 """Contains the GameManager class that represents a blank game"""
 import pygame
 from gamestate import GameState
-
-# frame rate stuff
-
-FILTER_SELECTION = 2
+from config import Config
 
 class GameManager:
     """This class represents a blank game. 
@@ -13,20 +10,22 @@ class GameManager:
 
     Attributes
     ----------
-    scale : int
-        width/height of each pixel
-    screen_pixels : tuple[int, int]
-        screen's actual dimensions
+    __fps : int
+        The FPS to run the game at
+    __scale : int
+        Width/height of each pixel
+    __screen_pixels : tuple[int, int]
+        Screen's actual dimensions
+    __screen : pygame.Surface
+        Actual screen to draw on, preceding drawing the screen filter
     drawing_surface : pygame.Surface
-        pixelated surface for gameobjects to draw themselves on
-    screen : pygame.Surface
-        actual screen to draw on, preceding drawing the screen filter
-    current_state : str
-        string description of the current gamestate the game is in
+        Pixelated surface for gameobjects to draw themselves on
+    __grid_filter : pygame.Surface
+        The screen filter to put on top of the scaled pixel image
+    __clock : pygame.time.Clock
+        Used to llmit the frame rate
     state : GameState
-        the actual current gamestate the game is in
-    states : list[GameState]
-        the list of possible gamestates the game can be in
+        The actual current gamestate the game is in
     """
     def __init__(self, fps: int, scale: int, pixels:tuple[int, int])->None:
         """Initializes the GameManager, setting up the screen and clock
@@ -34,7 +33,7 @@ class GameManager:
         Parameters
         ----------
         fps : int
-            The fps to run the game at
+            The FPS to run the game at
         scale : int
             The size of the pixels to be drawn
         pixels : tuple[int, int]
@@ -50,23 +49,30 @@ class GameManager:
         self.__state:GameState = None
 
     def __generate_grid_surface(self)->pygame.Surface:
-        """Create the screen filter to give the game a retro look"""
+        """Create the screen filter to give the game a retro look
+        
+        Returns
+        -------
+        pygame.Surface
+            The screen filter with the screen's dimensions
+        """
         color = max(255 - (self.__scale - 1) * 50, 0)
         alpha = min((self.__scale - 1) * 20, 255)
         grid_color = (color, color, color, alpha)
         #SRCALPHA to make the initial image all transparent (default is all black)
         grid_filter = pygame.Surface(self.__screen_pixels, pygame.SRCALPHA)
-        if FILTER_SELECTION in (1, 3):
+        filter_selection = int(Config.config['Screen']['filter'])
+        if filter_selection in (1, 3):
             for x in range (0, self.__screen_pixels[0], self.__scale):
                 pygame.draw.line(grid_filter, grid_color, (x, 0), (x, self.__screen_pixels[1]))
             for y in range(0, self.__screen_pixels[1], self.__scale):
                 pygame.draw.line(grid_filter, grid_color, (0, y), (self.__screen_pixels[0], y))
-            if FILTER_SELECTION == 3:
+            if filter_selection == 3:
                 for x in range (0, self.__screen_pixels[0] + 1, self.__scale):
                     for y in range(0, self.__screen_pixels[1] + 1, self.__scale):
                         pygame.draw.polygon (grid_filter, grid_color, 
                                              [(x - 2, y),(x, y - 2), (x + 2, y), (x, y + 2)])
-        if FILTER_SELECTION == 2:
+        if filter_selection == 2:
             grid_filter.fill(grid_color)
             for x in range (int(self.__scale/2), self.__screen_pixels[0], self.__scale):
                 for y in range(int(self.__scale/2), self.__screen_pixels[1], self.__scale):
@@ -85,7 +91,7 @@ class GameManager:
         self.__screen.blit (pygame.transform.scale_by(self.drawing_surface, self.__scale), (0, 0)) 
         # draw filter
         self.__screen.blit(self.__grid_filter, (0, 0))
-        # flip() the display to put your work on screen
+        # flip() the display to put work on screen
         pygame.display.flip()
 
         self.__clock.tick(self.__fps)
@@ -107,10 +113,9 @@ class GameManager:
             The initial GameState class for the game to start with
         """
         self.__state = start
-        # game loop
+
         running = True
         while running:
-            # poll for events
             for event in pygame.event.get():
                 pos = pygame.mouse.get_pos()
                 if pos:

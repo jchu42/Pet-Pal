@@ -6,7 +6,7 @@ from gameobject import GameObject
 from gameobjects.status import Status
 from gameobjects.poop import Poop
 from imagesdict import ImagesDict
-import gameDatabase as db
+from gamedatabase import GameDatabase as db
 from config import Config
 
 class MainPet(GameObject):
@@ -20,12 +20,24 @@ class MainPet(GameObject):
         The user's username for use with the database
     pet_type : str
         The name of the pet, determines the imageset to use
+    poops : list[Poop]
+        The poops this pet owns
+    last_updated : float
+        The last status check of this pet
+    poop_interval : int
+        How often this pet should poop
+    poop_max : int
+        The max number of poops this pet can poop before it DIES
     hunger : int
         The happiness value of the pet
     action : str
         The description of the action the pet is currently performing
-    poops : list[GameObject]
-        The poops the pet has taken
+    _action_value : int
+        Parameter for action
+    _change_action : bool
+        True when this pet's action will change
+    goodbye_forever : bool
+        True when this pet has taken its last breath
     """
     def __init__ (self,
                   username:str,
@@ -38,8 +50,16 @@ class MainPet(GameObject):
 
         Parameters
         ----------
+        username : str
+            The user's username
         pet_type : str
-            The pet selection. Currently available: panda, cat
+            The pet selection. Currently available: panda, cat, pig
+        pet_hunger : int
+            How humgwy this pet is
+        poops : int
+            How many poops this pet has taken
+        last_updated : float
+            The last unix time these stats for the pet were recorded
         """
         # pet selection?
         # idle, happyidle (default to idle if happyidle does not exist), 
@@ -71,7 +91,7 @@ class MainPet(GameObject):
         #self.status = Status()
         #self.add_child_object(self.status)
 
-        self._right = True
+        self._mirrored = True
         self.action = "idle"
         self._action_value = 0
         self._change_action = True
@@ -182,10 +202,10 @@ class MainPet(GameObject):
         elif self.action == "move":
             self.set_image_name(["move", "idle"])
             if self.get_pos()[0] < self._action_value:
-                self._right = True
+                self._mirrored = False
                 self.set_pos ((self.get_pos()[0] + 1, self.get_pos()[1]))
             elif self.get_pos()[0] > self._action_value: 
-                self._right = False
+                self._mirrored = True
                 self.set_pos ((self.get_pos()[0] - 1, self.get_pos()[1]))
             elif self.get_pos()[0] == self._action_value:
                 self._change_action = True
@@ -198,18 +218,24 @@ class MainPet(GameObject):
             elif self.get_pos()[1] == self._action_value:
                 self._change_action = True
 
-        if not self._right:
-            self._mirror()
 
         #self.status.set_happiness(self.happy)
         #self.status.set_hunger(self.hunger)
         #self.status.set_pos((self.get_pos()[0], self.get_pos()[1] - 15))
 
     def _get_num_poops(self)->int:
+        """Get how many poops this pooper has pooped
+        
+        Returns
+        -------
+        int
+            The number of poops
+        """
         self.poops = list(filter(lambda poop: not poop.deleted, self.poops))
         return len(self.poops)
 
     def _make_poop(self)->None:
+        """Makes this pooper make a poop"""
         poop = Poop()
         self.add_child_object(poop)
         self.poops.append (poop)

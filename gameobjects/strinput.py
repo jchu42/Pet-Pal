@@ -14,8 +14,22 @@ class StrInput(GameObject):
     ----------
     text : str
         The text that is currently in this StrInput
+    _color : tuple[int, int, int, int]
+        The color of this StrInputs text
+    _censored : bool
+        Whether or not all input in this StrInput should be *, and all sound sound the same
+    _cursor_frame_cnt : int
+        Used to keep track of how many frames the cursor's current state has been active for
+    _cursor_on : bool
+        Whether or not the cursor is currently active
     char_limit : int
         The maximum number of characters that can be entered into this StrInput
+    _shift_pressed : bool
+        Whether or not the shift button is currently being pressed
+    _backspace_held : bool
+        Whether or not the backspace button us currently being pressed
+    _backspace_duration : int
+        How long the backspace button has been pressed for
     """
     def __init__(self,
                  color:tuple[int, int, int, int]=(0, 0, 0, 255),
@@ -23,7 +37,19 @@ class StrInput(GameObject):
                  censored=False,
                  origin:tuple[float, float]=(0, 1),
                  **wargs)->None:
-        """Initialize the StrInput class"""
+        """Initialize the StrInput class
+        
+        Parameters
+        ----------
+        color : tuple[int, int, int, int], default=(0, 0, 0, 255)
+            The color of the text in this StrInput
+        initial_text : str, default=""
+            The text this StrInput should start with
+        censored : bool, default=False
+            Whether or not all input in this textbox should appear as *, and sound all the same
+        origin : tuple[float, float], default=(0, 1)
+            The origin this StrInput should have
+        """
         GameObject.__init__(self, origin=origin, **wargs)
         self.on_key_press.append(self._handle_key_press)
         self.on_key_release.append(self._handle_key_release)
@@ -222,10 +248,9 @@ class StrInput(GameObject):
                 key_sound = 41
             else:
                 key_sound = 60
-
         self.queue_sound(127 - key_sound, 45)
     def _handle_key_release (self, key:str)->None:
-        """Toggle shift key as off when released
+        """Toggle shift and/or backspace key as off when released
         
         Parameters
         ----------

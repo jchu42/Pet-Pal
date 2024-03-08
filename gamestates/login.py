@@ -1,4 +1,5 @@
 """Contains the Login class"""
+import psycopg2
 from gamestate import GameState
 from gameobject import GameObject
 from gameobjects.strinput import StrInput
@@ -6,18 +7,26 @@ import gamestates.mainmenu as mm
 import gamestates.room as rm
 import gamestates.petselector as ps
 import gamestates.error as err
-import gameDatabase as db
+from gamedatabase import GameDatabase as db
 
 
 # (0, 125, 255, 255) dark blue
 # (127, 209, 255, 255) light blue (main bg colour)
-# (235, 250, 122, 255) yellow 
-# (188, 107, 242, 255) purple 
+# (235, 250, 122, 255) yellow
+# (188, 107, 242, 255) purple
 
 class Login(GameState):
     """This is the login screen state."""
-    def __init__(self, is_register_screen, username="")->None:
-        """Initialize the login screen to the username entry"""
+    def __init__(self, is_register_screen:bool, username:str="")->None:
+        """Initialize the login screen to the username entry
+        
+        Parameters
+        ----------
+        is_register_screen : bool
+            True if this should be a register screen, False if this should be a login screen
+        username : str, default=""
+            The previously entered username, if any.
+        """
         GameState.__init__(self)
         self.is_register_screen = is_register_screen
 
@@ -93,10 +102,10 @@ class Login(GameState):
         if self.is_register_screen:
             if (self.username.get_text() == "" or self.password.get_text() == ""):
                 self._set_state(err.Error("Error", ["Please enter a", "username and", "password"], Login(True)))
-            if db.get_pet (self.username.get_text(), db.USERNAME) is None:
+            try:
                 db.add_user(self.username.get_text(), self.password.get_text())
                 self._set_state(ps.PetSelector(self.username.get_text()))
-            else:
+            except psycopg2.DatabaseError:
                 self._set_state(err.Error("Error", ["Username", "already exists!"], Login(True)))
         else:
             if (self.username.get_text() == "" or self.password.get_text() == ""):

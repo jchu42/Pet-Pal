@@ -10,7 +10,8 @@ class Poop(GameObject):
 
     Attributes
     ----------
-    
+    __animate_poop_pop : bool
+        True to start the poop pop animation
     """
     def __init__ (self, layer:int=1, **wargs)->None:
         """Poop the poop"""

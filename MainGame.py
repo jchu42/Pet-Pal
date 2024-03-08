@@ -1,13 +1,8 @@
 """This module contains the code to run the game itself
 
-TODO:
-- database stuff
-
 
 rejection tone
     pitch 35, instrument 6, volume 100
-poopy sound
-    20/25, 7, 100
 
     
 happiness icon = fullness - poops
@@ -53,6 +48,9 @@ def main() -> int:
     pygame.init()
     pygame.midi.init()
     GameObject.midi_out = pygame.midi.Output(pygame.midi.get_default_output_id())
+    pygame.mixer.music.load('Sakura-Girl-Lucky-Day.wav')
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_volume(0.1)
 
     # startup screen manager
     gm = GameManager(fps, scale, PIXELS)
