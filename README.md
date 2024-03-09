@@ -6,9 +6,11 @@
 ## 2. Installation
     - Dependencies: pygame, psycopg2
     - Installation Instructions: 
-        1. "pip i pygame"
-        2. "pip i psycopg2"
-        3. "python MainGame.py" to run the game!
+        1. download and extract zip, or clone the git repository
+        2. "cd" to the folder with MainGame.py, or open the project folder in the terminal
+        3. "pip i pygame"
+        4. "pip i psycopg2"
+        5. "python MainGame.py" to run the game!
 ## 3. Usage
     - Examples: 
         run "python MainGame.py" to run the game
