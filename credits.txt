@@ -1,0 +1,13 @@
+room.jpg    https://openverse.org/image/26ec49b0-b14c-43ce-a576-2eabcdc25895?q=room
+kitchen.jpg https://openverse.org/image/aa5e1438-076b-48d5-8585-f40845376704?q=kitchen
+room2.jpg   https://openverse.org/image/1bdd859b-81a3-4b4d-baa8-efd817ae86f4?q=room
+panda       https://www.patreon.com/posts/red-panda-98152976
+cat         https://www.patreon.com/posts/cat-sprites-40356299
+borders     https://bdragon1727.itch.io/border-and-panels-menu-part-3
+
+numpy docstrings convention https://numpydoc.readthedocs.io/en/latest/format.html
+
+Lucky Day by Sakura Girl | https://soundcloud.com/sakuragirl_official
+Music promoted by https://www.chosic.com/free-music/all/
+Creative Commons CC BY 3.0
+https://creativecommons.org/licenses/by/3.0/
