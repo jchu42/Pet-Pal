@@ -4,7 +4,10 @@
     - Title: Pet Pal
     - Description: Take care of a pet! Make sure the room doesn't get too filled with poop. Click poop to make it disappear. 
 ## 2. Installation
-    - Dependencies: pygame, psycopg2
+    - Dependencies: 
+        - python 3.11
+        - pygame
+        - psycopg2
     - Installation Instructions: 
         1. download and extract zip, or clone the git repository
         2. "cd" to the folder with MainGame.py, or open the project folder in the terminal
@@ -90,6 +93,8 @@
     - Troubleshooting: 
         Q: "I think I messed up when editing the config.ini file, the game crashes now"
             A: Run python config.py to reset the config.ini file to its default. 
+        Q: "I'm getting a "could not import Self from typing" error"
+            A: Ensure your version of Python is at least 3.11
     - Roadmap: 
         - Food & Fullness
         - General graphics improvements
