@@ -93,6 +93,8 @@
     - Troubleshooting: 
         Q: "I think I messed up when editing the config.ini file, the game crashes now"
             A: Run python config.py to reset the config.ini file to its default. 
+        Q: "I'm getting some kind of file-related error, or a config key error"
+            A: Make sure you're running the game from the correct folder. 
         Q: "I'm getting a "could not import Self from typing" error"
             A: Ensure your version of Python is at least 3.11
     - Roadmap: 
