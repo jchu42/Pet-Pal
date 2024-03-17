@@ -3,6 +3,7 @@ To reset the database, run this module."""
 
 import psycopg2
 import exceptions as err
+from config import Config
 
 class GameDatabase:
     """Contains functions to interact with the database"""
@@ -29,11 +30,11 @@ class GameDatabase:
         pycopg2.DatabaseError
             Raised when the command fails to run
         """
-        with psycopg2.connect(database='game_data',
-                            user='btran37',
-                            password='tk6cqTyGZK4I',
-                            host='ep-soft-breeze-a5w3y270.us-east-2.aws.neon.tech',
-                            port= '5432'
+        with psycopg2.connect(database=Config.config['Database']['database'],
+                            user=Config.config['Database']['user'],
+                            password=Config.config['Database']['password'],
+                            host=Config.config['Database']['host'],
+                            port= Config.config['Database']['port']
                             ) as con:
             cursor_obj = con.cursor()
 
@@ -93,12 +94,12 @@ class GameDatabase:
     FIELD_OPTIONS = (USERNAME, PET_TYPE, ROOM_TYPE, BORDER_TYPE, PET_HUNGER, POOPS, LAST_UPDATED)
 
     @staticmethod
-    def get_pet(username, fields:tuple)->tuple:
+    def get_pet(username, fields:tuple|str)->tuple:
         """Get the selected fields from the database with the given username
         
         Parameters
         ----------
-        fields : tuple
+        fields : tuple|str
             The fields to get from the database
             options: pet_Type, room_Type, border_type, pet_hunger, poops, last_updated
 
@@ -169,6 +170,7 @@ class GameDatabase:
 
 
 if __name__ == '__main__':
+    Config.load_config()
     GameDatabase.run_command("""DROP TABLE users""")
 
     GameDatabase.run_command ("""CREATE TABLE users (
@@ -181,4 +183,4 @@ if __name__ == '__main__':
                               poops INT,
                               last_updated FLOAT(53)
                               )""")
-    print ("Table created.")
+    print ("Table reset.")

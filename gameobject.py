@@ -85,7 +85,8 @@ class GameObject:
         imagename : str, default=""
             The name of the image to use. If empty, imagetext is used instead.
         imagetext : tuple[str, tuple[int, int, int, int]]
-            Only used if imagename is empty. Sets the text of this GameObject.
+            Only used if imagename is empty. 
+            Sets the text to str, and the color of the text to the tuple (rgba).
         layer : int
             The layer to draw this GameObject on. May be negative. 
         pos : tuple[int, int], default=(0, 0)

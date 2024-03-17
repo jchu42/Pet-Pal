@@ -18,6 +18,11 @@ class Config:
         Config.config['Screen'] = {'fps' : '5', 'scale' : '5', 'filter' : '2'}
         Config.config['Poop'] = {'interval' : 10, 'max' : 5}
         Config.config['Debug'] = {'text' : False, 'images':False}
+        Config.config['Database'] = {'database': '',
+                                     'user': '',
+                                     'password': '',
+                                     'host': '',
+                                     'port': ''}
         with open('config.ini', 'w', encoding="utf8") as configfile:
             Config.config.write(configfile)
 

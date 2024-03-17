@@ -37,7 +37,7 @@ class Poop(GameObject):
         self.set_frames_per_frame(1)
 
     def tick(self)->None:
-        """Animate when being deletd, delete when done"""
+        """Animate when being deleted, delete when done"""
         if self.__animate_poop_pop:
             if self._frame == self._num_frames() - 1:
                 self.set_deleted()
